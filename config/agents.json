@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "notice": "All shipped entries are demo fixtures. Replace with deployed BSC endpoints and evidence before submission.",
+  "agents": [
+    {
+      "agent_id": "lp-guardian-demo",
+      "name": "LP Guardian",
+      "category": "rebalancing",
+      "description": "Explainable PancakeSwap liquidity range monitoring and bounded rebalancing recommendation.",
+      "endpoint": "{PUBLIC_BASE_URL}/api/agents/lp-guardian-demo",
+      "chain_id": 97,
+      "owner": "0x0000000000000000000000000000000000000000",
+      "contract_address": null,
+      "live_bsc": false,
+      "version": "0.1.0",
+      "tags": [
+        "pancakeswap",
+        "range",
+        "simulation",
+        "demo"
+      ],
+      "metrics": {
+        "identity": 55,
+        "execution_reliability": 70,
+        "track_record": 25,
+        "risk": 82,
+        "cost": 78,
+        "benchmark_advantage": 72,
+        "freshness": 80,
+        "category_metrics": {
+          "net_apr": 18.4,
+          "in_range_ratio": 0.88,
+          "rebalance_count": 12,
+          "fee_earned_usd": 324.5,
+          "impermanent_loss_pct": -2.1,
+          "max_drawdown_pct": -3.4,
+          "average_execution_cost_usd": 0.22
+        }
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-lp-demo-1",
+          "level": 0,
+          "source": "demo_fixture",
+          "kind": "benchmark_fixture",
+          "summary": "Synthetic demonstration record; not live BSC evidence."
+        }
+      ]
+    },
+    {
+      "agent_id": "grid-sentinel-demo",
+      "name": "Grid Sentinel",
+      "category": "grid_trading",
+      "description": "Risk-bounded grid proposal and execution monitor with explicit turnover and drawdown metrics.",
+      "endpoint": "{PUBLIC_BASE_URL}/api/agents/grid-sentinel-demo",
+      "chain_id": 97,
+      "owner": "0x0000000000000000000000000000000000000000",
+      "contract_address": null,
+      "live_bsc": false,
+      "version": "0.1.0",
+      "tags": [
+        "grid",
+        "risk",
+        "demo"
+      ],
+      "metrics": {
+        "identity": 50,
+        "execution_reliability": 66,
+        "track_record": 22,
+        "risk": 76,
+        "cost": 73,
+        "benchmark_advantage": 68,
+        "freshness": 75,
+        "category_metrics": {
+          "return_7d_pct": 1.8,
+          "return_30d_pct": 5.6,
+          "win_rate": 0.61,
+          "max_drawdown_pct": -4.9,
+          "trades": 87,
+          "average_slippage_bps": 21,
+          "turnover_usd": 42850,
+          "track_record_days": 30
+        }
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-grid-demo-1",
+          "level": 0,
+          "source": "demo_fixture",
+          "kind": "benchmark_fixture",
+          "summary": "Synthetic demonstration record; not live BSC evidence."
+        }
+      ]
+    },
+    {
+      "agent_id": "yield-scout-demo",
+      "name": "Yield Scout",
+      "category": "yield_optimisation",
+      "description": "Compares net yield, stability, liquidity and protocol exposure before suggesting reallocations.",
+      "endpoint": "{PUBLIC_BASE_URL}/api/agents/yield-scout-demo",
+      "chain_id": 97,
+      "owner": "0x0000000000000000000000000000000000000000",
+      "contract_address": null,
+      "live_bsc": false,
+      "version": "0.1.0",
+      "tags": [
+        "yield",
+        "venus",
+        "lista",
+        "pancakeswap",
+        "demo"
+      ],
+      "metrics": {
+        "identity": 50,
+        "execution_reliability": 68,
+        "track_record": 20,
+        "risk": 80,
+        "cost": 76,
+        "benchmark_advantage": 75,
+        "freshness": 82,
+        "category_metrics": {
+          "net_apy": 11.2,
+          "yield_stability": 0.79,
+          "protocol_exposure_count": 3,
+          "reallocation_cost_usd": 0.31,
+          "tvl_context_usd": 125000000,
+          "risk_tier": "moderate"
+        }
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-yield-demo-1",
+          "level": 0,
+          "source": "demo_fixture",
+          "kind": "benchmark_fixture",
+          "summary": "Synthetic demonstration record; not live BSC evidence."
+        }
+      ]
+    },
+    {
+      "agent_id": "hf-shield-demo",
+      "name": "HF Shield",
+      "category": "health_factor_monitoring",
+      "description": "Monitors lending health factor and prepares bounded repay/collateral responses.",
+      "endpoint": "{PUBLIC_BASE_URL}/api/agents/hf-shield-demo",
+      "chain_id": 97,
+      "owner": "0x0000000000000000000000000000000000000000",
+      "contract_address": null,
+      "live_bsc": false,
+      "version": "0.1.0",
+      "tags": [
+        "venus",
+        "lending",
+        "health-factor",
+        "demo"
+      ],
+      "metrics": {
+        "identity": 52,
+        "execution_reliability": 72,
+        "track_record": 24,
+        "risk": 87,
+        "cost": 74,
+        "benchmark_advantage": 82,
+        "freshness": 84,
+        "category_metrics": {
+          "minimum_health_factor": 1.31,
+          "alert_latency_seconds": 11,
+          "response_latency_seconds": 43,
+          "uptime_pct": 99.2,
+          "failed_actions": 1,
+          "liquidations_prevented": 4,
+          "capital_used_usd": 2100
+        }
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-hf-demo-1",
+          "level": 0,
+          "source": "demo_fixture",
+          "kind": "benchmark_fixture",
+          "summary": "Synthetic demonstration record; not live BSC evidence."
+        }
+      ]
+    }
+  ]
+}

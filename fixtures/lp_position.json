@@ -1,0 +1,15 @@
+{
+  "source": "demo_fixture",
+  "warning": "Replace with timestamped PancakeSwap onchain data before submission.",
+  "position": {
+    "current_price": 610.0,
+    "lower_price": 560.0,
+    "upper_price": 620.0,
+    "realized_volatility_30d": 0.48,
+    "fee_apr": 0.21,
+    "liquidity_usd": 2800000,
+    "estimated_rebalance_cost_usd": 0.42,
+    "uncollected_fees_usd": 0.31
+  },
+  "notional_usd": 5000
+}

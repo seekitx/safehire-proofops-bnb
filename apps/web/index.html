@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="SafeHire helps users compare, verify, limit and hire BNB Chain DeFi agents." />
+  <link rel="icon" href="data:," />
+  <title>SafeHire · ProofOps for BNB Chain</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="page-glow"></div>
+  <header class="nav shell">
+    <a class="brand" href="/" aria-label="SafeHire home">
+      <span class="mark">S</span>
+      <span>SafeHire</span>
+      <small>ProofOps</small>
+    </a>
+    <div class="nav-actions">
+      <div class="network-pill"><span class="dot" id="networkDot"></span><span id="networkLabel">Checking BSC…</span></div>
+      <button class="button secondary compact" id="walletButton" type="button">Connect wallet</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div>
+        <div class="eyebrow">THE TRUST LAYER FOR AGENTIC FINANCE</div>
+        <h1>Hire the outcome.<br/><span>Limit the downside.</span></h1>
+        <p>Compare job-specific proof, run a deterministic preview, set exactly what an agent may spend, and keep a verifiable receipt for every action.</p>
+        <div class="hero-actions">
+          <a class="button" href="#marketplace">Explore agents</a>
+          <a class="text-link" href="#hire-console">See the hiring flow <span>↘</span></a>
+        </div>
+      </div>
+      <aside class="trust-card">
+        <div class="trust-head"><span>Permission envelope</span><span class="live-chip">USER CONTROLLED</span></div>
+        <div class="permission-ring"><div><strong>$100</strong><small>single action cap</small></div></div>
+        <div class="trust-rows">
+          <div><span>Allowed methods</span><strong>1 / 10</strong></div>
+          <div><span>Approval</span><strong>Required</strong></div>
+          <div><span>Expiry</span><strong>60 min</strong></div>
+          <div><span>Revoke</span><strong>Any time</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="shell status-grid" aria-label="System status">
+      <article><label>Runtime</label><strong id="runtimeStatus">Checking…</strong><small>Plugin lifecycle and execution mode</small></article>
+      <article><label>BSC source</label><strong id="chainStatus">Checking…</strong><small id="chainMeta">Live JSON-RPC confirmation</small></article>
+      <article><label>Evidence ledger</label><strong id="ledgerStatus">Checking…</strong><small>Append-only hash-chain integrity</small></article>
+      <article><label>Submission gate</label><strong id="gateStatus">Checking…</strong><small>Fails closed until real evidence exists</small></article>
+    </section>
+
+    <section class="market-section shell" id="marketplace">
+      <div class="section-head">
+        <div><div class="eyebrow">DISCOVER</div><h2>Purpose-built agents, comparable proof.</h2></div>
+        <p>Each category keeps its own decision metrics. AgentProof adds a shared evidence ceiling without pretending unlike strategies are identical.</p>
+      </div>
+      <div class="tabs" id="categories" role="tablist"></div>
+      <div class="agent-grid" id="agents" aria-live="polite"></div>
+      <div class="compare-bar hidden" id="compareBar">
+        <span><strong id="compareCount">0</strong> selected · choose 2 or 3</span>
+        <button class="button compact" id="compareButton" type="button" disabled>Compare proof</button>
+      </div>
+    </section>
+
+    <section class="shell panel hidden" id="comparePanel">
+      <div class="panel-head"><div><div class="eyebrow">SIDE BY SIDE</div><h2>Evidence before reputation.</h2></div><button class="icon-button" id="closeCompare" type="button" aria-label="Close comparison">×</button></div>
+      <div class="comparison" id="comparison"></div>
+    </section>
+
+    <section class="hire-section" id="hire-console">
+      <div class="shell">
+        <div class="section-head inverse">
+          <div><div class="eyebrow">HIRE SAFELY</div><h2>One visible path. No hidden authority.</h2></div>
+          <p>SafeHire previews the job first. The wallet signature only opens your control session; a separate approval is still required before execution.</p>
+        </div>
+
+        <div class="console-layout">
+          <ol class="steps" id="steps">
+            <li class="active"><span>01</span><div><strong>Select</strong><small>Choose a specialist</small></div></li>
+            <li><span>02</span><div><strong>Verify</strong><small>Sign in with wallet</small></div></li>
+            <li><span>03</span><div><strong>Limit</strong><small>Set scope and budget</small></div></li>
+            <li><span>04</span><div><strong>Execute</strong><small>Approve, receipt, revoke</small></div></li>
+          </ol>
+
+          <div class="console-card">
+            <div class="console-agent" id="consoleAgent">
+              <span class="agent-symbol">—</span>
+              <div><small>Selected agent</small><strong>Choose an agent above</strong><p>The example input and permission form will appear here.</p></div>
+              <span class="proof-pill">No selection</span>
+            </div>
+
+            <div class="console-grid">
+              <section>
+                <div class="form-title"><span>Task input</span><button class="text-button" id="resetExample" type="button">Reset example</button></div>
+                <textarea id="taskInput" rows="15" spellcheck="false" aria-label="Agent task JSON" disabled>{}</textarea>
+                <button class="button secondary full" id="previewButton" type="button" disabled>Run deterministic preview</button>
+              </section>
+
+              <section class="limits-form">
+                <div class="form-title"><span>Permission limits</span><span class="safe-label">FAIL-CLOSED</span></div>
+                <label>Owner wallet<input id="ownerAddress" readonly placeholder="Connect wallet first" /></label>
+                <div class="field-row">
+                  <label>Single action cap<input id="maxValue" type="number" min="1" max="100000" value="100" /></label>
+                  <label>Daily cap<input id="dailyValue" type="number" min="1" max="500000" value="300" /></label>
+                </div>
+                <div class="field-row">
+                  <label>Max slippage (bps)<input id="slippage" type="number" min="0" max="500" value="100" /></label>
+                  <label>Expires in minutes<input id="ttl" type="number" min="1" max="1440" value="60" /></label>
+                </div>
+                <label>Allowed target<input id="allowedTarget" placeholder="Agent endpoint or contract" /></label>
+                <label>Allowed method<input id="allowedMethod" value="invoke" /></label>
+                <div class="approval-row"><span>Human approval before execution</span><strong>Always on</strong></div>
+                <button class="button full" id="hireButton" type="button" disabled>Create permission &amp; hire</button>
+              </section>
+            </div>
+
+            <div class="workflow hidden" id="workflowPanel">
+              <div class="workflow-head"><div><small>Current task</small><strong id="taskIdentifier">—</strong></div><span class="state-chip" id="taskState">—</span></div>
+              <div class="result-grid">
+                <div><span>Agent decision</span><strong id="decisionValue">—</strong></div>
+                <div><span>Confidence</span><strong id="confidenceValue">—</strong></div>
+                <div><span>Policy expiry</span><strong id="expiryValue">—</strong></div>
+                <div><span>Evidence source</span><strong id="sourceValue">—</strong></div>
+              </div>
+              <pre class="result" id="taskResult"></pre>
+              <div class="workflow-actions">
+                <button class="button" id="approveButton" type="button">Approve task</button>
+                <button class="button" id="executeButton" type="button" disabled>Execute approved task</button>
+                <button class="button danger" id="revokeButton" type="button">Revoke permission</button>
+              </div>
+              <p class="fine-print" id="executionNote">Demo receipts are visibly labeled and never count as live BSC evidence.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence-section shell">
+      <div class="section-head">
+        <div><div class="eyebrow">PROVE THE ADVANTAGE</div><h2>Designed for the TermiX report.</h2></div>
+        <p>Every real benchmark keeps agent output, manual output, time, cost and quality together—so the advantage can be inspected instead of asserted.</p>
+      </div>
+      <div class="evidence-grid">
+        <article><span>01</span><strong>Same task, two paths</strong><p>Run the identical brief through a hired agent and a documented manual workflow.</p></article>
+        <article><span>02</span><strong>Raw outputs attached</strong><p>No summary-only evidence. Preserve timestamps, costs, inputs and complete responses.</p></article>
+        <article><span>03</span><strong>Independent quality rubric</strong><p>Score correctness, completeness, risk awareness, actionability and evidence.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <footer class="shell"><span>SafeHire · ProofOps for BNB Chain</span><span>Testnet-first · No profit guarantee · Mainnet disabled by default</span></footer>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

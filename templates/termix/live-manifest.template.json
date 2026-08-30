@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "tasks": [
+    {
+      "task_id": "replace-with-real-task-1",
+      "category": "rebalancing",
+      "prompt_path": "evidence/termix/raw/task-1/prompt.txt",
+      "agent": {
+        "output_path": "evidence/termix/raw/task-1/agent-output.json",
+        "started_at": "2026-08-30T10:00:00+08:00",
+        "finished_at": "2026-08-30T10:01:00+08:00",
+        "cost_usd": 0.01,
+        "tooling": "SafeHire callable agent"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/task-1/manual-output.md",
+        "started_at": "2026-08-30T10:05:00+08:00",
+        "finished_at": "2026-08-30T10:15:00+08:00",
+        "cost_usd": 0,
+        "tooling": "documented browser and calculator workflow"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        },
+        "manual": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        }
+      },
+      "reviewer": "replace-with-independent-reviewer"
+    }
+  ]
+}

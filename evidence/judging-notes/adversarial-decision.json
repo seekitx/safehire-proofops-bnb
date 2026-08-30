@@ -1,0 +1,108 @@
+{
+  "accepted": true,
+  "average_score": 92.0,
+  "vetoes": [],
+  "arguments": [
+    {
+      "role": "bnb_main_judge",
+      "score": 92,
+      "verdict": "Strong BNB-native trust layer",
+      "strengths": [
+        "Clear problem and short path",
+        "Sponsor integrations sit on the critical path"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "termix_sponsor_judge",
+      "score": 90,
+      "verdict": "Benchmarkable agent advantage",
+      "strengths": [
+        "Time, cost and quality can be measured",
+        "High-risk financial tasks are explicit"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "pancake_defi_reviewer",
+      "score": 88,
+      "verdict": "One LP workflow is deeper than many logos",
+      "strengths": [
+        "Explainable range policy",
+        "Cost-aware simulation before execution"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "security_red_team",
+      "score": 95,
+      "verdict": "Fail closed with independent execution authority",
+      "strengths": [
+        "LLM is advisory",
+        "Revocation and idempotency are explicit"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "system_architect",
+      "score": 91,
+      "verdict": "Bounded plugin architecture",
+      "strengths": [
+        "Capabilities are replaceable",
+        "Execution boundary remains deterministic"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "solo_builder_schedule_attacker",
+      "score": 92,
+      "verdict": "Scope is survivable for one fast builder",
+      "strengths": [
+        "One deep LP feature",
+        "Optional integrations can be deferred"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    },
+    {
+      "role": "evidence_auditor",
+      "score": 96,
+      "verdict": "Evidence can be independently inspected",
+      "strengths": [
+        "Append-only trace",
+        "Source labels prevent demo/live confusion"
+      ],
+      "attacks": [],
+      "required_changes": [],
+      "veto": false
+    }
+  ],
+  "non_negotiables": [
+    "One complete product; no second submission for the same team.",
+    "Four categories have category-specific metrics and callable endpoints.",
+    "AgentProof is deterministic and evidence-capped.",
+    "At least one reproducible real BSC transaction before submission.",
+    "AI cannot bypass simulation, policy, permission or human approval.",
+    "Fixtures are visually and machine-readably labeled.",
+    "Three raw manual-vs-agent benchmark reports are included."
+  ],
+  "deferred": [
+    "General-purpose AI chat",
+    "Multi-chain expansion",
+    "Complex microservice split",
+    "Mainnet unattended execution",
+    "Altana integration if it blocks cash-prize paths for more than half a day",
+    "Advanced ML price prediction"
+  ]
+}

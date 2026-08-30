@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "chain_id": 97,
+  "network": "bsc-testnet",
+  "deployer": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "observed_at": "2026-08-30T13:23:45.311Z",
+  "contracts": {
+    "AgentRegistry": {
+      "address": "0x3be589f3ad22b602ba28b8c6fbffbb1e1d8c5feb",
+      "deployment_tx_hash": "0x7d6efaf3e1b7f529e16d0aacfe283614df70b25ccf7bc923a5673db850b3bdee",
+      "block_number": 128110037,
+      "gas_used": "625166",
+      "runtime_code_bytes": 2648
+    },
+    "EvidenceAnchor": {
+      "address": "0x84e70cdc1ebf90c549c507332671993a756c10dd",
+      "deployment_tx_hash": "0x05e8c6742f2ce9198f82682d31a2b35d88952b65f416358bf7e8de5b6dd6a618",
+      "block_number": 128110287,
+      "gas_used": "221617",
+      "runtime_code_bytes": 781
+    },
+    "ScopedExecutionPolicy": {
+      "address": "0x5f43004c5662d8013ccdb1bda8010900cc714ab5",
+      "deployment_tx_hash": "0xc00c52f8cd98cb82d52584157d3ae34961fe4f60a0f1424fc454cb80d02a4687",
+      "block_number": 128110492,
+      "gas_used": "474260",
+      "runtime_code_bytes": 1655
+    }
+  },
+  "agent_wallet_funding": {
+    "to": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+    "value_wei": "50000000000000000",
+    "tx_hash": "0xee058963b4d5a059811dd11d6474887ba552237ca77c15f578e3c99e638e4c08",
+    "block_number": 128064765,
+    "gas_used": "21000"
+  },
+  "scoped_policy": {
+    "owner": "0xE144264e2B71EC885cb10A10c6881b45fDf54F5F",
+    "executor": "0xE144264e2B71EC885cb10A10c6881b45fDf54F5F",
+    "allowed_targets": [
+      "0x3BE589F3ad22B602Ba28b8c6FBffBb1e1d8c5FEB"
+    ],
+    "allowed_selectors": [
+      "0xe3da861e"
+    ],
+    "selector_signature": "register(bytes32,uint8,string,bytes32)",
+    "max_value_per_call_wei": "0",
+    "max_total_value_wei": "0",
+    "expires_at": 1788700929,
+    "require_human_approval": true,
+    "revocable": true,
+    "revoked_at_verification": false
+  },
+  "verification": {
+    "rpc_chain_id": 97,
+    "all_receipts_successful": true,
+    "all_contracts_have_runtime_code": true,
+    "seller_balance_tbnb": "0.05",
+    "verified_at": "2026-08-30T13:25:00Z"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "benchmark_id": "termix-yield-compare-v1",
+  "task_name": "Yield Opportunity Comparison",
+  "input": {
+    "asset": "USDT",
+    "amount_usd": 10000,
+    "candidates": [
+      {
+        "protocol": "PancakeSwap",
+        "net_apy": 10.8,
+        "tvl_usd": 125000000,
+        "risk": 42
+      },
+      {
+        "protocol": "Venus",
+        "net_apy": 7.9,
+        "tvl_usd": 240000000,
+        "risk": 28
+      },
+      {
+        "protocol": "Lista",
+        "net_apy": 9.2,
+        "tvl_usd": 85000000,
+        "risk": 35
+      }
+    ]
+  },
+  "manual": {
+    "output": {
+      "selected": "Venus",
+      "reason": "lower modelled risk despite lower APY",
+      "reviewed_protocols": 3,
+      "warning": "rates are variable"
+    },
+    "elapsed_ms": 1080000.001,
+    "estimated_cost_usd": 1.8,
+    "rubric": {
+      "correctness": 80,
+      "completeness": 73,
+      "risk_awareness": 85,
+      "actionability": 72,
+      "evidence": 60,
+      "total": 76.4
+    }
+  },
+  "agent": {
+    "output": {
+      "ranked": [
+        {
+          "protocol": "Venus",
+          "net_apy": 7.9,
+          "tvl_usd": 240000000,
+          "risk": 28
+        },
+        {
+          "protocol": "Lista",
+          "net_apy": 9.2,
+          "tvl_usd": 85000000,
+          "risk": 35
+        },
+        {
+          "protocol": "PancakeSwap",
+          "net_apy": 10.8,
+          "tvl_usd": 125000000,
+          "risk": 42
+        }
+      ],
+      "selected": "Venus",
+      "formula": "0.65 * net_apy + 0.35 * inverse_risk",
+      "warnings": [
+        "variable rates",
+        "smart contract risk",
+        "liquidity can change"
+      ],
+      "action": "simulate before reallocation"
+    },
+    "elapsed_ms": 0.006,
+    "estimated_cost_usd": 0.006,
+    "rubric": {
+      "correctness": 89,
+      "completeness": 93,
+      "risk_awareness": 91,
+      "actionability": 87,
+      "evidence": 82,
+      "total": 89.2
+    }
+  },
+  "advantage": {
+    "time_saved_ms": 1079999.995,
+    "quality_delta": 12.8,
+    "incremental_cost_usd": -1.794
+  },
+  "limitations": [
+    "Candidate rates are labeled fixtures in this package.",
+    "Risk score is a transparent heuristic, not an audit or financial advice.",
+    "Submission must replace fixtures with timestamped live sources."
+  ]
+}

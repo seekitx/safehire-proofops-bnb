@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "design_note": "Capabilities are replaceable plugins. No LLM/provider plugin owns transaction authority.",
+  "plugins": [
+    {
+      "plugin_id": "evidence-ledger",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.evidence:EvidencePlugin",
+      "provides": [
+        "evidence.ledger"
+      ],
+      "requires": [],
+      "critical": true,
+      "config": {}
+    },
+    {
+      "plugin_id": "agent-registry",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.agent_registry:AgentRegistryPlugin",
+      "provides": [
+        "agents.registry"
+      ],
+      "requires": [
+        "evidence.ledger"
+      ],
+      "critical": true,
+      "config": {
+        "path": "config/agents.json"
+      }
+    },
+    {
+      "plugin_id": "agent-proof",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.agent_proof:AgentProofPlugin",
+      "provides": [
+        "agents.proof"
+      ],
+      "requires": [
+        "evidence.ledger"
+      ],
+      "critical": true,
+      "config": {}
+    },
+    {
+      "plugin_id": "lp-guardian",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.lp_guardian:LpGuardianPlugin",
+      "provides": [
+        "pancake.lp_guardian"
+      ],
+      "requires": [
+        "evidence.ledger"
+      ],
+      "critical": true,
+      "config": {
+        "safety_multiple": 2.0,
+        "horizon_days": 7
+      }
+    },
+    {
+      "plugin_id": "benchmark",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.benchmark:BenchmarkPlugin",
+      "provides": [
+        "benchmark.runner"
+      ],
+      "requires": [
+        "evidence.ledger",
+        "pancake.lp_guardian"
+      ],
+      "critical": true,
+      "config": {}
+    },
+    {
+      "plugin_id": "adversarial-council",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.adversarial:AdversarialCouncilPlugin",
+      "provides": [
+        "design.council"
+      ],
+      "requires": [
+        "evidence.ledger"
+      ],
+      "optional_requires": [
+        "llm.provider"
+      ],
+      "critical": false,
+      "config": {
+        "security_veto": true,
+        "evidence_veto": true
+      }
+    },
+    {
+      "plugin_id": "deepseek-provider",
+      "version": "0.1.0",
+      "entrypoint": "proofops.plugins.deepseek_provider:DeepSeekProviderPlugin",
+      "provides": [
+        "llm.provider"
+      ],
+      "requires": [],
+      "critical": false,
+      "enabled": false,
+      "config": {
+        "model": "deepseek-chat",
+        "timeout_seconds": 20
+      }
+    }
+  ]
+}

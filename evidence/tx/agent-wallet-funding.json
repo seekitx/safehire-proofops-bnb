@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "source": "testnet_evidence",
+  "label": "agent-wallet-funding",
+  "chain_id": 97,
+  "tx_hash": "0xee058963b4d5a059811dd11d6474887ba552237ca77c15f578e3c99e638e4c08",
+  "successful": true,
+  "explorer_url": "https://testnet.bscscan.com/tx/0xee058963b4d5a059811dd11d6474887ba552237ca77c15f578e3c99e638e4c08",
+  "from": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "to": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+  "value_wei": "50000000000000000",
+  "value_tbnb": "0.05",
+  "block_number": 128064765,
+  "gas_used": "21000",
+  "observed_at": "2026-08-30T13:23:45.311Z",
+  "trust_boundary": "Receipt and recipient balance were independently re-read from a BSC Testnet JSON-RPC provider. This transfer funds the Agent signer; it is not the 0.1 U ERC-8183 hiring payment."
+}

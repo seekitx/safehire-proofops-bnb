@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>SafeHire · BSC Testnet deployment</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/assets/deploy-testnet.css" />
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>TESTNET DEPLOY</small></a>
+    <div class="network-pill"><span class="dot" id="deployDot"></span><span id="deployNetwork">Wallet not connected</span></div>
+  </header>
+
+  <main class="deploy-shell shell">
+    <section class="deploy-hero">
+      <div class="eyebrow">BSC TESTNET ONLY</div>
+      <h1>Deploy proof contracts without exposing your wallet key.</h1>
+      <p>This page asks the Chrome wallet to create three contracts. Each transaction needs a separate wallet confirmation. It spends only testnet BNB gas—no U, USDT or USDC.</p>
+    </section>
+
+    <section class="deploy-warning">
+      <strong>What will be created</strong>
+      <ul>
+        <li>AgentRegistry: commits Agent endpoint and metadata hashes.</li>
+        <li>EvidenceAnchor: anchors the evidence-ledger root.</li>
+        <li>ScopedExecutionPolicy: allows only AgentRegistry.register, transfers zero BNB, expires after 7 days, and can be revoked.</li>
+      </ul>
+      <p>These hackathon contracts are not audited and must stay on BSC Testnet.</p>
+    </section>
+
+    <section class="deploy-card">
+      <div class="deploy-head">
+        <div><small>Connected deployer</small><strong id="deployer">—</strong></div>
+        <button class="button secondary compact" id="connectDeployWallet" type="button">Connect wallet</button>
+      </div>
+      <ol class="deploy-steps" id="deploySteps">
+        <li data-step="FundAgentWallet"><span>01</span><div><strong>Fund Agent wallet</strong><small>Waiting for wallet</small></div></li>
+        <li data-step="AgentRegistry"><span>02</span><div><strong>AgentRegistry</strong><small>Waiting</small></div></li>
+        <li data-step="EvidenceAnchor"><span>03</span><div><strong>EvidenceAnchor</strong><small>Waiting</small></div></li>
+        <li data-step="ScopedExecutionPolicy"><span>04</span><div><strong>ScopedExecutionPolicy</strong><small>Waiting</small></div></li>
+      </ol>
+      <div class="deploy-cost"><span>Estimated next gas</span><strong id="estimatedGas">—</strong></div>
+      <button class="button full" id="deployNext" type="button" disabled>Connect wallet first</button>
+      <p class="fine-print" id="deployNote">No transaction is sent until you press the button and approve it in the wallet.</p>
+    </section>
+
+    <section class="deploy-result hidden" id="deployResult">
+      <div class="eyebrow">DEPLOYMENT EVIDENCE</div>
+      <h2>All three receipts succeeded.</h2>
+      <p>Keep this page open while Codex verifies the receipts and writes the local deployment manifest.</p>
+      <pre class="result" id="deploymentJson"></pre>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/deploy-testnet.js" defer></script>
+</body>
+</html>

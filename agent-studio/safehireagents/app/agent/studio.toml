@@ -1,0 +1,105 @@
+[project]
+name = "safehire-proofops-agent"
+
+[stack]
+# Project-lifetime facts: which runtime adapter recipe this Agent was
+# scaffolded against. doctor / dev / deploy read these to know what to
+# check, load, and route. runtime: agentcore | azure-foundry.
+runtime = "agentcore"
+# Public faces exposed by this one runtime and signer (canonical order):
+#   A2A — serveA2a: agent card + negotiate/notify_funded skills.
+#   MCP — streamable-HTTP /mcp: negotiate (signed quote) + notify_funded
+#         (verify → deliver → submit, synchronously within the tool call) +
+#         read-only chain tools.
+#   X402 or MPP — publish exactly one sibling B402 seller route (/x402 or
+#          /mpp). Payment-only still uses A2A as the cloud carrier but hides
+#          that native face at the public gateway.
+protocols = ["A2A","MCP","X402"]
+
+[network]
+default = "bsc-testnet"
+
+[wallet]
+# Local keystore signer. The Agent is the SOLE key-holder/signer.
+# The keystore lives at the WORKSPACE root — outside app/agent (the deploy
+# codeLocation) — so no packaging path can bundle it into a deploy artifact.
+kind = "evm-local"
+signer = "local"
+keystore_dir = "../../.studio/wallets"
+# address = "0x..."   # filled by `bag wallet new`
+address = "0x7ca564102be3C107EdA9075F490a9bB1bb74daED"
+
+[llm]
+provider = "pieverse-llm"
+model = "auto/free"
+
+[llm.pieverse]
+# Pieverse topup runs ONLY on BSC mainnet (chainId=56); decoupled from [network].default.
+network = "bsc-mainnet"
+# key_hash = "..."        # written by `bag llm activate`
+# zero-deposit default. `bag llm activate` creates the key with $0
+# allocation; switch to a paid model + `bag llm topup` only when you need it.
+initial_allocation_usd = 0
+key_hash = "4c83850f9786b7d9d1d99563906556665cc5100d68bc6593debf80fb9cda0378"
+
+[llm.auto_renew]
+# hook auto-allocates from Pieverse Account Balance to the API key when Key
+# Credit < min_balance_usd. Account Balance is NEVER refilled automatically
+# from your wallet UNLESS you opt in via `bag budget enable` — defaults below
+# stay in allocate-only mode. This automatic hook IS the agent's LLM-credit
+# self-top-up (NOT an LLM-callable tool).
+enabled = false           # explicit opt-out for the hackathon demo; top up manually
+min_balance_usd = 0.01    # Key Credit threshold that triggers allocate
+topup_chunk_usd = 1.0     # chunk pulled from Account Balance per allocate
+max_topup_per_day_usd = 3.0   # opt-in cap; only enforced when `bag budget enable` is on
+check_interval_seconds = 60
+
+[payments.erc8183]
+# Read by the Agent: it quotes the FIXED `price`, CLAMPS it to [min,max],
+# freezes a short-TTL offer, and EIP-191 signs it — pricing is rule-based, the
+# LLM never prices. price=0 is FREE and is supported by the canonical stack.
+currency = "0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565"   # $U token address — prefilled from [network].default; rarely changed
+# All prices are in wei of the currency token. U has 18 decimals (not 6 like USDC).
+price = "100000000000000000"                    # wei; 0 = FREE (zero token escrow)
+min_price = "0"                                # wei — clamp floor
+max_price = "100000000000000000"               # wei — hard ceiling equals the fixed 0.1 U list price
+quote_ttl_seconds = 900                        # seconds a signed quote stays valid; SDK caps at 900 (~15min work window)
+default_estimated_completion_seconds = 600
+poll_interval_seconds = 30
+auto_settle = false                            # opt-in: detect dispute-window-elapsed → settle
+
+[storage]
+# Deliverables pinned to IPFS. upload() returns ipfs://CID, published
+# on-chain verbatim — durable, public, deploy-ready. Works with any
+# pinning service or self-hosted node: the upload endpoint is
+# STORAGE_API_URL and the write key/JWT is STORAGE_API_KEY, both in
+# .studio/.env.local.
+kind = "ipfs"
+
+
+[payments.b402_seller]
+# Public X402 seller rail mounted at /x402. Credentials stay in
+# <workspace>/.studio/.env.local and are issued per B402 environment.
+enabled = true
+# Decimal USD string; "0" is explicit FREE passthrough and bypasses B402.
+price_usd = "0"
+# v1 supports United Stables (U) through EIP-3009 only.
+assets = ["U"]
+# Empty means the agent wallet receives payment.
+pay_to = ""
+# Payment settles before work; this bounds only the post-settlement work.
+work_timeout_seconds = 60
+# Optional Bazaar metadata can be added later as scalar JSON fields under
+# [payments.b402_seller.bazaar]: info_json, schema_json, description,
+# and route_template.
+
+[budget]
+# auto-topup consent — `acknowledged_at` is the ISO-8601 UTC
+# timestamp marking when the user explicitly accepted the auto-topup terms.
+# Both `enabled = true` AND a valid `acknowledged_at` are required for the
+# in-process auto-topup hook to fire (defends against hand-edits).
+enabled = false
+# Caps — tighten/loosen via `bag budget enable --max-per-topup-usd N ...`
+max_per_topup_usd = 1.0
+max_per_day_usd = 3.0
+max_per_month_usd = 15.0

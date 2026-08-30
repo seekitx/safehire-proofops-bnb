@@ -1,0 +1,14 @@
+{
+  "name": "safehire-proofops-contracts",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run deploy.cjs --network bscTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "5.0.0",
+    "hardhat": "2.29.1"
+  }
+}

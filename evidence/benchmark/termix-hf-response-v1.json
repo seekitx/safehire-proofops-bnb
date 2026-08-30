@@ -1,0 +1,57 @@
+{
+  "benchmark_id": "termix-hf-response-v1",
+  "task_name": "Health Factor Risk Response",
+  "input": {
+    "protocol": "Venus",
+    "health_factor": 1.12,
+    "debt_usd": 6000,
+    "collateral_usd": 9200,
+    "trigger": 1.2,
+    "max_action_usd": 1000
+  },
+  "manual": {
+    "output": {
+      "severity": "high",
+      "recommendation": "repay or add collateral after checking wallet balance",
+      "estimated_response_seconds": 240
+    },
+    "elapsed_ms": 240000.001,
+    "estimated_cost_usd": 0.4,
+    "rubric": {
+      "correctness": 86,
+      "completeness": 71,
+      "risk_awareness": 90,
+      "actionability": 77,
+      "evidence": 57,
+      "total": 79.55
+    }
+  },
+  "agent": {
+    "output": {
+      "severity": "high",
+      "suggested_repay_usd": 480.0,
+      "execution": "blocked until simulation + scoped permission + human approval",
+      "fallback": "alert-only if RPC or signer unavailable"
+    },
+    "elapsed_ms": 0.005,
+    "estimated_cost_usd": 0.003,
+    "rubric": {
+      "correctness": 91,
+      "completeness": 88,
+      "risk_awareness": 97,
+      "actionability": 91,
+      "evidence": 84,
+      "total": 90.9
+    }
+  },
+  "advantage": {
+    "time_saved_ms": 239999.996,
+    "quality_delta": 11.35,
+    "incremental_cost_usd": -0.397
+  },
+  "limitations": [
+    "No live Venus position is accessed by the fixture benchmark.",
+    "Real response latency requires a deployed watcher and timestamped onchain receipt.",
+    "Automated execution remains disabled without explicit approval."
+  ]
+}

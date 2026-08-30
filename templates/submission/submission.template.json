@@ -1,0 +1,10 @@
+{
+  "title": "SafeHire / ProofOps",
+  "one_liner": "Compare proof, limit permissions and hire BNB Chain DeFi agents.",
+  "project_url": "REPLACE_WITH_PUBLIC_HTTPS_URL",
+  "github_url": "REPLACE_WITH_PUBLIC_GITHUB_URL",
+  "demo_video_url": "REPLACE_WITH_PUBLIC_VIDEO_URL",
+  "demo_video_seconds": 0,
+  "networks": ["BSC Testnet"],
+  "evidence_mode": "live"
+}

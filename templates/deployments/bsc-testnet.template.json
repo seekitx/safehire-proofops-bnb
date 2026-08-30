@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "chain_id": 97,
+  "network": "bsc-testnet",
+  "deployer": "REPLACE_WITH_DEPLOYER_ADDRESS",
+  "contracts": {
+    "AgentRegistry": {
+      "address": "REPLACE_WITH_CONTRACT_ADDRESS",
+      "deployment_tx_hash": "REPLACE_WITH_TX_HASH"
+    },
+    "ScopedExecutionPolicy": {
+      "address": "REPLACE_WITH_CONTRACT_ADDRESS",
+      "deployment_tx_hash": "REPLACE_WITH_TX_HASH"
+    },
+    "EvidenceAnchor": {
+      "address": "REPLACE_WITH_CONTRACT_ADDRESS",
+      "deployment_tx_hash": "REPLACE_WITH_TX_HASH"
+    }
+  }
+}

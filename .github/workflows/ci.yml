@@ -1,0 +1,53 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e '.[dev,bnb]'
+      - run: ruff check src apps tests scripts
+      - run: mypy src apps scripts
+      - run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
+      - run: python scripts/static_security_check.py
+      - run: python scripts/submission_gate.py --allow-incomplete
+      - run: docker build -t safehire-proofops:${{ github.sha }} .
+  contracts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run compile
+      - run: npm test
+      - run: npm audit --omit=dev
+  agent-studio:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent-studio/safehireagents
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: agent-studio/safehireagents/pnpm-lock.yaml
+      - run: corepack enable
+      - run: corepack pnpm install --frozen-lockfile
+      - run: corepack pnpm --dir app/agent build
