@@ -70,7 +70,7 @@
           <ul>${renderInputs(inputs)}</ul>
         </details>
         <div class="live-card-actions">
-          <button class="quote-button" type="button" data-live-quote="${escapeHtml(agent.skill_id)}">Prepare hire quote</button>
+          <button class="quote-button" type="button" data-live-quote="${escapeHtml(agent.skill_id)}" data-agent-token-id="${escapeHtml(agent.token_id)}">Prepare signed quote</button>
           <a href="${safeHttpsUrl(agent.registry_url)}" target="_blank" rel="noreferrer">8004 identity <span>↗</span></a>
           <a href="${safeHttpsUrl(agent.registration_url)}" target="_blank" rel="noreferrer">Registration tx <span>↗</span></a>
         </div>
@@ -83,7 +83,7 @@
     return text.length > 18 ? `${text.slice(0, 10)}…${text.slice(-8)}` : text;
   };
 
-  const prepareQuote = async (skillId, button) => {
+  const prepareQuote = async (skillId, tokenId, button) => {
     quotePanel.hidden = false;
     quotePanel.classList.add("loading");
     quotePanel.classList.remove("error");
@@ -99,7 +99,7 @@
       const response = await fetch("/api/live-market/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ skill_id: skillId }),
+        body: JSON.stringify({ skill_id: skillId, agent_token_id: Number(tokenId) }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
@@ -114,7 +114,7 @@
       quoteBoundary.textContent = payload.evidence_boundary;
       quoteIdentity.href = safeHttpsUrl(payload.agent?.registration_url);
       if (continueLiveHire) {
-        continueLiveHire.href = `/hire-live?skill_id=${encodeURIComponent(skillId)}`;
+        continueLiveHire.href = `/hire-live?skill_id=${encodeURIComponent(skillId)}&agent_token_id=${encodeURIComponent(tokenId)}`;
         continueLiveHire.hidden = false;
       }
     } catch (error) {
@@ -146,7 +146,11 @@
       meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString()} · ${payload.operator_count || 0} independent operator(s) · read-only`;
       boundary.textContent = payload.trust_boundary;
       agentContainer.querySelectorAll("[data-live-quote]").forEach((button) => {
-        button.addEventListener("click", () => prepareQuote(button.dataset.liveQuote, button));
+        button.addEventListener("click", () => prepareQuote(
+          button.dataset.liveQuote,
+          button.dataset.agentTokenId,
+          button,
+        ));
       });
     })
     .catch((error) => {

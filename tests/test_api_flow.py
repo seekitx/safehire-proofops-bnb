@@ -356,3 +356,41 @@ def test_browser_deployment_plan_is_hidden_in_production(tmp_path, monkeypatch) 
         response = client.get("/api/dev/contracts/deployment-plan")
 
     assert response.status_code == 404
+
+
+def test_external_mainnet_hire_is_explicitly_feature_gated(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))
+    monkeypatch.setenv("EVIDENCE_LEDGER_PATH", str(tmp_path / "evidence.jsonl"))
+    monkeypatch.setenv("ALLOW_EXTERNAL_MAINNET_HIRE", "false")
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/live-hire/prepare",
+            json={
+                "buyer": "0x1111111111111111111111111111111111111111",
+                "skill_id": "grid_plan",
+                "agent_token_id": 302258,
+                "task_input": {
+                    "token": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
+                },
+            },
+        )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "external_mainnet_hire_disabled"
+
+
+def test_canonical_judge_scorecard_api_and_page(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))
+    monkeypatch.setenv("EVIDENCE_LEDGER_PATH", str(tmp_path / "evidence.jsonl"))
+
+    with TestClient(app) as client:
+        api_response = client.get("/api/judge-scorecard")
+        page_response = client.get("/judge-scorecard")
+
+    assert api_response.status_code == 200
+    assert api_response.json()["official_rubric"]["numeric_weights_published"] is False
+    assert page_response.status_code == 200
+    assert "Judge Scorecard" in page_response.text

@@ -1,19 +1,31 @@
 from __future__ import annotations
 
+import asyncio
+import ipaddress
 import json
-import re
+import socket
 import time
+from collections.abc import Awaitable, Callable, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeAlias
+from urllib.parse import urljoin, urlparse
 
 import httpx
 from eth_abi.abi import decode, encode
 from eth_utils.address import to_checksum_address
 from eth_utils.crypto import keccak
 
-from proofops.services.live_agent_market import A2A_ENDPOINT, request_live_agent_quote
+from proofops.integrations.erc8183_quote import (
+    canonical_json,
+    verify_job_description,
+)
+from proofops.services.live_agent_market import (
+    DEFAULT_A2A_ENDPOINT,
+    request_live_agent_quote,
+    resolve_live_agent,
+)
 
 BSC_MAINNET_RPC = "https://bsc-dataseed.bnbchain.org"
 CHAIN_ID = 56
@@ -22,19 +34,38 @@ COMMERCE = to_checksum_address("0xea4daa3100a767e86fded867729ae7446476eba6")
 ROUTER = to_checksum_address("0x51895229e12f9876011789b04f8698af06ccd6da")
 POLICY = to_checksum_address("0x9c01845705b3078aa2e8cff7520a6376fd766de5")
 U_TOKEN = to_checksum_address("0xce24439f2d9c6a2289f741120fe202248b666666")
+ZERO_ADDRESS = to_checksum_address("0x0000000000000000000000000000000000000000")
 STATUS_NAMES = ("OPEN", "FUNDED", "SUBMITTED", "COMPLETED", "REJECTED", "EXPIRED")
 VERDICT_NAMES = ("UNDECIDED", "APPROVE", "REJECT")
-ADDRESS_PATTERN = re.compile(r"^0x[a-fA-F0-9]{40}$")
 ALLOWED_SKILLS = {
     "rebalance_plan",
     "grid_plan",
     "yield_plan",
     "health_factor",
 }
+MAX_JOB_LIFETIME_SECONDS = 7 * 24 * 60 * 60
+MIN_DELIVERY_SECONDS = 120
+EXPIRY_BUFFER_SECONDS = 30 * 60
+MANIFEST_MAX_BYTES = 1_000_000
+LOG_SCAN_WINDOW = 10_000
+LOG_SCAN_WINDOWS = 30
+JOB_INITIALISED_TOPIC = f"0x{keccak(text='JobInitialised(uint256,bytes32,uint64,bytes)').hex()}"
+JOB_COMPLETED_TOPIC = f"0x{keccak(text='JobCompleted(uint256,address,bytes32)').hex()}"
+TRANSFER_TOPIC = f"0x{keccak(text='Transfer(address,address,uint256)').hex()}"
+
+RpcCall: TypeAlias = Callable[[str, list[Any]], Awaitable[Any]]
+ManifestFetcher: TypeAlias = Callable[[str, int], Awaitable[tuple[dict[str, Any], str]]]
 
 
 def _call_data(signature: str, types: list[str], values: list[Any]) -> str:
     return f"0x{(keccak(text=signature)[:4] + encode(types, values)).hex()}"
+
+
+def _decode_uint(raw: Any, *, field: str) -> int:
+    value = str(raw or "")
+    if not value.startswith("0x"):
+        raise ValueError(f"{field} returned malformed hex")
+    return int.from_bytes(bytes.fromhex(value[2:]), byteorder="big")
 
 
 def _number(
@@ -56,10 +87,10 @@ def _number(
 
 
 def _address(raw: Any, *, field: str) -> str:
-    value = str(raw).strip()
-    if not ADDRESS_PATTERN.fullmatch(value):
-        raise ValueError(f"{field} must be an EVM address")
-    return to_checksum_address(value)
+    try:
+        return to_checksum_address(str(raw).strip())
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{field} must be an EVM address") from exc
 
 
 def validate_task_input(skill_id: str, raw: Any) -> dict[str, Any]:
@@ -135,7 +166,10 @@ def validate_task_input(skill_id: str, raw: Any) -> dict[str, Any]:
             {
                 "token": token,
                 "usd": _number(
-                    item["usd"], field=f"holdings[{index}].usd", minimum=0.01, maximum=100_000_000
+                    item["usd"],
+                    field=f"holdings[{index}].usd",
+                    minimum=0.01,
+                    maximum=100_000_000,
                 ),
             }
         )
@@ -172,21 +206,61 @@ async def _rpc(method: str, params: list[Any]) -> Any:
     return payload["result"]
 
 
-def _verified_quote(raw: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
-    agent = raw.get("agent")
-    quote = raw.get("quote")
-    if not isinstance(agent, dict) or not isinstance(quote, dict):
-        raise TypeError("live Agent quote is incomplete")
-    if int(quote.get("chain_id", 0)) != CHAIN_ID:
-        raise ValueError("live Agent quote is not for BSC mainnet")
-    if to_checksum_address(str(quote.get("verifying_contract"))) != COMMERCE:
-        raise ValueError("live Agent quote names an unexpected ERC-8183 contract")
-    if to_checksum_address(str(quote.get("payment_token"))) != U_TOKEN:
-        raise ValueError("live Agent quote names an unexpected payment token")
-    if int(quote.get("price", 0)) != PRICE_RAW:
-        raise ValueError("live Agent quote is not exactly 0.10 U")
-    provider = _address(quote.get("provider"), field="provider")
-    return agent, {**quote, "provider": provider}
+async def _policy_dispute_window() -> int:
+    raw = await _rpc(
+        "eth_call",
+        [{"to": POLICY, "data": _call_data("disputeWindow()", [], [])}, "latest"],
+    )
+    window = _decode_uint(raw, field="disputeWindow")
+    if not 1 <= window <= 7 * 24 * 60 * 60:
+        raise ValueError("policy dispute window is outside the supported safety range")
+    return window
+
+
+def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
+    if description.get("version") != 1:
+        raise ValueError("job does not contain the supported signed description version")
+    raw_task = description.get("task")
+    if not isinstance(raw_task, str):
+        raise TypeError("signed job description contains no task")
+    try:
+        task = json.loads(raw_task)
+    except json.JSONDecodeError as exc:
+        raise ValueError("signed job task is not valid JSON") from exc
+    if not isinstance(task, dict) or task.get("schema_version") != "safehire-external-hire-v2":
+        raise ValueError("job was not created by the hardened SafeHire hire flow")
+    skill_id = str(task.get("service", ""))
+    token_id = task.get("erc8004_token_id")
+    nonce = str(task.get("request_nonce", ""))
+    if skill_id not in ALLOWED_SKILLS:
+        raise ValueError("signed job names an unsupported service")
+    if not isinstance(token_id, int) or token_id <= 0:
+        raise ValueError("signed job has no valid ERC-8004 token id")
+    if len(nonce) < 16 or len(nonce) > 128:
+        raise ValueError("signed job request nonce is invalid")
+    task_input = validate_task_input(skill_id, task.get("task_input"))
+    return {
+        "schema_version": task["schema_version"],
+        "service": skill_id,
+        "erc8004_token_id": token_id,
+        "request_nonce": nonce,
+        "task_input": task_input,
+    }
+
+
+async def _verify_anchored_description(
+    description: Mapping[str, Any], *, provider: str
+) -> dict[str, Any]:
+    return await verify_job_description(
+        description=description,
+        provider=provider,
+        expected_chain_id=CHAIN_ID,
+        expected_verifying_contract=COMMERCE,
+        expected_payment_token=U_TOKEN,
+        expected_price_raw=PRICE_RAW,
+        rpc_url=BSC_MAINNET_RPC,
+        rpc_call=_rpc,
+    )
 
 
 async def prepare_live_hire(
@@ -195,32 +269,48 @@ async def prepare_live_hire(
     buyer: str,
     skill_id: str,
     task_input: dict[str, Any],
+    agent_token_id: int | None = None,
 ) -> dict[str, Any]:
+    """Prepare one unsigned createJob call from a verified provider promise."""
+
     owner = _address(buyer, field="buyer")
     normalized_input = validate_task_input(skill_id, task_input)
-    quote_payload = await request_live_agent_quote(project_root, skill_id=skill_id)
-    agent, quote = _verified_quote(quote_payload)
+    quote_payload = await request_live_agent_quote(
+        project_root,
+        skill_id=skill_id,
+        agent_token_id=agent_token_id,
+        task_input=normalized_input,
+        rpc_url=BSC_MAINNET_RPC,
+        rpc_call=_rpc,
+    )
+    verification = quote_payload.get("quote_verification")
+    quote = quote_payload.get("quote")
+    if not isinstance(verification, dict) or not isinstance(quote, dict):
+        raise TypeError("verified quote response is incomplete")
+    provider = _address(verification.get("provider"), field="provider")
+    job_description = str(verification.get("job_description") or "")
+    if not job_description:
+        raise ValueError("verified quote has no signed job description")
+
+    dispute_window = await _policy_dispute_window()
+    eta = int(verification.get("estimated_completion_seconds") or 0)
     now = int(time.time())
-    expires_at = now + 60 * 60
-    description_payload = {
-        "schema_version": "safehire-live-hire-v1",
-        "service": skill_id,
-        "task_input": normalized_input,
-        "erc8004_token_id": agent.get("erc8004_token_id"),
-        "provider": quote["provider"],
-        "price_raw": str(PRICE_RAW),
-        "quote_observed_at": quote_payload.get("observed_at"),
-        "created_at": datetime.now(UTC).isoformat(),
-        "expires_at": expires_at,
-    }
-    description = json.dumps(description_payload, separators=(",", ":"), ensure_ascii=False)
+    lifetime = max(eta, MIN_DELIVERY_SECONDS) + dispute_window + EXPIRY_BUFFER_SECONDS
+    if lifetime > MAX_JOB_LIFETIME_SECONDS:
+        raise ValueError("provider ETA and dispute window exceed the supported job lifetime")
+    expires_at = now + lifetime
+    quote_expires_at = int(verification.get("quote_expires_at") or 0)
+    if quote_expires_at <= now + 30:
+        raise ValueError("signed quote expires too soon to create a safe job")
+
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "network": "bsc-mainnet",
         "chain_id": CHAIN_ID,
         "buyer": owner,
-        "agent": agent,
+        "agent": quote_payload.get("agent"),
         "quote": quote,
+        "quote_verification": verification,
         "task_input": normalized_input,
         "expires_at": expires_at,
         "commerce_address": COMMERCE,
@@ -230,16 +320,24 @@ async def prepare_live_hire(
         "job_created_topic": (
             f"0x{keccak(text='JobCreated(uint256,address,address,address,uint256,address)').hex()}"
         ),
+        "timeline": {
+            "quote_expires_at": quote_expires_at,
+            "estimated_completion_seconds": eta,
+            "dispute_window_seconds": dispute_window,
+            "safety_buffer_seconds": EXPIRY_BUFFER_SECONDS,
+            "job_expires_at": expires_at,
+        },
         "transaction": {
             "step": "create_job",
-            "label": "Create external Agent job",
+            "label": "Create signed external Agent job",
             "to": COMMERCE,
             "data": _call_data(
                 "createJob(address,address,uint256,string,address)",
                 ["address", "address", "uint256", "string", "address"],
-                [quote["provider"], ROUTER, expires_at, description, ROUTER],
+                [provider, ROUTER, expires_at, job_description, ROUTER],
             ),
             "value": "0x0",
+            "valid_until": quote_expires_at,
         },
         "safety": {
             "mainnet_value_at_risk": "0.10 U plus BNB gas",
@@ -247,7 +345,44 @@ async def prepare_live_hire(
             "unlimited_approval": False,
             "automatic_transaction": False,
             "manual_wallet_confirmation_per_write": True,
+            "signed_task_bound": True,
+            "cross_chain_replay_blocked": True,
         },
+    }
+
+
+async def _open_job_progress(client: str, job_id: int) -> dict[str, Any]:
+    calls = [
+        _rpc(
+            "eth_call",
+            [{"to": ROUTER, "data": _call_data("jobPolicy(uint256)", ["uint256"], [job_id])}, "latest"],
+        ),
+        _rpc(
+            "eth_call",
+            [
+                {
+                    "to": U_TOKEN,
+                    "data": _call_data(
+                        "allowance(address,address)",
+                        ["address", "address"],
+                        [client, COMMERCE],
+                    ),
+                },
+                "latest",
+            ],
+        ),
+    ]
+    raw_policy, raw_allowance = await asyncio.gather(*calls)
+    policy_bytes = bytes.fromhex(str(raw_policy)[2:])
+    if len(policy_bytes) < 32:
+        raise ValueError("router jobPolicy returned malformed data")
+    job_policy = to_checksum_address(policy_bytes[-20:])
+    allowance = _decode_uint(raw_allowance, field="allowance")
+    return {
+        "registered_policy": job_policy,
+        "policy_registered": job_policy == POLICY,
+        "allowance_raw": str(allowance),
+        "exact_allowance": allowance == PRICE_RAW,
     }
 
 
@@ -261,21 +396,33 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
         ["(uint256,address,address,address,string,uint256,uint256,uint8,address,uint256,bytes32)"],
         raw,
     )[0]
+    if int(fields[0]) != job_id:
+        raise ValueError("BSC returned a different job id")
     status_value = int(fields[7])
     status_name = STATUS_NAMES[status_value] if status_value < len(STATUS_NAMES) else "UNKNOWN"
-    expired = int(fields[6]) <= int(time.time())
+    now = int(time.time())
+    expired = int(fields[6]) <= now
     description_raw = str(fields[4])
     try:
         description = json.loads(description_raw)
-    except json.JSONDecodeError:
-        description = {"raw": description_raw}
+    except json.JSONDecodeError as exc:
+        raise ValueError("job description is not the signed SafeHire schema") from exc
+    if not isinstance(description, dict):
+        raise TypeError("job description is not an object")
+    provider = to_checksum_address(fields[2])
+    task_spec = _parse_task_spec(description)
+    description_verification = await _verify_anchored_description(
+        description, provider=provider
+    )
     result: dict[str, Any] = {
         "chain_id": CHAIN_ID,
         "job_id": int(fields[0]),
         "client": to_checksum_address(fields[1]),
-        "provider": to_checksum_address(fields[2]),
+        "provider": provider,
         "evaluator": to_checksum_address(fields[3]),
         "description": description,
+        "task_spec": task_spec,
+        "description_verification": description_verification,
         "budget_raw": str(fields[5]),
         "budget_u": str(Decimal(int(fields[5])) / Decimal(10**18)),
         "expired_at": int(fields[6]),
@@ -284,10 +431,13 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
         "submitted_at": int(fields[9]),
         "deliverable_hash": f"0x{fields[10].hex()}",
         "can_settle": False,
+        "can_dispute": False,
         "completed": status_value == 3,
         "expired": expired,
         "can_refund": status_value == 1 and expired,
     }
+    if status_value == 0:
+        result["open_progress"] = await _open_job_progress(result["client"], job_id)
     if status_value != 2:
         return result
 
@@ -331,50 +481,56 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
     )
     disputed = bool(decode(["bool"], bytes.fromhex(str(responses[4]["result"])[2:]))[0])
     settle_after = policy_submitted_at + dispute_window
+    seconds_until_settle = max(0, settle_after - now)
+    review_window_closed = seconds_until_settle == 0
     verdict_name = (
         VERDICT_NAMES[verdict_value] if verdict_value < len(VERDICT_NAMES) else "UNKNOWN"
     )
+    policy_final = verdict_name in {"APPROVE", "REJECT"}
+    can_settle = policy_final and (
+        verdict_name == "REJECT" or review_window_closed
+    )
     result.update(
         {
-            "can_settle": verdict_value in {1, 2},
+            "can_settle": can_settle,
+            "can_dispute": not disputed and not review_window_closed,
+            "policy_final": policy_final,
             "policy_verdict": verdict_name,
             "policy_reason": f"0x{reason.hex()}",
             "policy_submitted_at": policy_submitted_at,
             "dispute_window_seconds": dispute_window,
             "settle_after": settle_after,
-            "seconds_until_settle": max(0, settle_after - int(time.time())),
+            "seconds_until_settle": seconds_until_settle,
+            "review_window_closed": review_window_closed,
             "disputed": disputed,
         }
     )
     return result
 
 
-async def live_followup_plan(
-    *,
-    buyer: str,
-    skill_id: str,
-    job_id: int,
-) -> dict[str, Any]:
+async def live_followup_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
+    """Rebuild only the missing Open-state transactions from chain state."""
+
     owner = _address(buyer, field="buyer")
     status = await live_job_status(job_id=job_id)
     if status["client"].lower() != owner.lower():
         raise ValueError("the connected wallet does not own this job")
-    description = status.get("description")
-    if not isinstance(description, dict) or description.get("service") != skill_id:
-        raise ValueError("the job description does not match the selected service")
-    if str(description.get("provider", "")).lower() != status["provider"].lower():
-        raise ValueError("the on-chain provider does not match the verified job description")
-    if str(description.get("price_raw", "")) != str(PRICE_RAW):
-        raise ValueError("the verified job description is not priced at exactly 0.10 U")
     if status["status"] != "OPEN":
         raise ValueError(f"job #{job_id} is {str(status['status']).lower()}, not open")
-    return {
-        "chain_id": CHAIN_ID,
-        "job_id": job_id,
-        "price_raw": str(PRICE_RAW),
-        "payment_token": U_TOKEN,
-        "commerce_address": COMMERCE,
-        "transactions": [
+    progress = status.get("open_progress")
+    if not isinstance(progress, dict):
+        raise TypeError("open job progress is unavailable")
+    registered_policy = _address(progress["registered_policy"], field="registered policy")
+    if registered_policy not in {ZERO_ADDRESS, POLICY}:
+        raise ValueError("job is already bound to an unexpected policy")
+    budget = int(status["budget_raw"])
+    if budget not in {0, PRICE_RAW}:
+        raise ValueError("job already has an unexpected budget")
+    allowance = int(progress["allowance_raw"])
+
+    transactions: list[dict[str, Any]] = []
+    if registered_policy == ZERO_ADDRESS:
+        transactions.append(
             {
                 "step": "register_job",
                 "label": "Bind official optimistic policy",
@@ -383,7 +539,10 @@ async def live_followup_plan(
                     "registerJob(uint256,address)", ["uint256", "address"], [job_id, POLICY]
                 ),
                 "value": "0x0",
-            },
+            }
+        )
+    if budget == 0:
+        transactions.append(
             {
                 "step": "set_budget",
                 "label": "Set exact 0.10 U budget",
@@ -394,7 +553,10 @@ async def live_followup_plan(
                     [job_id, PRICE_RAW, b""],
                 ),
                 "value": "0x0",
-            },
+            }
+        )
+    if allowance != PRICE_RAW:
+        transactions.append(
             {
                 "step": "approve_u",
                 "label": "Approve exactly 0.10 U",
@@ -403,46 +565,69 @@ async def live_followup_plan(
                     "approve(address,uint256)", ["address", "uint256"], [COMMERCE, PRICE_RAW]
                 ),
                 "value": "0x0",
-            },
-            {
-                "step": "fund_job",
-                "label": "Fund 0.10 U escrow",
-                "to": COMMERCE,
-                "data": _call_data(
-                    "fund(uint256,uint256,bytes)",
-                    ["uint256", "uint256", "bytes"],
-                    [job_id, PRICE_RAW, b""],
-                ),
-                "value": "0x0",
-            },
-        ],
+            }
+        )
+    transactions.append(
+        {
+            "step": "fund_job",
+            "label": "Fund 0.10 U escrow",
+            "to": COMMERCE,
+            "data": _call_data(
+                "fund(uint256,uint256,bytes)",
+                ["uint256", "uint256", "bytes"],
+                [job_id, PRICE_RAW, b""],
+            ),
+            "value": "0x0",
+        }
+    )
+    return {
+        "chain_id": CHAIN_ID,
+        "job_id": job_id,
+        "task_spec": status["task_spec"],
+        "description_verification": status["description_verification"],
+        "price_raw": str(PRICE_RAW),
+        "payment_token": U_TOKEN,
+        "commerce_address": COMMERCE,
+        "resume_safe": True,
+        "transactions": transactions,
     }
 
 
-async def notify_live_agent(
-    *,
-    job_id: int,
-    skill_id: str,
-) -> dict[str, Any]:
+async def notify_live_agent(project_root: Path, *, job_id: int) -> dict[str, Any]:
     status = await live_job_status(job_id=job_id)
-    if status["status"] not in {"FUNDED", "SUBMITTED", "COMPLETED"}:
+    if status["status"] == "SUBMITTED":
+        return {
+            "job_id": job_id,
+            "status": "already_submitted",
+            "transaction_sent": False,
+            "next_action": "review_delivery",
+        }
+    if status["status"] == "COMPLETED":
+        return {
+            "job_id": job_id,
+            "status": "already_completed",
+            "transaction_sent": False,
+            "next_action": "download_verified_receipt",
+        }
+    if status["status"] != "FUNDED":
         raise ValueError(f"job #{job_id} must be funded before Agent notification")
     if status["budget_raw"] != str(PRICE_RAW):
         raise ValueError("funded job budget is not exactly 0.10 U")
-    description = status.get("description")
-    if not isinstance(description, dict) or description.get("service") != skill_id:
-        raise ValueError("funded job does not match the requested service")
-    if str(description.get("provider", "")).lower() != status["provider"].lower():
-        raise ValueError("funded job provider does not match the verified job description")
-    if str(description.get("price_raw", "")) != str(PRICE_RAW):
-        raise ValueError("funded job description is not priced at exactly 0.10 U")
-    task_input = validate_task_input(skill_id, description.get("task_input"))
+    task_spec = status["task_spec"]
+    assert isinstance(task_spec, dict)
+    skill_id = str(task_spec["service"])
+    token_id = int(task_spec["erc8004_token_id"])
+    route = resolve_live_agent(
+        project_root, skill_id=skill_id, agent_token_id=token_id
+    )
+    if str(route.get("operator", "")).strip() == "":
+        raise ValueError("selected Agent has no operator identity")
     data = {
         "skill": "notify_funded",
         "service": skill_id,
         "job_id": job_id,
-        "parameters": task_input,
-        **task_input,
+        "parameters": task_spec["task_input"],
+        **task_spec["task_input"],
     }
     request = {
         "jsonrpc": "2.0",
@@ -456,8 +641,9 @@ async def notify_live_agent(
             }
         },
     }
+    endpoint = str(route.get("endpoint") or DEFAULT_A2A_ENDPOINT)
     async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(A2A_ENDPOINT, json=request)
+        response = await client.post(endpoint, json=request)
         response.raise_for_status()
         payload = response.json()
     if not isinstance(payload, dict) or payload.get("error"):
@@ -465,10 +651,254 @@ async def notify_live_agent(
     return {
         "job_id": job_id,
         "skill_id": skill_id,
+        "erc8004_token_id": token_id,
+        "operator": route.get("operator"),
+        "endpoint": endpoint,
+        "status": "accepted",
         "notified_at": datetime.now(UTC).isoformat(),
         "agent_response": payload.get("result"),
         "next_action": "wait_for_onchain_submission_then_review",
         "transaction_sent": False,
+    }
+
+
+def _topic_uint(value: int) -> str:
+    return f"0x{value:064x}"
+
+
+async def _find_event_log(*, address: str, topic0: str, job_id: int) -> dict[str, Any] | None:
+    latest = int(str(await _rpc("eth_blockNumber", [])), 16)
+    to_block = latest
+    for _ in range(LOG_SCAN_WINDOWS):
+        from_block = max(0, to_block - LOG_SCAN_WINDOW + 1)
+        logs = await _rpc(
+            "eth_getLogs",
+            [
+                {
+                    "address": address,
+                    "fromBlock": hex(from_block),
+                    "toBlock": hex(to_block),
+                    "topics": [topic0, _topic_uint(job_id)],
+                }
+            ],
+        )
+        if isinstance(logs, list) and logs:
+            candidates = [item for item in logs if isinstance(item, dict)]
+            if candidates:
+                return candidates[-1]
+        if from_block == 0:
+            break
+        to_block = from_block - 1
+    return None
+
+
+async def _delivery_pointer(job_id: int, expected_hash: str) -> dict[str, Any]:
+    log = await _find_event_log(
+        address=POLICY, topic0=JOB_INITIALISED_TOPIC, job_id=job_id
+    )
+    if log is None:
+        raise ValueError("JobInitialised delivery event was not found in the recent chain window")
+    raw_data = bytes.fromhex(str(log.get("data", "0x"))[2:])
+    deliverable, submitted_at, opt_params = decode(["bytes32", "uint64", "bytes"], raw_data)
+    deliverable_hash = f"0x{deliverable.hex()}"
+    if deliverable_hash.lower() != expected_hash.lower():
+        raise ValueError("policy delivery event hash does not match the Commerce job")
+    try:
+        params = json.loads(bytes(opt_params).decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("delivery event optParams is not valid JSON") from exc
+    if not isinstance(params, dict) or not isinstance(params.get("deliverable_url"), str):
+        raise TypeError("delivery event contains no deliverable_url")
+    return {
+        "deliverable_url": params["deliverable_url"],
+        "deliverable_hash": deliverable_hash,
+        "submitted_at": int(submitted_at),
+        "block_number": int(str(log.get("blockNumber", "0x0")), 16),
+        "transaction_hash": str(log.get("transactionHash") or ""),
+    }
+
+
+def _normalise_manifest_url(raw: str) -> str:
+    value = raw.strip()
+    if value.startswith("ipfs://"):
+        cid_path = value.removeprefix("ipfs://").lstrip("/")
+        if not cid_path or ".." in cid_path.split("/"):
+            raise ValueError("deliverable IPFS URL is invalid")
+        return f"https://ipfs.io/ipfs/{cid_path}"
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.hostname:
+        raise ValueError("deliverable URL must use HTTPS or ipfs://")
+    return value
+
+
+def _public_ip(address: str) -> bool:
+    ip = ipaddress.ip_address(address)
+    return not (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_multicast
+        or ip.is_reserved
+        or ip.is_unspecified
+    )
+
+
+async def _assert_public_hostname(hostname: str) -> None:
+    try:
+        direct = ipaddress.ip_address(hostname)
+    except ValueError:
+        direct = None
+    if direct is not None:
+        if not _public_ip(str(direct)):
+            raise ValueError("deliverable URL resolves to a non-public IP")
+        return
+    try:
+        rows = await asyncio.to_thread(socket.getaddrinfo, hostname, 443, type=socket.SOCK_STREAM)
+    except socket.gaierror as exc:
+        raise ValueError("deliverable hostname cannot be resolved") from exc
+    addresses = {str(row[4][0]) for row in rows}
+    if not addresses or not all(_public_ip(address) for address in addresses):
+        raise ValueError("deliverable hostname resolves to a non-public IP")
+
+
+async def _fetch_manifest(url: str, max_bytes: int) -> tuple[dict[str, Any], str]:
+    current = _normalise_manifest_url(url)
+    async with httpx.AsyncClient(timeout=20, follow_redirects=False) as client:
+        for _ in range(3):
+            parsed = urlparse(current)
+            assert parsed.hostname is not None
+            await _assert_public_hostname(parsed.hostname)
+            async with client.stream("GET", current, headers={"Accept": "application/json"}) as response:
+                if 300 <= response.status_code < 400:
+                    location = response.headers.get("location")
+                    if not location:
+                        raise ValueError("deliverable redirect has no location")
+                    current = _normalise_manifest_url(urljoin(current, location))
+                    continue
+                response.raise_for_status()
+                content_type = response.headers.get("content-type", "").split(";", 1)[0]
+                if content_type not in {"application/json", "text/json", "text/plain"}:
+                    raise ValueError("deliverable response is not JSON")
+                buffer = bytearray()
+                async for chunk in response.aiter_bytes():
+                    buffer.extend(chunk)
+                    if len(buffer) > max_bytes:
+                        raise ValueError("deliverable manifest exceeds the configured size limit")
+            try:
+                payload = json.loads(buffer.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise ValueError("deliverable manifest is not valid UTF-8 JSON") from exc
+            if not isinstance(payload, dict):
+                raise TypeError("deliverable manifest must be a JSON object")
+            return payload, current
+    raise ValueError("deliverable redirect limit exceeded")
+
+
+def _verify_manifest(
+    manifest: Mapping[str, Any], *, job_id: int, expected_hash: str
+) -> dict[str, Any]:
+    if manifest.get("version") != 1:
+        raise ValueError("deliverable manifest uses an unsupported version")
+    if manifest.get("job_id") != job_id or manifest.get("chain_id") != CHAIN_ID:
+        raise ValueError("deliverable manifest is bound to a different job or chain")
+    contracts = manifest.get("contracts")
+    response = manifest.get("response")
+    if not isinstance(contracts, Mapping) or not isinstance(response, Mapping):
+        raise TypeError("deliverable manifest is missing contracts or response")
+    expected_contracts = {"commerce": COMMERCE, "router": ROUTER, "policy": POLICY}
+    for name, expected in expected_contracts.items():
+        if _address(contracts.get(name), field=f"manifest contracts.{name}") != expected:
+            raise ValueError(f"deliverable manifest {name} contract mismatch")
+    content = response.get("content")
+    content_type = response.get("content_type")
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("deliverable manifest contains no response content")
+    if not isinstance(content_type, str) or not content_type.strip():
+        raise ValueError("deliverable manifest contains no response content_type")
+    computed_hash = f"0x{keccak(text=canonical_json(dict(manifest))).hex()}"
+    if computed_hash.lower() != expected_hash.lower():
+        raise ValueError("deliverable manifest hash does not match the on-chain commitment")
+    return {
+        "valid": True,
+        "computed_hash": computed_hash,
+        "content": content,
+        "content_type": content_type,
+        "metadata": manifest.get("metadata") if isinstance(manifest.get("metadata"), Mapping) else {},
+    }
+
+
+async def live_delivery(
+    *,
+    job_id: int,
+    fetch_manifest: ManifestFetcher | None = None,
+) -> dict[str, Any]:
+    status = await live_job_status(job_id=job_id)
+    if status["status"] not in {"SUBMITTED", "COMPLETED"}:
+        raise ValueError(f"job #{job_id} has no submitted delivery")
+    pointer = await _delivery_pointer(job_id, str(status["deliverable_hash"]))
+    fetcher = fetch_manifest or _fetch_manifest
+    manifest, resolved_url = await fetcher(pointer["deliverable_url"], MANIFEST_MAX_BYTES)
+    verification = _verify_manifest(
+        manifest, job_id=job_id, expected_hash=str(status["deliverable_hash"])
+    )
+    terms = status["description"].get("terms")
+    return {
+        "schema_version": "1.0",
+        "evidence_mode": "live",
+        "chain_id": CHAIN_ID,
+        "job_id": job_id,
+        "provider": status["provider"],
+        "task_spec": status["task_spec"],
+        "success_criteria": terms.get("success_criteria", []) if isinstance(terms, dict) else [],
+        "onchain": pointer,
+        "manifest_url": resolved_url,
+        "manifest": manifest,
+        "verification": {
+            "hash_matches": True,
+            "job_matches": True,
+            "chain_matches": True,
+            "contracts_match": True,
+            "provider_submit_authorized_by_contract": True,
+            "human_success_criteria_review_required": True,
+            **verification,
+        },
+        "settlement": {
+            "can_settle": status.get("can_settle", False),
+            "can_dispute": status.get("can_dispute", False),
+            "review_window_closed": status.get("review_window_closed", False),
+            "seconds_until_settle": status.get("seconds_until_settle", 0),
+            "policy_verdict": status.get("policy_verdict"),
+            "disputed": status.get("disputed", False),
+        },
+        "evidence_boundary": (
+            "SafeHire verified the retrieved manifest against the on-chain deliverable hash, job, "
+            "chain and contract trio. A human still decides whether the content satisfies the signed "
+            "success criteria before settle or dispute."
+        ),
+    }
+
+
+async def live_dispute_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
+    owner = _address(buyer, field="buyer")
+    status = await live_job_status(job_id=job_id)
+    if status["client"].lower() != owner.lower():
+        raise ValueError("only the job client can dispute this delivery")
+    if status["status"] != "SUBMITTED" or not status.get("can_dispute"):
+        raise ValueError("delivery is not inside an open dispute window")
+    return {
+        "job_id": job_id,
+        "seconds_remaining": status.get("seconds_until_settle", 0),
+        "transaction": {
+            "step": "dispute_job",
+            "label": "Dispute delivery before the review window closes",
+            "to": POLICY,
+            "data": _call_data("dispute(uint256)", ["uint256"], [job_id]),
+            "value": "0x0",
+        },
+        "boundary": (
+            "Disputing does not itself reject the job. It opens the policy's voter path and blocks "
+            "silent approval until the policy reaches a final verdict."
+        ),
     }
 
 
@@ -483,10 +913,13 @@ async def live_settle_plan(*, job_id: int) -> dict[str, Any]:
         if seconds > 0:
             raise ValueError(f"delivery review window remains open for {seconds} seconds")
         raise ValueError("the policy has not returned a final verdict")
-    verdict = str(status.get("policy_verdict", "APPROVE"))
+    verdict = str(status.get("policy_verdict", "UNDECIDED"))
+    if verdict not in {"APPROVE", "REJECT"}:
+        raise ValueError("policy verdict is not final")
     return {
         "job_id": job_id,
         "policy_verdict": verdict,
+        "review_window_closed": status.get("review_window_closed"),
         "transaction": {
             "step": "settle_job",
             "label": (
@@ -514,4 +947,85 @@ async def live_refund_plan(*, job_id: int) -> dict[str, Any]:
             "data": _call_data("claimRefund(uint256)", ["uint256"], [job_id]),
             "value": "0x0",
         },
+    }
+
+
+def _topic_address(value: str) -> str:
+    return f"0x{_address(value, field='event address')[2:].lower():0>64}"
+
+
+async def _verified_payment(settlement_tx_hash: str, *, provider: str) -> int | None:
+    receipt = await _rpc("eth_getTransactionReceipt", [settlement_tx_hash])
+    if not isinstance(receipt, Mapping) or receipt.get("status") != "0x1":
+        return None
+    for raw in receipt.get("logs", []):
+        if not isinstance(raw, Mapping):
+            continue
+        topics = raw.get("topics")
+        if (
+            str(raw.get("address", "")).lower() == U_TOKEN.lower()
+            and isinstance(topics, list)
+            and len(topics) >= 3
+            and str(topics[0]).lower() == TRANSFER_TOPIC.lower()
+            and str(topics[1]).lower() == _topic_address(COMMERCE).lower()
+            and str(topics[2]).lower() == _topic_address(provider).lower()
+        ):
+            amount = int(str(raw.get("data", "0x0")), 16)
+            if 0 < amount <= PRICE_RAW:
+                return amount
+    return None
+
+
+async def build_verified_receipt(*, job_id: int) -> dict[str, Any]:
+    """Build a server-revalidated mainnet dossier suitable for evidence capture."""
+
+    status = await live_job_status(job_id=job_id)
+    if status["status"] != "COMPLETED":
+        raise ValueError("a paid evidence dossier requires a completed job")
+    delivery = await live_delivery(job_id=job_id)
+    completion = await _find_event_log(
+        address=COMMERCE, topic0=JOB_COMPLETED_TOPIC, job_id=job_id
+    )
+    if completion is None:
+        raise ValueError("JobCompleted settlement event was not found")
+    settlement_tx_hash = str(completion.get("transactionHash") or "")
+    payment_raw = await _verified_payment(
+        settlement_tx_hash, provider=str(status["provider"])
+    )
+    if payment_raw is None:
+        raise ValueError("provider payment transfer could not be verified")
+    task_spec = status["task_spec"]
+    assert isinstance(task_spec, dict)
+    return {
+        "schema_version": "1.0",
+        "evidence_mode": "live",
+        "verification_status": "mainnet_verified",
+        "verified_at": datetime.now(UTC).isoformat(),
+        "chain_id": CHAIN_ID,
+        "job_id": job_id,
+        "external_provider": True,
+        "provider": status["provider"],
+        "client": status["client"],
+        "erc8004_token_id": task_spec["erc8004_token_id"],
+        "skill_id": task_spec["service"],
+        "task_input": task_spec["task_input"],
+        "quote": status["description_verification"],
+        "delivery": {
+            "manifest_url": delivery["manifest_url"],
+            "deliverable_hash": status["deliverable_hash"],
+            "manifest": delivery["manifest"],
+            "verification": delivery["verification"],
+        },
+        "settlement_tx_hash": settlement_tx_hash,
+        "settlement_block_number": int(str(completion.get("blockNumber", "0x0")), 16),
+        "paid": True,
+        "payment_token": U_TOKEN,
+        "payment_raw": str(payment_raw),
+        "quoted_price_raw": str(PRICE_RAW),
+        "provider_payment_verified": True,
+        "evidence_boundary": (
+            "This dossier was rebuilt from BSC Mainnet state, the signed on-chain job description, "
+            "the hash-matched delivery manifest and the settlement transfer. Save it under "
+            "evidence/marketplace/paid-deliveries/ and commit it to make the track record public."
+        ),
     }

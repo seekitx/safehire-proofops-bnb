@@ -30,3 +30,29 @@
 ## 上线底线
 
 mainnet 只能在合约审计、独立签名器、金额极小、综合监控、故障演练和用户二次确认都完成后再考虑。黑客松阶段保持 `ALLOW_BSC_MAINNET=false`。
+
+## 2026-08-31 external ERC-8183 buyer hardening
+
+The external mainnet hire path now treats the provider quote and deliverable as
+hostile input until verified:
+
+- the buyer recomputes request, response and negotiation hashes;
+- the provider signature must recover to the quoted provider (EOA) or pass
+  ERC-1271 on BSC Mainnet;
+- chain ID, Commerce address, payment token, exact price and quote expiry are
+  fail-closed;
+- the exact signed JobDescription, including the canonical task input, ERC-8004
+  token ID and nonce, is anchored by `createJob`;
+- job expiry covers provider ETA, the on-chain dispute window and a safety buffer;
+- resumed jobs rebuild policy, budget and allowance progress from BSC state;
+- deliverable URLs accept only HTTPS/IPFS, reject non-public DNS/IPs, cap redirects,
+  content type and response size, then compare the canonical manifest hash with the
+  on-chain commitment;
+- success-criteria satisfaction remains a human decision; the client can dispute
+  during the policy window or settle only after a final verdict;
+- browser activity JSON is explicitly unverified. Paid history is counted only from
+  a server-rebuilt dossier that verifies completion and the provider token transfer.
+
+Residual risks remain explicit: public RPC availability, off-chain storage
+availability, third-party provider correctness, contract-level vulnerabilities and
+lack of an independent audit. Use a disposable low-value contest wallet.

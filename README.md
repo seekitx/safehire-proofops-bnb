@@ -16,17 +16,17 @@ Discover → Compare proof → Quote → Limit authority → Hire
 
 ## Judge in 90 seconds
 
-1. **Live judge scorecard**
-   https://safehire-proofops-bnb.onrender.com/assets/judge-scorecard.html
-2. **Marketplace — four live ERC-8004 categories**
+1. **Live judge scorecard**  
+   https://safehire-proofops-bnb.onrender.com/judge-scorecard
+2. **Marketplace — four live ERC-8004 categories**  
    https://safehire-proofops-bnb.onrender.com
-3. **External ERC-8183 hire path**
+3. **External ERC-8183 hire path**  
    https://safehire-proofops-bnb.onrender.com/hire-live
-4. **On-chain proof dossier**
+4. **On-chain proof dossier**  
    https://safehire-proofops-bnb.onrender.com/proof
-5. **TermiX benchmark lab**
+5. **TermiX benchmark lab**  
    https://safehire-proofops-bnb.onrender.com/benchmark
-6. **Public A2A Agent Card**
+6. **Public A2A Agent Card**  
    https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
 
 The scorecard is a deterministic evidence map, **not an official BNB Chain score**.
@@ -83,9 +83,8 @@ a fabricated green status.
 
 - Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,
   yield optimisation and health-factor monitoring.
-- Each card can request a live `0.10 U` quote without connecting a wallet.
-- `/hire-live` continues a reviewed quote into wallet-confirmed ERC-8183
-  create/register/budget/approve/fund/delivery/settle-or-refund steps.
+- Each card can request a live `0.10 U` quote without connecting a wallet; the hardened buyer verifies request/response hashes, chain and Commerce binding, quote expiry, and the provider's EIP-191 or ERC-1271 signature.
+- `/hire-live` anchors the exact signed JobDescription, calculates expiry from provider ETA plus the on-chain dispute window, restores an interrupted job from BSC state, verifies the retrieved delivery manifest against its on-chain hash, and exposes explicit dispute/settle/refund branches.
 - BSC Testnet Job #808 has successful create, register, budget, approve, fund,
   delivery and settlement receipts plus observed provider payment.
 - `AgentRegistry`, `ScopedExecutionPolicy` and `EvidenceAnchor` are deployed on
@@ -152,7 +151,7 @@ uvicorn apps.api.main:app --reload --port 8000
 Open:
 
 - marketplace: `http://localhost:8000`
-- judge scorecard: `http://localhost:8000/assets/judge-scorecard.html`
+- judge scorecard: `http://localhost:8000/judge-scorecard`
 - OpenAPI: `http://localhost:8000/docs`
 
 ## Verification
@@ -191,11 +190,13 @@ keystores, virtual environments, caches, build output and dependencies.
 2. [`agent.md`](agent.md) — task-oriented file index.
 3. [`docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md`](docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md)
    — current official-rubric strategy and demo.
-4. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)
+4. [`docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md`](docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md)
+   — latest signed-quote, delivery verification, dispute and resumability review.
+5. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)
    — ten-role debate and consensus.
-5. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)
+6. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)
    — official winner patterns and current gap analysis.
-6. `docs/02_ARCHITECTURE.md` through `docs/10_EXTERNAL_COMPLETION_CHECKLIST.md`
+7. `docs/02_ARCHITECTURE.md` through `docs/10_EXTERNAL_COMPLETION_CHECKLIST.md`
    — implementation, security, operation and submission details.
 
 ## Security boundary

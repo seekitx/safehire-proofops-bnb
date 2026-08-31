@@ -44,6 +44,8 @@
           <div><small>PROVIDER</small><strong id="quoteProvider">—</strong></div>
           <div><small>DELIVERY</small><strong id="quoteEta">—</strong></div>
           <div><small>IDENTITY</small><a id="identityLink" target="_blank" rel="noreferrer">—</a></div>
+          <div><small>SIGNATURE</small><strong id="quoteSignature">—</strong></div>
+          <div><small>QUOTE EXPIRY</small><strong id="quoteExpiry">—</strong></div>
         </div>
         <div class="task-head"><strong>Task input</strong><button id="resetTask" type="button">Reset reviewed example</button></div>
         <ul class="needs" id="taskNeeds"></ul>
@@ -61,6 +63,7 @@
         <label class="risk-confirm"><input id="riskConfirm" type="checkbox"/><span>I understand this is BSC Mainnet and each confirmed wallet transaction can spend real assets.</span></label>
         <button class="button full" id="prepareHire" type="button" disabled>Connect wallet to prepare exact transactions</button>
         <p class="field-note" id="prepareNote">Preparing a plan is read-only. Sending starts only after a separate button press.</p>
+        <p class="resume-note" id="resumeState" hidden></p>
       </article>
     </section>
 
@@ -73,7 +76,7 @@
         <li data-step="approve_u"><span>04</span><div><strong>Approve exactly 0.10 U</strong><small>Waiting</small></div></li>
         <li data-step="fund_job"><span>05</span><div><strong>Fund escrow</strong><small>Waiting</small></div></li>
         <li data-step="agent_delivery"><span>06</span><div><strong>External delivery</strong><small>Waiting</small></div></li>
-        <li data-step="settle_job"><span>07</span><div><strong>Settle or refund</strong><small>Waiting</small></div></li>
+        <li data-step="settle_job"><span>07</span><div><strong>Review, dispute or settle</strong><small>Waiting</small></div></li>
       </ol>
       <div class="next-action"><span>NEXT EXPLICIT ACTION</span><strong id="nextAction">Prepare a verified plan first</strong></div>
       <div class="action-row">
@@ -81,11 +84,21 @@
         <button class="button secondary" id="notifyAgent" type="button" disabled>Ask Agent to deliver</button>
         <button class="button secondary" id="checkDelivery" type="button" disabled>Check on-chain delivery</button>
         <button class="button" id="settleJob" type="button" disabled>Settle reviewed delivery</button>
+        <button class="danger-link" id="disputeJob" type="button" disabled>Dispute delivery</button>
         <button class="danger-link" id="refundJob" type="button" disabled>Refund expired escrow</button>
       </div>
+      <section class="delivery-panel" id="deliveryPanel" hidden>
+        <div class="delivery-head">
+          <div><small>HASH-VERIFIED DELIVERABLE</small><strong id="deliveryTitle">Waiting for submission</strong></div>
+          <a id="deliveryManifestLink" href="#" target="_blank" rel="noreferrer">Manifest ↗</a>
+        </div>
+        <div class="delivery-verification" id="deliveryVerification"></div>
+        <pre id="deliveryContent"></pre>
+        <label class="risk-confirm"><input id="deliveryConfirm" type="checkbox"/><span>I read the delivery and compared it with the signed success criteria before settlement.</span></label>
+      </section>
       <div class="receipt-panel" id="receiptPanel" hidden>
         <div><small>PUBLIC RECEIPT DOSSIER</small><strong id="receiptTitle">Job prepared</strong></div>
-        <button id="downloadReceipt" type="button">Download JSON</button>
+        <button id="downloadReceipt" type="button">Download verified JSON</button>
         <pre id="receiptJson"></pre>
       </div>
     </section>

@@ -23,6 +23,7 @@ from proofops.domain.errors import (
     TaskTransitionError,
 )
 from proofops.domain.models import DataSource, ExecutionMode, LpPosition
+from proofops.judging.scorecard import build_judge_scorecard
 from proofops.plugins.adversarial import Proposal
 from proofops.services.bootstrap import Application, build_application
 from proofops.services.browser_deployment import (
@@ -38,6 +39,9 @@ from proofops.services.browser_erc8183 import (
 )
 from proofops.services.live_agent_market import live_agent_market, request_live_agent_quote
 from proofops.services.live_erc8183 import (
+    build_verified_receipt,
+    live_delivery,
+    live_dispute_plan,
     live_followup_plan,
     live_job_status,
     live_refund_plan,
@@ -162,6 +166,7 @@ class LiveMarketQuoteRequest(BaseModel):
         "yield_plan",
         "health_factor",
     ]
+    agent_token_id: int | None = Field(default=None, gt=0)
 
 
 LiveSkillId = Literal[
@@ -175,17 +180,21 @@ LiveSkillId = Literal[
 class LiveHirePrepareRequest(BaseModel):
     buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
     skill_id: LiveSkillId
+    agent_token_id: int | None = Field(default=None, gt=0)
     task_input: dict[str, Any]
 
 
 class LiveHireJobRequest(BaseModel):
     buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
-    skill_id: LiveSkillId
     job_id: int = Field(gt=0)
 
 
 class LiveHireNotifyRequest(BaseModel):
-    skill_id: LiveSkillId
+    job_id: int = Field(gt=0)
+
+
+class LiveHireDisputeRequest(BaseModel):
+    buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
     job_id: int = Field(gt=0)
 
 
@@ -404,6 +413,7 @@ async def runtime(application: ApplicationDep) -> dict[str, Any]:
         "github_repo_url": application.settings.github_repo_url,
         "wallet_auth_required": True,
         "mainnet_enabled": application.settings.allow_bsc_mainnet,
+        "external_mainnet_hire_enabled": application.settings.allow_external_mainnet_hire,
     }
 
 
@@ -415,6 +425,14 @@ async def network_status(application: ApplicationDep, chain_id: int = 97) -> dic
 def _require_development(application: Application) -> None:
     if application.settings.app_env == "production":
         raise HTTPException(status_code=404, detail="not_found")
+
+
+def _require_external_mainnet_hire(application: Application) -> None:
+    if not application.settings.allow_external_mainnet_hire:
+        raise HTTPException(
+            status_code=503,
+            detail="external_mainnet_hire_disabled",
+        )
 
 
 @app.get("/api/dev/contracts/deployment-plan")
@@ -501,13 +519,19 @@ async def official_agents(
 
 @app.get("/api/live-market")
 async def live_market() -> dict[str, Any]:
-    return await live_agent_market(Path(__file__).resolve().parents[2])
+    return await live_agent_market(PROJECT_ROOT)
 
 
 @app.post("/api/live-market/quote")
 async def live_market_quote(body: LiveMarketQuoteRequest) -> dict[str, Any]:
     try:
-        return await request_live_agent_quote(PROJECT_ROOT, skill_id=body.skill_id)
+        return await request_live_agent_quote(
+            PROJECT_ROOT,
+            skill_id=body.skill_id,
+            agent_token_id=body.agent_token_id,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=503,
@@ -516,12 +540,16 @@ async def live_market_quote(body: LiveMarketQuoteRequest) -> dict[str, Any]:
 
 
 @app.post("/api/live-hire/prepare")
-async def prepare_external_hire(body: LiveHirePrepareRequest) -> dict[str, Any]:
+async def prepare_external_hire(
+    body: LiveHirePrepareRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
     try:
         return await prepare_live_hire(
             PROJECT_ROOT,
             buyer=body.buyer,
             skill_id=body.skill_id,
+            agent_token_id=body.agent_token_id,
             task_input=body.task_input,
         )
     except (TypeError, ValueError) as exc:
@@ -531,13 +559,12 @@ async def prepare_external_hire(body: LiveHirePrepareRequest) -> dict[str, Any]:
 
 
 @app.post("/api/live-hire/followup-plan")
-async def external_hire_followup(body: LiveHireJobRequest) -> dict[str, Any]:
+async def external_hire_followup(
+    body: LiveHireJobRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
     try:
-        return await live_followup_plan(
-            buyer=body.buyer,
-            skill_id=body.skill_id,
-            job_id=body.job_id,
-        )
+        return await live_followup_plan(buyer=body.buyer, job_id=body.job_id)
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except httpx.HTTPError as exc:
@@ -555,20 +582,46 @@ async def external_hire_status(job_id: int) -> dict[str, Any]:
 
 
 @app.post("/api/live-hire/notify")
-async def external_hire_notify(body: LiveHireNotifyRequest) -> dict[str, Any]:
+async def external_hire_notify(
+    body: LiveHireNotifyRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
     try:
-        return await notify_live_agent(
-            job_id=body.job_id,
-            skill_id=body.skill_id,
-        )
+        return await notify_live_agent(PROJECT_ROOT, job_id=body.job_id)
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=503, detail="external Agent delivery service is unavailable") from exc
 
 
+@app.get("/api/live-hire/delivery/{job_id}")
+async def external_hire_delivery(job_id: int) -> dict[str, Any]:
+    try:
+        return await live_delivery(job_id=job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="external delivery is temporarily unavailable") from exc
+
+
+@app.post("/api/live-hire/dispute-plan")
+async def external_hire_dispute(
+    body: LiveHireDisputeRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
+    try:
+        return await live_dispute_plan(buyer=body.buyer, job_id=body.job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="BSC mainnet dispute read is unavailable") from exc
+
+
 @app.get("/api/live-hire/settle-plan/{job_id}")
-async def external_hire_settle(job_id: int) -> dict[str, Any]:
+async def external_hire_settle(
+    job_id: int, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
     try:
         return await live_settle_plan(job_id=job_id)
     except (TypeError, ValueError) as exc:
@@ -578,13 +631,26 @@ async def external_hire_settle(job_id: int) -> dict[str, Any]:
 
 
 @app.get("/api/live-hire/refund-plan/{job_id}")
-async def external_hire_refund(job_id: int) -> dict[str, Any]:
+async def external_hire_refund(
+    job_id: int, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_external_mainnet_hire(application)
     try:
         return await live_refund_plan(job_id=job_id)
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=503, detail="BSC mainnet refund read is unavailable") from exc
+
+
+@app.get("/api/live-hire/verified-receipt/{job_id}")
+async def external_hire_verified_receipt(job_id: int) -> dict[str, Any]:
+    try:
+        return await build_verified_receipt(job_id=job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="verified receipt is temporarily unavailable") from exc
 
 
 @app.post("/api/providers/validate")
@@ -930,6 +996,11 @@ async def verify_evidence(application: ApplicationDep) -> dict[str, Any]:
 @app.get("/api/submission/validate")
 async def validate_submission(application: ApplicationDep) -> dict[str, Any]:
     return application.submission.run()
+
+
+@app.get("/api/judge-scorecard")
+async def judge_scorecard(application: ApplicationDep) -> dict[str, Any]:
+    return build_judge_scorecard(PROJECT_ROOT, application.submission.run())
 
 
 def _a2a_data_part(params: dict[str, Any]) -> dict[str, Any] | None:
@@ -1347,6 +1418,11 @@ async def live_hire_page() -> FileResponse:
 @app.get("/benchmark", include_in_schema=False)
 async def benchmark_page() -> FileResponse:
     return FileResponse(WEB_ROOT / "benchmark.html")
+
+
+@app.get("/judge-scorecard", include_in_schema=False)
+async def judge_scorecard_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "assets" / "judge-scorecard.html")
 
 
 @app.get("/dev/deploy-testnet", include_in_schema=False)
