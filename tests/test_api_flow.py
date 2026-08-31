@@ -85,12 +85,38 @@ def test_public_marketplace_a2a_card_and_preview(tmp_path, monkeypatch) -> None:
                 },
             },
         )
+        sponsored_hire = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": "hire-1",
+                "method": "message/send",
+                "params": {
+                    "message": {
+                        "role": "user",
+                        "messageId": "hire-message-1",
+                        "parts": [
+                            {
+                                "kind": "data",
+                                "data": {
+                                    "skill": "hire_analysis",
+                                    "task_id": "termix-grid-test",
+                                    "agent_id": "grid-sentinel-demo",
+                                    "input": example,
+                                },
+                            }
+                        ],
+                    }
+                },
+            },
+        )
 
     assert card.status_code == 200
     assert card.json()["url"] == "https://safehire.example.com/a2a"
     assert {skill["id"] for skill in card.json()["skills"]} == {
         "list_live_agents",
         "preview",
+        "hire_analysis",
         "public_proof",
     }
     assert invoke.status_code == 200
@@ -98,6 +124,10 @@ def test_public_marketplace_a2a_card_and_preview(tmp_path, monkeypatch) -> None:
     assert invoke.json()["result"]["agent_id"] == "grid-sentinel-demo"
     assert invoke.json()["result"]["action"] == "propose_grid"
     assert "no wallet signature" in invoke.json()["result"]["evidence_boundary"]
+    assert sponsored_hire.status_code == 200
+    assert sponsored_hire.json()["result"]["status"] == "completed"
+    assert sponsored_hire.json()["result"]["hire_receipt"]["payment_mode"] == "sponsored"
+    assert len(sponsored_hire.json()["result"]["hire_receipt"]["record_hash"]) == 64
 
 
 def test_public_marketplace_a2a_validation_and_proof(tmp_path, monkeypatch) -> None:
