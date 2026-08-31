@@ -100,6 +100,67 @@ def test_public_marketplace_a2a_card_and_preview(tmp_path, monkeypatch) -> None:
     assert "no wallet signature" in invoke.json()["result"]["evidence_boundary"]
 
 
+def test_public_marketplace_a2a_validation_and_proof(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))
+    monkeypatch.setenv("EVIDENCE_LEDGER_PATH", str(tmp_path / "evidence.jsonl"))
+
+    with TestClient(app) as client:
+        wrong_method = client.post(
+            "/a2a",
+            json={"jsonrpc": "2.0", "id": 1, "method": "tasks/get", "params": {}},
+        )
+        missing_data = client.post(
+            "/a2a",
+            json={"jsonrpc": "2.0", "id": 2, "method": "message/send", "params": {}},
+        )
+        unknown_skill = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "message/send",
+                "params": {"data": {"skill": "move_funds"}},
+            },
+        )
+        malformed_preview = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": 4,
+                "method": "message/send",
+                "params": {"data": {"skill": "preview", "agent_id": 42, "input": []}},
+            },
+        )
+        invalid_agent = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": 5,
+                "method": "message/send",
+                "params": {"data": {"skill": "preview", "agent_id": "missing", "input": {}}},
+            },
+        )
+        public_proof = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": "proof-1",
+                "method": "message/send",
+                "params": {"data": {"skill": "public_proof"}},
+            },
+        )
+
+    assert wrong_method.json()["error"]["code"] == -32601
+    assert missing_data.json()["error"]["code"] == -32602
+    assert unknown_skill.json()["error"]["code"] == -32602
+    assert malformed_preview.json()["error"]["code"] == -32602
+    assert invalid_agent.json()["error"]["code"] == -32602
+    assert public_proof.status_code == 200
+    assert public_proof.json()["result"]["erc8183"]["job_id"] == 808
+    assert public_proof.json()["result"]["erc8183"]["status"] == "COMPLETED"
+
+
 def test_wallet_hire_approve_execute_and_revoke_flow(tmp_path, monkeypatch) -> None:
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))
