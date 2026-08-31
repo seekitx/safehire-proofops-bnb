@@ -1,108 +1,204 @@
-# SafeHire：历届 BNB 获奖方向与本届评委偏好对照
+# SafeHire：历届 BNB 获奖作品与本届评委偏好
 
-> 核对日期：2026-08-31。外部事实只引用 BNB Chain 当前赛事页与官方获奖回顾；SafeHire 状态来自本仓库代码、证据文件和公开 API。本文是冲奖判断，不是主办方评分或获奖保证。
+> 核对日期：2026-08-31。赛事事实以 BNB Chain 官方活动页和官方获奖回顾为准；
+> SafeHire 状态以当前仓库代码、公开 API 与 evidence 目录为准。本文不构成官方评分或获奖保证。
 
-## 结论
+## 当前结论
 
-### 本轮实施状态
+SafeHire 已经具备 Working MVP 的主要技术闭环：四类外部 BSC Agent 发现与报价、
+`/hire-live` 的 ERC-8183 主网雇佣流程、Job #808 的完整测试网结算证据、权限控制、
+公开 proof dossier、TermiX 原始输出、PancakeSwap 可重算收益证据和 provider intake。
 
-代码层已补上原分析中可自动完成的主要缺口：外部 Agent 报价可继续进入人工逐笔确认的主网 ERC-8183 雇佣；首页分开展示实时探测、索引健康、反馈和运营方数；新增只读 provider intake；TermiX 新增真人计时与 A/B 盲评工具；PancakeSwap 新报告覆盖三档金额和估算 Gas 后净改善。
+因此，旧版本中的“真实 Agent 只能报价，没有统一雇佣页”已经不再成立。准确状态是：
 
-下面的缺口仍保留作为评审背景，但其中“没有统一雇佣页”和“没有证据工具”已从代码缺口变成人工验收缺口。本地 Python 检查、合约测试、Agent Studio 构建和 Docker 镜像构建已经通过；生产版本仍以 GitHub Actions 和 Render 的最新部署结果为准。尚未完成的关键事实是：外部 Agent 主网付费交付为 `0`，真人盲评为 `0`，独立运营方仍只有 `1`个。
+- **雇佣页已实现**，但外部主网付费交付记录仍为 `0`；
+- **盲评实验室已实现**，但独立真人盲评记录仍为 `0`；
+- **provider intake 已实现**，但当前四个 live skill 仍来自 `1` 个运营方；
+- **提交结构可以通过门禁**，但获奖级采用证据仍需真人和链上动作补齐。
 
-SafeHire 已经是可提交的 Working MVP，差异化也成立：它把“选 Agent”从宣传页问题改成了身份、证据、权限、托管、交付、结算和撤销都能复核的信任问题。真正妨碍它打动评委的不是合约或协议数量，而是三条证据路径尚未合并：
-
-1. 外部 BSC Agent 可以发现并取得实时 `0.10 U` 报价，但产品不会从该卡片继续创建、付款和等待交付；
-2. 可以完整预演、限制权限和执行的页面使用的是四个本地 demo Agent；
-3. 已结算的 ERC-8183 Job #808 是独立历史证据，不是当前外部 Agent 卡片产生的订单。
-
-官方主赛明确要求普通用户能在几次点击内完成“找到、理解、启用 Agent”，不能遇到死路；TermiX 也会亲自从市场雇佣 Agent。若评委点击真实 Agent 后只得到报价，再发现真正的 Hire 控制台操作的是 demo Agent，这会同时伤害 Functionality、Data Quality、Marketplace Quality 和 Proven Agent Advantage。
+这四个数字比继续增加协议或页面更影响评委信任。
 
 ## 本届官方评审重点
 
-官方要求四个类别都达到同等深度，并主要看：端到端功能、实时且能支持选择的数据、四类 Agent 的多样性。TermiX 另看服务价值 30%、可证明 Agent 优势 30%、高风险类别与历史记录 20%、市场质量 20%；其报告至少要有三项真实任务，逐项提供 Agent 与不用 Agent 两条路径的耗时、成本、质量和完整输出。PancakeSwap 奖要求给交易者或 LP 带来真实好处。
+官方主赛要求市场让普通用户能在少量点击中找到、理解和激活 Agent，并将四类
+Agent 作为同等重要的一等能力：
 
-来源：
+1. Rebalancing
+2. Grid Trading
+3. Yield Optimisation
+4. Health Factor Monitoring
 
-- [The Smart Money Era 官方赛事页](https://www.bnbchain.org/en/hackathons/smart-money-era?tab=tracks)
+主赛公开列出的三个评分维度是：
+
+- **Functionality**：完整端到端运行，不能出现发现后无法激活的死路；
+- **Data Quality**：实时、准确、足以支持用户选择；
+- **Agent Diversity**：四类都要有同等深度，不能只把一类做深。
+
+官方没有公布主赛三项的数字权重，因此本仓库只输出逐项状态，不生成所谓“官方总分”。
+
+伙伴奖方面：
+
+- TermiX 要求至少三个真实任务，分别完成“通过市场雇佣 Agent”和“不用 Agent”
+  两条路径，记录时间、成本、质量并附完整输出；
+- PancakeSwap 要求给交易者或 LP 带来真实好处；
+- Altana 要求自己的 wallet、scoped session、真实 session-key 交易和应用内撤销，
+  并附 Explorer 证据。
+
+官方入口：
+
+- [The Smart Money Era](https://www.bnbchain.org/en/hackathons/smart-money-era?tab=tracks)
 - [Build the Official BNB Agent Studio Marketplace](https://www.bnbchain.org/en/blog/build-the-era-build-the-official-bnb-agent-studio-marketplace)
 
-## 历届获奖项目体现出的共性
+## 历届官方获奖项目反复出现的模式
 
-| 官方获奖案例 | 被官方突出描述的能力 | 对 SafeHire 的启示 |
+| 官方案例 | 官方突出点 | 对 SafeHire 的直接启示 |
 |---|---|---|
-| Neural Alpha、Genesis、Gridora（AI Trading Agent Edition） | 读取市场条件、管理策略、进行链上执行，并更自主地运行 | 评委看闭环，不只看分析或报价 |
-| DeFi Copilot | 实时分析、一键执行、PancakeSwap 自动管理 | 把复杂 DeFi 压成一条清楚的用户动作链 |
-| BIBIM | 用直观可视界面创建、测试和变现策略 | 易懂、可试、可比较比协议名更有说服力 |
-| DeFi Pro | 简单聊天命令连接 Pendle、Lista 与实时收益数据 | 用真实数据解决一个高级但明确的问题 |
-| Midas | 实时社交数据、影响评估、模块化工作流、自动交易 | 从信号到决定再到行动，因果链必须看得见 |
-| Outrun | 多个互相咬合的 DeFi 原语形成完整经济系统 | 技术模块必须共同服务一个产品结果，不能像附件拼装 |
+| Neural Alpha / Genesis / Gridora | 分析真实市场、执行策略、链上交互、自主运行 | “推荐”必须继续到动作或交付 |
+| DeFi Copilot | 实时分析 + 一键执行 + PancakeSwap 管理 | 复杂 DeFi 要压缩成一条清楚路径 |
+| DeFi Pro | 用简单交互接入 Pendle、Lista 与实时收益 | 使用门槛和实时数据比堆模型更重要 |
+| Midas | 实时信号 → 推理 → 模块化工作流 → 自动交易 | 输入、判断、行动和结果应形成因果链 |
+| BIBIM | 创建、测试、变现策略的直观界面 | 能试、能比较、能复核比抽象协议叙事更强 |
+| AGOS Clawjob | Agent 服务市场、USDT 支付、链上交易 | 市场必须有真实商业激活，不只是目录 |
+| ShieldBot / Aegis | 执行前拦截或监控后采取可验证保护动作 | 风险控制必须影响资金路径，而非装饰面板 |
+| Tearline / Tutorial Agent 等 | 官方回顾强调用户、请求、交易量等采用数据 | 真实使用指标会显著提高可信度 |
+| MCPForge | 把能力包装为可部署、调用、变现服务 | Provider onboarding 和标准接口决定可扩展性 |
 
-官方来源：
+官方回顾：
 
-- [AI Trading Agent Edition 获奖回顾](https://www.bnbchain.org/en/blog/meet-the-winners-of-bnb-hack-ai-trading-agent-edition)
-- [2025 年 7 月 BNB Hack 获奖回顾](https://www.bnbchain.org/en/blog/congratulations-to-the-latest-bnb-hack-winners-july-21-batch)
-- [BNB Hack Abu Dhabi 获奖回顾](https://www.bnbchain.org/en/blog/bnb-hack-abu-dhabi-highlights-from-the-hackathon-and-demo-night)
-- [BNB Hack Buenos Aires 评审维度](https://www.bnbchain.org/en/blog/bnb-hack-buenos-aires-recap-highlighting-builders-innovation-and-the-winners)
-- [BNB Hack 2024 Q4 获奖回顾](https://www.bnbchain.org/en/blog/bnb-hack-2024-q4-winners-a-celebration-of-innovation)
+- [AI Trading Agent Edition winners](https://www.bnbchain.org/en/blog/meet-the-winners-of-bnb-hack-ai-trading-agent-edition)
+- [Good Vibes Only winners](https://www.bnbchain.org/en/blog/good-vibes-only-the-ai-hackathon-winners)
+- [BNB Hack Abu Dhabi](https://www.bnbchain.org/en/blog/bnb-hack-abu-dhabi-highlights-from-the-hackathon-and-demo-night)
+- [BNB Hack Buenos Aires](https://www.bnbchain.org/en/blog/bnb-hack-buenos-aires-recap-highlighting-builders-innovation-and-the-winners)
+- [BNB Hack 2024 Q4](https://www.bnbchain.org/en/blog/bnb-hack-2024-q4-winners-a-celebration-of-innovation)
 
-跨届共性可以概括为五点：
+## 从获奖模式推导出的五条评委偏好
 
-1. 真实输入，不是漂亮的静态卡片；
-2. 真实动作或交付，不止一条推荐；
-3. 用户收益可以重新计算；
-4. 复杂能力被压缩成低门槛界面；
-5. 有真实使用、交易、任务量或持续运行记录时，可信度明显更高。
+### 1. 评委奖励闭环，不奖励组件数量
 
-Buenos Aires 的官方评审维度还明确包含设计与易用性、创新、可扩展性与技术深度、开源贡献、生态契合。Abu Dhabi 官方总结强调真实用户需求、快速测试、保持产品简单，以及持续迭代。
+获奖项目往往能用一句话描述用户从问题到结果的路径。协议、模型、合约和数据源只有在
+这条路径中发挥作用才加分。
 
-## SafeHire 当前强项
+SafeHire 应固定为：
 
-1. **定位有差异**：不是再做一个交易 Agent，而是做 Agent 金融市场的信任与结算层。
-2. **安全边界具体**：权限范围、单次和每日额度、过期、单独批准、撤销、回执，不是只写“安全”。
-3. **链上证据比一般 MVP 扎实**：ERC-8004 身份、ERC-8183 Job #808、三个 ProofOps 合约和公开 proof dossier 都可复核。
-4. **诚实边界做得好**：代码明确区分 live、quote-only、sponsored、demo fixture 和未成交报价，没有把预演冒充利润。
-5. **四类目录已经出现**：外部 BSC mainnet Agent 覆盖四个官方类别，当前公开 API 也能实时确认四项能力可调用。
+```text
+Discover → Compare proof → Quote → Bound authority → Hire → Delivery
+→ Settle/refund → Receipt → Reputation
+```
 
-这部分最适合形成一句冲奖叙事：
+不要演示时按“先介绍三个合约，再介绍七个插件，再介绍四个 Agent”的顺序。
 
-> SafeHire is the trust and settlement layer for BNB Chain agents: compare verified outcomes, cap authority, hire in a few clicks, and settle only after a provable delivery.
+### 2. 真实数据必须能改变决定
 
-## 当前最影响获奖的缺口
+仅展示 TVL、APY、health score 或 reputation 不足。评委会问：
 
-### P0：必须先补
+- 这个值来自哪里，什么时候采集？
+- 它为什么改变推荐？
+- 如果来源失败，系统会不会用 fixture 伪装 live？
+- 身份分、端点健康和实际交付质量是否被混为一谈？
 
-1. **把真实外部 Agent 卡片接入同一个 Hire 流程。**从外部 ERC-8004 身份和报价开始，在同一页面选择任务、显示价格、创建/资助 ERC-8183、等待交付、验收、结算或退款，最后把回执回写到该 Agent 的履历。可以先使用 BSC Testnet 和小额 `0.1 U`，但必须让评委亲自走通。
-2. **重做 TermiX 三组证据。**现报告的不用 Agent 路径是同一脚本里的确定性函数，耗时显示 0 秒；Agent 反而慢 2.65 秒。三项质量分又由代码固定为同一组 `24.5 vs 22`，复核人仍是 `entrant review pending`。结构看起来合规，但无法经受评委追问。应改成真实人工工作流计时、盲评或至少由非输出作者按逐项证据评分，并让三项分数根据实际输出变化。
-3. **至少让一笔 TermiX 任务来自可公开雇佣的外部 Agent。**当前三次 sponsored hire 调用的是 SafeHire 自己的 A2A 确定性能力，外部四个 Agent 只参与发现和报价。TermiX 会亲自雇佣，这两条路径不能分离。
+SafeHire 的优势是已经区分当前 A2A 探测、8004scan 缓存信号、用户输入和链上证据。
+下一步不是再加字段，而是用一次真实付费交付证明这些字段真正支持了选择。
 
-### P1：显著提升胜率
+### 3. “真实动作”比“可执行按钮”更有说服力
 
-4. **用表现数据做“选择”，而不只是展示身份。**每个 Agent 至少补充成功/失败任务数、最近 10 笔结果、交付时延分布、真实价格、用户反馈、证据新鲜度、可复核输出，以及适合本类别的风险指标。8004scan 官方 API 已能提供身份、能力、所有权、reputation、feedback 和网络信息，本项目目前没有把 reputation/feedback 变成排序或推荐依据。
-5. **增加运营方和同类候选。**现有四个 live Agent 全来自 Brain On BNB AI，且每类只有一个。它满足“四类出现”，却不像能让用户比较选择的市场。至少引入第二个独立提供方，或给每类两种不同风险/价格方案。
-6. **补齐 Rebalancing 的真实深度。**TermiX 三组任务覆盖网格、收益和健康因子，没有调仓；四类中的调仓仍主要是外部报价和本地 fixture。至少做一笔真实 LP 区间分析/调仓交付，并给出费用、预期增益、无常损失、gas、触发阈值和不执行理由。
-7. **把 PancakeSwap 收益从“0.0039 USDT 单点报价”升级成可感知结果。**当前证据真实但很小，而且没有计 gas、没有交易。更强版本应比较多个区块/时段、不同交易规模或 LP 周期，报告累计节省、失败率、gas 后净收益和风险；最好让一次 Agent 选择实际产生测试网或受控执行回执。
+`/hire-live` 证明代码已经能生成和校验交易步骤；Job #808 证明测试网完整流程曾完成。
+但最强证据仍是一笔从当前外部卡片发起的真实小额交付。
 
-### P2：最后包装和可靠性
+这也是当前第一优先级。
 
-8. **提供 Agent 上架/验证入口。**主赛赢家会被官方采用为 BNB Agent Studio 市场；只有硬编码目录难以证明能扩展。做一个最小 provider onboarding：提交 Agent Card/8004 ID，自动校验端点、类别、价格、协议和证据完整度，再进入待审核状态。
-9. **消除 Render 免费休眠风险。**评委第一次打开如果等待几十秒，会直接削弱 Functionality 印象。至少准备稳定托管、健康监控和故障降级页；不要让 live 数据失败时回退成 demo。
-10. **录制 2–3 分钟单线演示。**视频不是当前表单硬门槛，但应该只讲一条 wow path：真实 Agent → 可比较证据 → 0.1 U 雇佣 → 权限上限 → 交付 → 结算/退款 → Agent 履历更新。不要按模块逐页念。
-11. **取得一条独立使用证据。**邀请一个外部 Agent 提供方或真实用户走完流程，保留公开评价、任务回执或 GitHub issue。历届官方回顾会突出用户数、交易数、任务量和成交量，说明真实采用是强信号。
+### 4. 简单界面背后可以有很深技术
 
-## 建议的提交前冲刺顺序
+历届项目经常把复杂协议压成一个明显动作。SafeHire 应让评委先看到：
 
-1. 真实外部 Agent 端到端雇佣闭环；
-2. 用该闭环重新做三组 TermiX 对照和真实评分；
-3. 每类真实履历/反馈/风险数据，同类可比较；
-4. 强化 PancakeSwap 的净收益证据和 Rebalancing 深度；
-5. 稳定托管、短视频和独立用户证言。
+- 我雇的是谁；
+- 为什么选它；
+- 它能花多少；
+- 它会交付什么；
+- 不满意如何退款/撤销；
+- 最后去哪验证。
 
-不要优先继续部署新合约、增加 Logo 或再做第五类 Agent。它们不会修复评委最容易撞见的死路。
+AgentProof、hash-chain、ERC-8004、ERC-8183 和 policy 是答案的底层，不应成为首页
+第一屏的术语墙。
+
+### 5. 真实采用会放大所有技术分
+
+第二运营方、第一笔外部付费任务、独立盲评者和一段真实使用反馈，会同时提升：
+
+- Functionality 的可信度；
+- Data Quality 的结果数据；
+- Agent Diversity 的市场真实性；
+- TermiX 的 Proven Agent Advantage；
+- 官方采用为 canonical marketplace 的说服力。
+
+## SafeHire 当前最有竞争力的创新
+
+### Proof-carrying Agent Marketplace
+
+传统 Agent 市场往往把身份、评分、权限、付款和交付分开。SafeHire 把它们组合为一个
+可携带、可复核的工作证明包络：
+
+```mermaid
+flowchart LR
+    I[ERC-8004 identity] --> Q[Live quote]
+    Q --> D[Decision evidence]
+    D --> P[Scoped permission]
+    P --> H[ERC-8183 hire]
+    H --> O[Provider output]
+    O --> S[Settle or refund]
+    S --> R[Receipt and reputation]
+```
+
+这个创新点比“我们也有 AI Agent”更容易征服评委，因为它解决的是 Agent 金融市场
+不可避免的信任问题，并且每一层都能展示真实证据。
+
+### Evidence before authority
+
+用户不是先给 Agent 一个钱包，再希望它做对；而是先看任务级证据，再只开放完成任务
+所需的目标、方法、金额和时间。
+
+### Honest decision data
+
+SafeHire 明确区分：
+
+- 注册身份；
+- 当前 endpoint 可达性；
+- 索引平台的缓存健康/评分；
+- SafeHire 自己观察到的交付；
+- sponsored 分析；
+- paid track record；
+- testnet 与 mainnet。
+
+这种“拒绝把弱信号包装成强证明”的能力本身就是金融 Agent 市场的产品价值。
+
+## 当前差距，不再使用过时描述
+
+### 已经补齐
+
+- 从 live card 到 `/hire-live` 的统一路径；
+- 外部 ERC-8183 任务、预算、授权、托管、通知、结算和退款交易计划；
+- 真人计时和隐藏 A/B 的 benchmark lab；
+- 第二 provider 的只读 intake 校验；
+- 多档 PancakeSwap 报价和 Gas 后净改善；
+- 官方索引信号与 SafeHire 当前探测的分开展示。
+
+### 仍需现实世界完成
+
+1. 第一笔外部主网 `0.10 U` 付费交付；
+2. 三项真人无 Agent 计时；
+3. 另一位真实评审人的三项盲评；
+4. 第二个独立 ERC-8004 运营方；
+5. 评审期稳定托管与短视频；
+6. 最终提交人的身份、钱包和条款确认。
 
 ## 最终判断
 
-- **提交资格层面：**已经达到有公开产品、公开代码和链上证据的认真作品水平。
-- **进入 shortlist 的说服力：**有，尤其是 ProofOps 权限与可核验结算的差异化。
-- **成为官方 canonical marketplace 的说服力：**目前不足。最大的反对理由会是“真实外部市场只能报价，能完成 Hire 的却是 demo；因此还不是给真实用户用的统一市场”。
-- **最可能翻盘的方向：**不再扩功能，把 SafeHire 定义成“真实 Agent 雇佣的信任与结算层”，然后用一条无断点的外部 Agent 订单和可信报告证明它。
+SafeHire 的技术和差异化足以进入认真评审范围。它比一般“AI 推荐 + 钱包连接”
+项目更强的地方，是把权限和证据做成了产品主线。
+
+最可能阻止它获奖的理由不再是“功能没做”，而是：
+
+> 评委看到了一个很完整的安全市场，但没有看到足够多的外部真实使用，因而不确定它是
+> canonical marketplace，还是一个完成度很高的单运营方演示。
+
+因此，剩余时间的最优使用方式不是继续扩功能，而是把现有闭环变成一条不可反驳的
+真实采用证据。

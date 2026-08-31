@@ -1,0 +1,47 @@
+name: judge-ready-delivery
+on:
+  push:
+    branches:
+      - "review/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: pip install -e '.[dev,bnb]'
+      - run: ruff check src apps tests scripts
+      - run: mypy src apps scripts
+      - name: Compile contracts for API tests
+        working-directory: contracts
+        run: npm ci --ignore-scripts && npm run compile
+      - run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
+      - run: python scripts/static_security_check.py
+      - run: python scripts/submission_gate.py --allow-incomplete
+      - run: python scripts/judge_scorecard.py --output judge-scorecard.json
+      - name: Build downloadable release
+        run: |
+          python scripts/build_release.py
+          mkdir -p dist
+          cp ../safehire-proofops-bnb-release.zip dist/
+          cp ../safehire-proofops-bnb-release.manifest.json dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: safehire-proofops-bnb-judge-ready
+          path: |
+            dist/safehire-proofops-bnb-release.zip
+            dist/safehire-proofops-bnb-release.manifest.json
+            judge-scorecard.json
+          if-no-files-found: error
+          retention-days: 14

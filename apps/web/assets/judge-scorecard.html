@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta
+    name="description"
+    content="A deterministic, judge-facing self-audit for SafeHire / ProofOps."
+  />
+  <title>SafeHire · Judge Scorecard</title>
+  <link rel="stylesheet" href="/assets/judge-scorecard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand" aria-label="Back to SafeHire">
+      <span>S</span>
+      <strong>SafeHire</strong>
+      <small>Judge scorecard</small>
+    </a>
+    <nav>
+      <a href="/">Marketplace</a>
+      <a href="/hire-live">Live hire</a>
+      <a href="/proof">Proof dossier</a>
+      <a href="/benchmark">Benchmark lab</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">90-SECOND JUDGE ROUTE</p>
+        <h1>Inspect the claim.<br /><span>Then inspect the boundary.</span></h1>
+        <p class="lede">
+          This page maps the public SafeHire evidence to the published BNB Chain
+          criteria. It never presents a project self-audit as an official score.
+        </p>
+      </div>
+      <aside class="headline-card">
+        <small>WINNER READINESS</small>
+        <strong id="winnerReadiness">Loading evidence…</strong>
+        <p id="winnerBoundary">
+          Live endpoints are being checked. No wallet action will be started.
+        </p>
+      </aside>
+    </section>
+
+    <section aria-labelledby="criteriaTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">MAIN TRACK</p>
+          <h2 id="criteriaTitle">Published criteria, separate verdicts.</h2>
+        </div>
+        <p>No invented weighting. No blended vanity score.</p>
+      </div>
+      <div id="criteriaGrid" class="criteria-grid" aria-live="polite">
+        <article class="criterion skeleton"></article>
+        <article class="criterion skeleton"></article>
+        <article class="criterion skeleton"></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="parityTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">CATEGORY PARITY</p>
+          <h2 id="parityTitle">Four categories, one depth envelope.</h2>
+        </div>
+        <p>Identity → input → quote → hire → receipt.</p>
+      </div>
+      <div id="categoryGrid" class="category-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="split" aria-labelledby="manualTitle">
+      <div>
+        <p class="eyebrow">MANUAL GATES</p>
+        <h2 id="manualTitle">Code cannot manufacture adoption.</h2>
+        <div id="manualGates" class="manual-gates"></div>
+      </div>
+      <aside class="route-card">
+        <p class="eyebrow">WOW PATH</p>
+        <ol>
+          <li><a href="/">Discover four live ERC-8004 skills</a></li>
+          <li><a href="/hire-live">Review and fund a bounded ERC-8183 job</a></li>
+          <li><a href="/proof">Verify identity, settlement and benefit</a></li>
+          <li><a href="/benchmark">Inspect Agent vs no-Agent evidence</a></li>
+        </ol>
+        <p class="fine">
+          External mainnet transactions always remain explicit wallet opt-in.
+        </p>
+      </aside>
+    </section>
+
+    <section class="partner-section" aria-labelledby="partnersTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">PARTNER TRACKS</p>
+          <h2 id="partnersTitle">Eligibility is evidence-gated.</h2>
+        </div>
+      </div>
+      <div id="partnerGrid" class="partner-grid"></div>
+    </section>
+
+    <p id="loadError" class="load-error" hidden></p>
+  </main>
+
+  <footer>
+    <span>SafeHire / ProofOps · proof-carrying agent marketplace</span>
+    <span id="observedAt">Checking public state…</span>
+  </footer>
+  <script src="/assets/judge-scorecard.js" defer></script>
+</body>
+</html>

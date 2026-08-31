@@ -1,4 +1,4 @@
-.PHONY: install test lint typecheck contracts agent-studio run seed gate package
+.PHONY: install test lint typecheck contracts agent-studio run seed gate judge-scorecard package
 
 install:
 	python -m pip install -e '.[dev]'
@@ -26,6 +26,9 @@ seed:
 
 gate:
 	python scripts/submission_gate.py
+
+judge-scorecard:
+	python scripts/judge_scorecard.py --output judge-scorecard.json
 
 package:
 	python scripts/build_release.py

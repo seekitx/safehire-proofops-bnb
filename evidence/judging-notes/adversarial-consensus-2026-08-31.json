@@ -191,5 +191,29 @@
     "Onboard a second independent ERC-8004 provider.",
     "Use reliable judging-period hosting and publish a focused demo."
   ],
-  "honesty_boundary": "This deterministic council accepts the product strategy; it does not certify official eligibility, adoption, independent quality or an award."
+  "honesty_boundary": "This deterministic council accepts the product strategy; it does not certify official eligibility, adoption, independent quality or an award.",
+  "rounds": [
+    {
+      "round": 1,
+      "purpose": "independent attacks",
+      "unresolved_conflicts": [
+        "new features versus real adoption",
+        "claim Altana versus evidence-gated scope",
+        "marketable TermiX score versus independent review",
+        "four categories versus one provider",
+        "single vanity score versus criterion-level proof"
+      ]
+    },
+    {
+      "round": 2,
+      "purpose": "concessions and scope convergence",
+      "consensus_order": [
+        "external paid delivery",
+        "human timing and blind review",
+        "second provider",
+        "stable hosting and focused demo",
+        "refresh evidence and submit"
+      ]
+    }
+  ]
 }

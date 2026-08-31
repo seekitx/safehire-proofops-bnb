@@ -1,78 +1,144 @@
 # SafeHire / ProofOps for BNB Chain
 
-SafeHire 是一个 BNB Chain DeFi Agent 市场与权限防火墙。用户先比较工作证据，再给 Agent 一个有目标、方法、金额和时间限制的权限，每次执行还要单独批准，最后保留可复核回执并能随时撤销。
+> **Hire proof-carrying BNB Chain DeFi agents with bounded permissions and
+> verifiable settlement.**
+
+SafeHire is a BNB Chain Agent marketplace and execution firewall. It does not treat
+an ERC-8004 identity, an endpoint health score or an Agent's own marketing as proof
+of performance. Users inspect job-specific evidence, review live commercial terms,
+cap targets/methods/value/expiry, hire through ERC-8183, and keep a public delivery
+and settlement trail.
 
 ```text
-Compare → Preview → Connect wallet → Set limits → Approve → Receipt → Revoke
+Discover → Compare proof → Quote → Limit authority → Hire
+→ Delivery → Settle/refund → Receipt → Reputation
 ```
 
-评委公开入口：
+## Judge in 90 seconds
 
-- 市场：https://safehire-proofops-bnb.onrender.com
-- 链上证据总页：https://safehire-proofops-bnb.onrender.com/proof
-- 公开 A2A Agent Card：https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
-- TermiX Agent Advantage Report：https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report
-- GitHub：https://github.com/seekitx/safehire-proofops-bnb
+1. **Live judge scorecard**
+   https://safehire-proofops-bnb.onrender.com/assets/judge-scorecard.html
+2. **Marketplace — four live ERC-8004 categories**
+   https://safehire-proofops-bnb.onrender.com
+3. **External ERC-8183 hire path**
+   https://safehire-proofops-bnb.onrender.com/hire-live
+4. **On-chain proof dossier**
+   https://safehire-proofops-bnb.onrender.com/proof
+5. **TermiX benchmark lab**
+   https://safehire-proofops-bnb.onrender.com/benchmark
+6. **Public A2A Agent Card**
+   https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
 
-## 当前已经有的真实证据
+The scorecard is a deterministic evidence map, **not an official BNB Chain score**.
+The event publishes Functionality, Data Quality and Agent Diversity as main-track
+criteria but does not publish a numeric weighting.
 
-- BSC Testnet 已部署 `AgentRegistry`、`EvidenceAnchor`、`ScopedExecutionPolicy` 三个合约，部署回执和链上代码均已回读。
-- 已在官方 ERC-8004 Registry 注册 Agent #2032，owner、Agent 钱包和公开 URI 已回读校验。
-- 已完成官方 ERC-8183 Job #808：签名报价、0.1 U 托管、Agent 交付、15 分钟异议窗口、结算和 Agent 收款全部在 BSC Testnet 有成功回执。
-- 已完成三次公开 SafeHire 赞助分析：保留 A2A 完整输出、hash-chain 回执、耗时、零成本和自动规则评分。这是旧版可复核基线，不冒充独立人类盲评。
-- 已把 PancakeSwap 同区块直连池报价与一次公开 Agent 交付绑定；新报告比较 `0.01 / 0.1 / 1 WBNB` 三档，并显示扣除估算 Gas 后相对 `0.05%` 池的净改善。
-- `/proof` 是给评委看的公开证据总页，会展示 7 笔 Job 回执、ERC-8004 身份、交付物和三个合约的 BscScan 入口。
+## Why this is different
 
-对应原始证据：[ERC-8183 Job #808](evidence/sponsor-integration/erc8183-job-808.json)、[ERC-8004 注册](evidence/sponsor-integration/erc8004-registration.json)、[Agent Studio 部署](evidence/sponsor-integration/agent-studio-deployment.json)、[BSC Testnet 合约](deployments/bsc-testnet.json)。
+### Proof-carrying Agent marketplace
 
-## 本地产品能力
+Every meaningful action can carry a linked evidence envelope:
 
-- 四个本地可调用的确定性演示 Agent：LP 区间调整、网格、收益优化、健康因子。
-- 按类别比较的 AgentProof；证据弱或仅是 fixture 时自动限分。
-- 钱包签名 challenge/session，钱包私钥不进后端。
-- 持久化 permission/task，覆盖预演、人工批准、风险门、执行、回执和撤销。
-- target/method allowlist、单次/每日额度、slippage、expiry、idempotency、kill switch。
-- 8004scan、Venus、Lista 官方只读适配器；PancakeSwap V3 官方 subgraph 适配器。
-- BSC RPC 链身份、块高和交易回执验证。
-- 可防篡改的 hash-chain 证据账本。
-- 严格 TermiX “Agent vs 人工”原始证据报告生成器。
-- `AgentRegistry`、`ScopedExecutionPolicy`、`EvidenceAnchor` 合约，含 Hardhat 编译、测试和 BSC Testnet 部署脚本。
-- 官方 `@bnbagent/studio-cli@0.0.13` 生成的 A2A + MCP + X402 卖方 Agent，已接通 SafeHire 只读预演。
-- 完整 Web 评委路径、FastAPI、Docker、CI 和 fail-closed 提交门禁。
+- ERC-8004 identity and ownership;
+- category-specific capability and required input;
+- source freshness and live endpoint state;
+- commercial quote and exact deliverables;
+- scoped target/method/value/expiry permission;
+- ERC-8183 job and funding receipts;
+- provider output;
+- settle/refund receipt;
+- independent feedback and track record.
 
-## 真实 BSC Agent 市场供给
+Identity is not silently promoted to performance. Sponsored output is not labelled
+paid. A quote is not labelled a trade. Testnet evidence is not labelled mainnet.
 
-首页会展示四个由外部运营方 `Brain On BNB AI` 在 BSC mainnet 注册的 ERC-8004 Agent，分别覆盖调仓、网格、收益优化和健康因子四类能力。`GET /api/live-market` 每次只调用免费的 A2A `list` 发现接口，不会签名、充值或创建 ERC-8183 订单。
+### Bounded authority
 
-这部分证明的是“真实 Agent 可被发现并能返回当前商业报价”，不是“SafeHire 已验证它们的质量”。每张卡可以调用免费的 `negotiate` 获取当前 `0.10 U` 主网报价，界面会明确停在 `QUOTE ONLY · NO TRANSACTION`；SafeHire 不会因此连接钱包、签名、授权或转账。当前没有为这四个外部 Agent 支付主网 `0.10 U`。TermiX 报告使用的是 SafeHire 自有公开 Agent 的三次零成本赞助雇佣，并与外部 Agent 的身份/报价证据分开。
+The LLM is advisory. Deterministic controls remain authoritative:
 
-新增的 `/hire-live` 会把实时报价继续到 ERC-8183 主网任务：创建订单、绑定官方策略、设置预算、精确授权 `0.10 U`、托管、等待交付、结算或过期退款。服务端只生成已校验的交易数据；每一笔写链仍必须由用户在钱包中单独确认。这个新流程尚未产生第一笔外部主网付费交付，因此卡片上的 SafeHire 付费履历仍如实显示为 `0`。
+- target and method allowlists;
+- single-action and daily caps;
+- slippage and expiry;
+- idempotency;
+- separate wallet session, policy and human approval;
+- revoke and kill switch;
+- no backend custody of the user's wallet.
 
-首页还会分开显示 SafeHire 当前实测、8004scan 缓存健康状态、评分和反馈数，并明确标出四张卡实际只来自 `1` 个运营方。最小上架入口可输入新的 ERC-8004 token ID 生成只读校验档案，但不会自动通过审核。
+## Official-rubric status
 
-每次提交前要用只读链上检查刷新这份证据：
+| Criterion | Current state | Reviewable evidence | Remaining proof |
+|---|---|---|---|
+| Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | first paid external mainnet delivery |
+| Data Quality | Conditional | current A2A probe, 8004scan signals, source/time labels, raw hashes | independent blind review and paid outcomes |
+| Agent Diversity | Conditional | all four required categories with equal activation depth | second independent provider |
+| TermiX | Conditional | three raw Agent/no-Agent pairs and reproducible baseline | human timing and independent blind review |
+| PancakeSwap | Conditional | same-block multi-size quote and gas-aware benefit evidence | controlled real-use receipt would strengthen it |
+| Altana | Not claimed | permission architecture alone is not eligibility | live session-key transaction and in-product revoke |
 
-```bash
-PYTHONPATH=src python scripts/refresh_live_agent_catalog.py
+`Conditional` means the code path exists and is inspectable, while the strongest
+adoption/quality claim still requires a real-world action. It is not replaced with
+a fabricated green status.
+
+## Current live and on-chain evidence
+
+- Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,
+  yield optimisation and health-factor monitoring.
+- Each card can request a live `0.10 U` quote without connecting a wallet.
+- `/hire-live` continues a reviewed quote into wallet-confirmed ERC-8183
+  create/register/budget/approve/fund/delivery/settle-or-refund steps.
+- BSC Testnet Job #808 has successful create, register, budget, approve, fund,
+  delivery and settlement receipts plus observed provider payment.
+- `AgentRegistry`, `ScopedExecutionPolicy` and `EvidenceAnchor` are deployed on
+  BSC Testnet with transaction evidence.
+- SafeHire Agent #2032 has ERC-8004 owner, wallet and URI read-back evidence.
+- The PancakeSwap report compares `0.01 / 0.1 / 1 WBNB` at one observed block and
+  exposes the gas-estimation boundary.
+- TermiX retains complete Agent/no-Agent outputs, time, cost, quality baseline and
+  SHA-256 fingerprints.
+- The evidence ledger is append-only and hash chained.
+
+Primary evidence:
+
+- `evidence/marketplace/live-agent-catalog.json`
+- `evidence/sponsor-integration/erc8004-registration.json`
+- `evidence/sponsor-integration/erc8183-job-808.json`
+- `evidence/pancakeswap/live-benefit-report.json`
+- `evidence/termix/agent-advantage-report.json`
+- `deployments/bsc-testnet.json`
+
+## Manual gates that code cannot complete honestly
+
+1. Execute and capture one bounded external mainnet `0.10 U` paid delivery.
+2. Complete at least three human no-Agent runs and independent blind A/B reviews.
+3. Onboard a second independent ERC-8004 provider.
+4. Use non-sleeping hosting during judging and publish a 2–3 minute single-path demo.
+5. The owner must verify identity, prize wallet, contact fields and terms before
+   submitting.
+
+See `docs/MANUAL_COMPLETION_GATES_2026-08-31.md`.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI[Marketplace / Judge UI] --> API[FastAPI application]
+    API --> H[Plugin Harness]
+    H --> R[Agent registry + AgentProof]
+    H --> B[Benchmark + adversarial council]
+    H --> L[Hash-chain evidence ledger]
+    API --> S[Official read-only sources]
+    API --> E[Deterministic execution service]
+    E --> G[RiskGate]
+    G --> W[Wallet-confirmed transaction plans]
+    W --> BSC[ERC-8004 / ERC-8183 / BSC]
 ```
 
-脚本会确认 BSC mainnet chain id、四笔注册交易都成功，并且四个 skill 仍在 A2A 免费列表里。它不会签名或发起付费。
+The default deployment is a modular monolith. Signing and fund execution stay
+isolated; adding microservices is intentionally deferred until real usage requires it.
 
-## 诚实边界
+## Local run
 
-开箱默认是 `demo` 模式。demo receipt 有合成 hash，但永远标记 `demo_fixture`，不会被提交门禁当成 BSC 交易。当前 `config/agents.json` 里四个类别卡片仍是本地演示 Agent；它们与首页上方的外部 BSC mainnet Agent 分开展示。Job #808 证明了 SafeHire 一次真实的注册和雇佣闭环，不代表已验证外部 Agent 的交付质量。
-
-原 BNB 托管 Agent Studio 卖方运行时是 48 小时试用，到期时间是 2026-09-01T13:54:15Z，只作为 Job #808 的历史采证环境。评委期公开入口已换成 Render 上的市场 Agent Card 和只读 A2A 预演桥；它不会伪装成 Agent Studio 签名卖方，也不会保存或使用钱包私钥。
-
-Render 免费实例长时间无访问会休眠，首次唤醒可能需要等待约 50 秒。这不影响链上证据，但对评委首次打开体验有风险；如果要去掉休眠，需要用户另行确认付费方案。
-
-自有执行适配器的 BSC mainnet 仍默认禁用。`/hire-live` 是一条单独的外部 ERC-8183 人工确认路径，最多服务支付为 `0.10 U` 加 BNB Gas；钱包会在每笔交易前再次弹出。官方合约与本项目都未经本项目团队的第三方审计，不要放超过演示所需的资产。
-
-Agent Studio 的签名仍在官方固定入口中，AI 只能调用只读预演。报价固定为 0.1 U 且有同值上限，自动充值默认关闭。
-
-## 快速启动
-
-需要 Python 3.11+。
+Python 3.11+:
 
 ```bash
 cp .env.example .env
@@ -83,18 +149,24 @@ python scripts/seed_demo.py
 uvicorn apps.api.main:app --reload --port 8000
 ```
 
-打开 <http://localhost:8000>。看 OpenAPI：<http://localhost:8000/docs>。
+Open:
 
-## 测试
+- marketplace: `http://localhost:8000`
+- judge scorecard: `http://localhost:8000/assets/judge-scorecard.html`
+- OpenAPI: `http://localhost:8000/docs`
+
+## Verification
 
 ```bash
 python -m pytest -q
 ruff check src apps tests scripts
 mypy src apps scripts
 python scripts/static_security_check.py
+python scripts/submission_gate.py --allow-incomplete
+python scripts/judge_scorecard.py --output judge-scorecard.json
 
 cd contracts
-npm install
+npm ci --ignore-scripts
 npm run compile
 npm test
 npm audit --omit=dev
@@ -104,119 +176,32 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm --dir app/agent build
 ```
 
-Hardhat 只是开发工具，不进入 Python 运行容器。`npm audit --omit=dev` 用于确认部署产物没有 Node 生产依赖。
-
-## 官方数据接口
-
-- `GET /api/sources/readiness`
-- `GET /api/sources/8004scan/agents`
-- `GET /api/sources/venus/pools`
-- `GET /api/sources/lista/vaults`
-- `GET /api/sources/pancakeswap/positions/{position_id}`（需服务端 `THE_GRAPH_API_KEY`）
-
-接口失败会返回错误，不会用演示数据伪装实时数据。影响资金的关键值还必须用 BSC RPC 或官方 SDK 复核。
-
-## TermiX Agent Advantage Report
-
-当前 live 报告已经完成并公开：
-
-- 机器可核验报告：[evidence/termix/agent-advantage-report.json](evidence/termix/agent-advantage-report.json)
-- 评委可读摘要：[evidence/termix/AGENT_ADVANTAGE_REPORT.md](evidence/termix/AGENT_ADVANTAGE_REPORT.md)
-- 公开 API：https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report
-- 公开证据页：https://safehire-proofops-bnb.onrender.com/proof
-
-三题分别覆盖 PancakeSwap 网格路线、Venus 稳定币收益排序和 Venus 健康因子响应。Agent 侧全部通过公开 SafeHire A2A 的 `hire_analysis` 完成，并返回 hash-chain 雇佣回执；对照侧不调用任何市场 Agent，直接按公开公式计算。两边输入相同，原始输出和 SHA-256 文件指纹全部保留。
-
-结果是 Agent 质量总分 `73.5 / 75`，直接计算为 `66 / 75`；三次成本均为 `0 U`。在这组确定性任务里，直接计算耗时更短，所以 SafeHire **不声称节省时间**。这份公开报告的评分来自自动规则，只是可复核基线，不是独立人类研究。
-
-新增的 `/benchmark` 证据实验室支持四题：原有三题加 PancakeSwap LP 调仓。它用不可暂停的浏览器计时器保存真实人工耗时，再把 Agent / No-Agent 完整输出随机隐藏为 A/B，分别下载盲评包和秘密映射。真人操作和独立评审未完成前，项目不会生成“已人工验证”的结论。详细流程见 [evidence/termix/v2/README.md](evidence/termix/v2/README.md)。
-
-重新采集命令：
+Release package:
 
 ```bash
-PYTHONPATH=src python scripts/capture_termix_live_comparisons.py \
-  --public-base-url https://safehire-proofops-bnb.onrender.com
+python scripts/build_release.py
 ```
 
-live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位复核人、全零评分和少于三个任务。完整方法和边界见 [docs/TERMIX_EXECUTION_RUNBOOK.md](docs/TERMIX_EXECUTION_RUNBOOK.md)。Venus 输入可用 `PYTHONPATH=src python scripts/capture_venus_yield_snapshot.py` 重新抓取，但刷新后必须同步冻结任务文件里的数值，不能让 Agent 和对照侧看到不同输入。
+The packager regenerates `ARTIFACT_MANIFEST.json` and excludes secrets, wallet
+keystores, virtual environments, caches, build output and dependencies.
 
-## PancakeSwap 真实路由收益证据
+## Repository reading order
 
-`scripts/capture_pancakeswap_live_benefit.py` 会在同一个 BSC mainnet 区块，从 PancakeSwap 官方 V3 Factory 发现 WBNB/USDT 的直连手续费池，再用官方 QuoterV2 比较 `0.01 / 0.1 / 1 WBNB` 三档输出。报告记录同区块 RPC Gas 价格，以 QuoterV2 的 gasEstimate 计算估算净输出，再与 `0.05%` 池对比。当前报告保存在 [evidence/pancakeswap/live-benefit-report.json](evidence/pancakeswap/live-benefit-report.json)。
+1. [`AGENTS.md`](AGENTS.md) — hard safety, evidence and scope invariants.
+2. [`agent.md`](agent.md) — task-oriented file index.
+3. [`docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md`](docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md)
+   — current official-rubric strategy and demo.
+4. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)
+   — ten-role debate and consensus.
+5. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)
+   — official winner patterns and current gap analysis.
+6. `docs/02_ARCHITECTURE.md` through `docs/10_EXTERNAL_COMPLETION_CHECKLIST.md`
+   — implementation, security, operation and submission details.
 
-```bash
-PYTHONPATH=src python scripts/capture_pancakeswap_live_benefit.py
-```
+## Security boundary
 
-这是真实主网只读报价，并已绑定一次公开 Agent 调用；它不是交易或利润承诺。QuoterV2 的 gasEstimate 不等于最终 Router 交易 Gas，所以前端会明确写“估算”。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
-
-## 合约部署
-
-```bash
-cd contracts
-# Inject BSC_DEPLOYER_PRIVATE_KEY from a secret manager or hidden shell prompt.
-export BSC_TESTNET_RPC_URL='https://bsc-testnet-dataseed.bnbchain.org'
-export POLICY_EXECUTOR='0x...'
-export POLICY_TARGET='0x...'
-export POLICY_SELECTOR='0x12345678'
-export POLICY_MAX_PER_CALL_WEI='0'
-export POLICY_MAX_TOTAL_WEI='0'
-npm run deploy:testnet
-```
-
-部署脚本锁定 chain id 97，默认拒绝覆盖已有 deployment evidence。不要把真实私钥写入 `.env.example`、shell 历史、日志或 Git。
-
-## 抓取真实 BSC 回执
-
-```bash
-python scripts/capture_bsc_evidence.py 0xREAL_TX_HASH \
-  --chain-id 97 \
-  --label bounded-test-swap
-```
-
-该工具只读 RPC，不需要私钥。交易找不到或失败时不会生成证据文件。
-
-## 提交门禁
-
-```bash
-PYTHONPATH=src python scripts/submission_gate.py
-```
-
-线上环境配置好公开 URL 后，主赛 `P0` 应该全部通过。本地 demo Agent 的未上链状态仍是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。TermiX 三组 live 对照与 PancakeSwap 同区块 V3 路由收益报告都已通过 `P1`。演示视频是 `P2` 可选加分项，不是官方表单硬门槛。
-
-## 距离正式提交还差什么
-
-1. 本地 Python 检查、合约测试、Agent Studio 构建和 Docker 镜像构建已经通过；生产版本需以 GitHub Actions 和 Render 的最新部署结果为准。
-2. 由用户在 `/hire-live` 中用小额主网钱包亲自确认每笔交易，完成第一笔外部 Agent `0.10 U` 付费交付，下载回执。
-3. 在 `/benchmark` 完成至少三题的真人无 Agent 计时，由另一位真实评审人完成不看映射的 A/B 盲评；至少一题使用上一步的外部付费 Agent 输出。
-4. 找到第二个独立 ERC-8004 运营方，用首页上架校验入口产生档案，再人工审核是否纳入目录。
-5. 最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款，并亲自点击官方表单的 `Submit`。演示视频仍是强加分项。
-
-## 仓库结构
-
-```text
-apps/api                 FastAPI 公开 API 和组装根
-apps/web                 无构建评委页面
-src/proofops/agents      四类可调用 Agent
-src/proofops/domain      领域对象和不变条件
-src/proofops/execution   权限、任务、风险门和执行适配器
-src/proofops/integrations BSC 与官方数据源
-src/proofops/evidence    TermiX 证据构建
-src/proofops/harness     插件生命周期和 trace bus
-contracts/src            Solidity 合约
-contracts/test           Hardhat 合约测试
-agent-studio/safehireagents 官方 BNB Agent Studio 卖方运行时
-docs                     要求、架构、安全、演示、运维和最后清单
-evidence                 演示与真实证据的明确分区
-templates                部署、TermiX 和提交模板
-```
-
-## 先看哪些文档
-
-1. [官方实施资料](docs/00_OFFICIAL_IMPLEMENTATION_REFERENCES.md)
-2. [比赛要求映射](docs/01_COMPETITION_REQUIREMENTS.md)
-3. [总体架构](docs/02_ARCHITECTURE.md)
-4. [建设蓝图](docs/07_CONSTRUCTION_BLUEPRINT.md)
-5. [演示与提交](docs/08_DEMO_AND_SUBMISSION.md)
-6. [外部完成清单](docs/10_EXTERNAL_COMPLETION_CHECKLIST.md)
-7. [本轮必须由用户完成的门槛](docs/MANUAL_COMPLETION_GATES_2026-08-31.md)
+Self-operated execution adapters remain mainnet-disabled by default. The external
+`/hire-live` path is a separate, explicit opt-in flow; every transaction is shown to
+the wallet, and the maximum service price currently exposed by the reviewed catalog
+is `0.10 U` plus BNB gas. Contracts and integrations have not received a third-party
+audit. Use only a disposable, low-value contest wallet.

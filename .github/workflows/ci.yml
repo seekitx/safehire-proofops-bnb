@@ -27,6 +27,7 @@ jobs:
       - run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
       - run: python scripts/static_security_check.py
       - run: python scripts/submission_gate.py --allow-incomplete
+      - run: python scripts/judge_scorecard.py --output judge-scorecard.json
       - run: docker build -t safehire-proofops:${{ github.sha }} .
   contracts:
     runs-on: ubuntu-latest
