@@ -993,10 +993,13 @@ async def public_proof() -> dict[str, Any]:
         },
         "agent_studio": {
             "status": deployment.get("status"),
+            "provider": deployment.get("provider"),
             "environment": deployment.get("environment"),
             "endpoint": deployment.get("endpoint"),
             "a2a_url": deployment.get("a2a_invoke_url"),
             "expires_at": deployment.get("expires_at"),
+            "runtime_scope": deployment.get("runtime_scope"),
+            "historical_trial": deployment.get("historical_agent_studio_trial"),
         },
         "contracts": [
             {

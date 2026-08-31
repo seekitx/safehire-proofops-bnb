@@ -159,6 +159,10 @@ def test_public_marketplace_a2a_validation_and_proof(tmp_path, monkeypatch) -> N
     assert public_proof.status_code == 200
     assert public_proof.json()["result"]["erc8183"]["job_id"] == 808
     assert public_proof.json()["result"]["erc8183"]["status"] == "COMPLETED"
+    runtime = public_proof.json()["result"]["agent_studio"]
+    assert runtime["provider"] == "render"
+    assert runtime["expires_at"] is None
+    assert runtime["historical_trial"]["provider"] == "bnb"
 
 
 def test_wallet_hire_approve_execute_and_revoke_flow(tmp_path, monkeypatch) -> None:

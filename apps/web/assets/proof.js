@@ -64,12 +64,23 @@ async function loadProof() {
   byId("registrationLink").href = safeHttpsUrl(proof.erc8004.registration_url);
   byId("uriLink").href = safeHttpsUrl(proof.erc8004.uri_update_url);
 
-  const expiresAt = new Date(proof.agent_studio.expires_at);
-  const runtimeExpired = Number.isFinite(expiresAt.getTime()) && expiresAt.getTime() <= Date.now();
-  byId("runtimeStatus").textContent = runtimeExpired ? "TRIAL EXPIRED" : String(proof.agent_studio.status).toUpperCase();
+  const runtime = proof.agent_studio;
+  const runtimeExpiresAt = runtime.expires_at ? new Date(runtime.expires_at) : null;
+  const runtimeExpired = runtimeExpiresAt instanceof Date
+    && Number.isFinite(runtimeExpiresAt.getTime())
+    && runtimeExpiresAt.getTime() <= Date.now();
+  const historicalExpiry = runtime.historical_trial?.expires_at
+    ? new Date(runtime.historical_trial.expires_at)
+    : null;
+  const historicalNote = historicalExpiry instanceof Date && Number.isFinite(historicalExpiry.getTime())
+    ? ` The original BNB Agent Studio signing trial is preserved as historical evidence and expired ${historicalExpiry.toLocaleString()}.`
+    : "";
+  byId("runtimeStatus").textContent = runtimeExpired
+    ? "EXPIRED"
+    : String(runtime.status).toLowerCase() === "running" ? "LIVE" : String(runtime.status).toUpperCase();
   byId("runtimeExpiry").textContent = runtimeExpired
-    ? `The recorded 48-hour trial expired ${expiresAt.toLocaleString()}; durable hosting is still required.`
-    : `Recorded trial expiry: ${expiresAt.toLocaleString()}. This is not represented as long-lived hosting.`;
+    ? `This public runtime expired ${runtimeExpiresAt.toLocaleString()}.${historicalNote}`
+    : `The public read-only Agent Card and A2A preview bridge run on ${String(runtime.provider || "durable hosting").toUpperCase()} without a trial expiry.${historicalNote}`;
   byId("runtimeCard").classList.toggle("danger", runtimeExpired);
   byId("agentCardLink").href = safeHttpsUrl(proof.agent_studio.endpoint);
   byId("a2aLink").href = safeHttpsUrl(proof.agent_studio.a2a_url);
