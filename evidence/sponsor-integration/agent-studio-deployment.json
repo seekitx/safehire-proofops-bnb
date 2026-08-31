@@ -25,6 +25,6 @@
     "deployed_at": "2026-08-30T13:54:20Z",
     "expires_at": "2026-09-01T13:54:15Z"
   },
-  "runtime_scope": "Public, read-only marketplace Agent Card and A2A preview bridge. The original BNB Agent Studio ERC-8183 seller remains separately evidenced as a 48-hour trial and is not represented as durable hosting.",
-  "notes": "Durable public judging endpoint on the user-approved Render free plan. It exposes discovery, proof lookup and deterministic preview skills without wallet signing or fund execution. Free instances may cold-start after inactivity."
+  "runtime_scope": "Public marketplace Agent Card, deterministic A2A preview and zero-cost sponsored analysis. The original BNB Agent Studio ERC-8183 seller remains separately evidenced as a 48-hour trial and is not represented as durable hosting.",
+  "notes": "Durable public judging endpoint on the user-approved Render free plan. It exposes discovery, proof lookup, deterministic preview and sponsored analysis without wallet signing or fund execution. Free instances may cold-start after inactivity."
 }

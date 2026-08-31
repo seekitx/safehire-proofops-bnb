@@ -88,7 +88,7 @@ async function loadProof() {
     : String(runtime.status).toLowerCase() === "running" ? "LIVE" : String(runtime.status).toUpperCase();
   byId("runtimeExpiry").textContent = runtimeExpired
     ? `This public runtime expired ${runtimeExpiresAt.toLocaleString()}.${historicalNote}`
-    : `The public read-only Agent Card and A2A preview bridge run on ${String(runtime.provider || "durable hosting").toUpperCase()} without a trial expiry.${historicalNote}`;
+    : `The public Agent Card, deterministic preview and zero-cost sponsored analysis run on ${String(runtime.provider || "durable hosting").toUpperCase()} without a trial expiry. They never sign or move funds.${historicalNote}`;
   byId("runtimeCard").classList.toggle("danger", runtimeExpired);
   byId("agentCardLink").href = safeHttpsUrl(proof.agent_studio.endpoint);
   byId("a2aLink").href = safeHttpsUrl(proof.agent_studio.a2a_url);
