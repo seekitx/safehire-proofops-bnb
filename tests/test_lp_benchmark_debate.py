@@ -5,7 +5,11 @@ import unittest
 from pathlib import Path
 
 from proofops.domain.models import LpPosition
-from proofops.plugins.adversarial import AdversarialCouncil, Proposal
+from proofops.plugins.adversarial import (
+    AdversarialCouncil,
+    CouncilRole,
+    Proposal,
+)
 from proofops.plugins.benchmark import BenchmarkRunner
 from proofops.plugins.evidence import EvidenceLedger
 from proofops.plugins.lp_guardian import LpGuardianPolicy
@@ -42,11 +46,22 @@ class LpBenchmarkDebateTests(unittest.TestCase):
             self.assertIn("advantage", data)
             self.assertTrue(data["limitations"])
 
-    def test_default_seven_role_debate_accepts(self) -> None:
+    def test_default_ten_role_debate_accepts_with_visible_manual_gaps(self) -> None:
         decision = AdversarialCouncil(self.ledger).review(Proposal.safehire_default())
         self.assertTrue(decision.accepted)
-        self.assertEqual(len(decision.arguments), 7)
+        self.assertEqual(len(decision.arguments), len(CouncilRole))
+        self.assertEqual(len(CouncilRole), 10)
         self.assertFalse(decision.vetoes)
+        changes = {
+            change
+            for argument in decision.arguments
+            for change in argument.required_changes
+        }
+        self.assertIn("Onboard a second independent ERC-8004 provider.", changes)
+        self.assertIn(
+            "Complete one bounded external paid hire and attach the delivery receipt.",
+            changes,
+        )
 
     def test_security_gap_causes_veto(self) -> None:
         proposal = Proposal.safehire_default()
@@ -55,9 +70,42 @@ class LpBenchmarkDebateTests(unittest.TestCase):
         self.assertFalse(decision.accepted)
         self.assertIn("security_red_team", decision.vetoes)
 
+    def test_missing_category_depth_causes_diversity_veto(self) -> None:
+        proposal = Proposal.safehire_default()
+        shallow = Proposal(
+            **{
+                **proposal.__dict__,
+                "category_depth": (
+                    "rebalancing",
+                    "grid_trading",
+                    "yield_optimisation",
+                ),
+            }
+        )
+        decision = AdversarialCouncil(self.ledger).review(shallow)
+        self.assertFalse(decision.accepted)
+        self.assertIn("bnb_diversity_judge", decision.vetoes)
+
     def test_fake_live_plan_causes_bnb_veto(self) -> None:
         proposal = Proposal.safehire_default()
         no_live = Proposal(**{**proposal.__dict__, "live_bsc_plan": False})
         decision = AdversarialCouncil(self.ledger).review(no_live)
         self.assertFalse(decision.accepted)
         self.assertIn("bnb_main_judge", decision.vetoes)
+
+    def test_altana_logo_without_session_is_challenged_not_counted(self) -> None:
+        proposal = Proposal.safehire_default()
+        claim = Proposal(
+            **{
+                **proposal.__dict__,
+                "sponsor_integrations": (*proposal.sponsor_integrations, "Altana"),
+            }
+        )
+        decision = AdversarialCouncil(self.ledger).review(claim)
+        altana = next(
+            item
+            for item in decision.arguments
+            if item.role == CouncilRole.ALTANA_SESSION_REVIEWER
+        )
+        self.assertTrue(altana.attacks)
+        self.assertIn("session-key", altana.attacks[0])

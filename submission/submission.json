@@ -1,15 +1,22 @@
 {
   "title": "SafeHire / ProofOps",
-  "one_liner": "Compare proof, limit permissions and hire BNB Chain DeFi agents.",
+  "one_liner": "Hire proof-carrying BNB Chain DeFi agents with bounded permissions and verifiable settlement.",
   "project_url": "https://safehire-proofops-bnb.onrender.com",
   "github_url": "https://github.com/seekitx/safehire-proofops-bnb",
+  "judge_scorecard_url": "https://safehire-proofops-bnb.onrender.com/assets/judge-scorecard.html",
   "proof_url": "https://safehire-proofops-bnb.onrender.com/proof",
+  "live_hire_url": "https://safehire-proofops-bnb.onrender.com/hire-live",
+  "benchmark_lab_url": "https://safehire-proofops-bnb.onrender.com/benchmark",
   "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
   "termix_report_url": "https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report",
   "pancakeswap_evidence_url": "https://github.com/seekitx/safehire-proofops-bnb/blob/main/evidence/pancakeswap/live-benefit-report.json",
   "demo_video_url": "",
   "demo_video_seconds": null,
-  "networks": ["BSC Mainnet", "BSC Testnet"],
+  "networks": [
+    "BSC Mainnet",
+    "BSC Testnet"
+  ],
   "evidence_mode": "live",
+  "winner_readiness": "conditional_manual_proof_gates",
   "submission_status": "ready_for_owner_review_not_submitted"
 }
