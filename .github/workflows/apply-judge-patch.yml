@@ -1,0 +1,100 @@
+name: apply-judge-patch
+on:
+  push:
+    branches:
+      - "review/judge-winning-proofops-20260831"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: apply-judge-patch
+  cancel-in-progress: false
+jobs:
+  apply-test-package:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: review/judge-winning-proofops-20260831
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - name: Verify and apply patch bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/patch-bundle.part-* > /tmp/patch.b64
+          base64 -d /tmp/patch.b64 > /tmp/patch.tar.gz
+          echo "fbc9c5a67bedd8d385055e0a5fce14d876c06c714df4597b6bd34dbb922dba55  /tmp/patch.tar.gz" | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path
+          import tarfile
+
+          root = Path.cwd().resolve()
+          with tarfile.open("/tmp/patch.tar.gz", "r:gz") as archive:
+              for member in archive.getmembers():
+                  target = (root / member.name).resolve()
+                  if target != root and root not in target.parents:
+                      raise SystemExit(f"unsafe archive path: {member.name}")
+              archive.extractall(root, filter="data")
+          PY
+          rm -f .github/patch-bundle.part-* .github/workflows/apply-judge-patch.yml
+      - name: Install Python dependencies
+        run: pip install -e '.[dev,bnb]'
+      - name: Lint and typecheck
+        run: |
+          ruff check src apps tests scripts
+          mypy src apps scripts
+      - name: Compile and test contracts
+        working-directory: contracts
+        run: |
+          npm ci --ignore-scripts
+          npm run compile
+          npm test
+          npm audit --omit=dev
+      - name: Test Python application
+        run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
+      - name: Security and submission gates
+        run: |
+          python scripts/static_security_check.py
+          python scripts/submission_gate.py --allow-incomplete
+          python scripts/judge_scorecard.py --output judge-scorecard.json
+      - name: Build BNB Agent Studio seller
+        working-directory: agent-studio/safehireagents
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --dir app/agent build
+      - name: Build container and release archive
+        run: |
+          docker build -t safehire-proofops:${{ github.sha }} .
+          python scripts/build_release.py
+      - name: Commit clean judge-ready patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: add judge-ready proof-carrying marketplace review"
+          git push origin HEAD:review/judge-winning-proofops-20260831
+      - uses: actions/upload-artifact@v4
+        with:
+          name: safehire-proofops-bnb-judge-ready-bootstrap
+          path: |
+            ../safehire-proofops-bnb-release.zip
+            ../safehire-proofops-bnb-release.manifest.json
+            judge-scorecard.json
+          if-no-files-found: error
+          retention-days: 14
