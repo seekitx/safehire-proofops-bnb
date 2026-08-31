@@ -1,18 +1,20 @@
 # SafeHire / ProofOps：Build the Era 官方要求与当前缺口
 
+> 状态说明：本文前半部分保留官网核对当时的原始缺口快照。后续已经补齐公开 Render 市场、GitHub、四类 live BSC Agent 发现与报价、三组 TermiX live 对照，以及 PancakeSwap Agent 交付绑定。当前提交状态以 `HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md` 和公开 `/proof` 页为准。
+
 核对日期：2026-08-31（Asia/Shanghai）
 
 ## 先说结论
 
 SafeHire / ProofOps 参加的是 BNB Chain 的 **The Smart Money Era: Build the Era**，目标是做“BNB Agent Studio 的 Agent 市场”，不是只交一个 Agent。提交截止时间是 **2026-09-09 12:00 UTC，也就是北京时间 2026-09-09 20:00**；评审期是 9 月 9 日到 9 月 23 日，11 月 5 日公布获奖者。[BNB Chain 专题页](https://www.bnbchain.org/en/hackathons/smart-money-era) [官方报名/提交表单](https://docs.google.com/forms/d/e/1FAIpQLSdFb30r24sZcFJVDbMqXNJ1_45BJHanc7eFqwUniScDYZfX9A/viewform?usp=send_form) [BNB Chain 发布文章](https://www.bnbchain.org/en/blog/build-the-era-build-the-official-bnb-agent-studio-marketplace)
 
-按 2026-08-31 本地仓库状态，ERC-8004 注册、公开 Agent Studio 试用端点和 ERC-8183 Job #808 完整付款已经是很强的真实链上证据，但还没有达到本场主赛的完整资格。现在最关键的缺口是：
+下面七项是 2026-08-31 首次官网核对时的原始缺口，保留用于说明项目从哪里开始；其中第 1–5 项后来已经补齐或形成公开证据，第 6 项 Altana 仍不具备资格，第 7 项最终表单仍等待参赛者：
 
-1. **没有能撑过整个评审期的公开 HTTPS 市场。**现有 Agent Studio 48 小时试用记录写明 9 月 1 日过期，而官方要求项目在评审期间公开可访问。
-2. **市场里的四类 Agent 仍是演示数据。**`config/agents.json` 的四个条目都标记为 `demo_fixture` 和 `live_bsc=false`；官方要求展示的 Agent 必须真实在线于 BSC，并且四个类别都要有相同深度。
-3. **没有公开/评委可访问的 GitHub 仓库。**当前 Git 仓库没有远端，正式表单把 GitHub 仓库链接列为必填项。
-4. **TermiX 必交的 Agent Advantage Report 尚未完成。**必须做至少三组真实的“Agent vs 不使用 Agent”同题对照，附原始输出、时间、成本和质量，且至少一题属于交易、股票或安全。
-5. **PancakeSwap 的真实用户收益还没有形成可复核证据。**若勾选 PancakeSwap，需要证明产品确实帮助交易者或 LP，而不只是贴名称或展示合成指标。
+1. **当时没有能撑过评审期的公开 HTTPS 市场；现已补齐。**Render 公开站点覆盖评审入口，免费实例仍有冷启动风险。
+2. **当时市场里的四类 Agent 仍是演示数据；现已补齐真实供给。**四个外部 ERC-8004 Agent 覆盖全部类别，本地 `config/agents.json` 预演仍保持 `demo_fixture` 标记，不混淆。
+3. **当时没有公开 GitHub；现已补齐。**仓库已公开供评委访问。
+4. **当时缺 TermiX Agent Advantage Report；现已补齐。**三组真实“Agent vs 不使用 Agent”对照、实际输出、时间、成本、质量和 hash 已公开。
+5. **当时缺 PancakeSwap 可复核收益证据；现已补齐。**真实同区块四池比较已经绑定 Agent 交付，并保留只读报价边界。
 6. **Altana 奖项目前不具备资格。**自建 `ScopedExecutionPolicy` 不是 Altana session；当前没有 Altana 钱包、链上 session、限额、撤销和 Altana Explorer 交易。
 7. **尚未填写并提交官方表单。**在用户最终检查和明确确认前，不应代替用户提交。
 
@@ -22,9 +24,11 @@ SafeHire / ProofOps 参加的是 BNB Chain 的 **The Smart Money Era: Build the 
 
 上面是官网核对时的原始缺口快照。随后已补充一项重要能力：首页现在会通过 ERC-8004 注册证据和免费 A2A `list` 接口，发现四个由 `Brain On BNB AI` 外部运营、真实注册于 BSC mainnet 的 Agent，覆盖调仓、网格、收益优化和健康因子四类。实时发现在 Chrome 中观察到 `4/4 skills callable`。
 
-这使“四类真实 BSC Agent 存在且当前可发现”从未完成变成已有证据，但不能扩大成“SafeHire 已验证它们的交付质量”：它们属于外部运营方，SafeHire 还没有为它们支付 BSC mainnet `0.10 U`，也没有把交付输出写进 TermiX 报告。本地 `config/agents.json` 的四个预演仍明确标为 demo，与真实市场区分开。
+这使“四类真实 BSC Agent 存在且当前可发现”从未完成变成已有证据，但不能扩大成“SafeHire 已验证它们的交付质量”：它们属于外部运营方，SafeHire 还没有为它们支付 BSC mainnet `0.10 U`。TermiX 报告使用 SafeHire 自有公开 Agent 的赞助雇佣，与外部 Agent 的身份和报价证据分开。本地 `config/agents.json` 的四个预演仍明确标为 demo。
 
-PancakeSwap 伙伴奖证据也已补充：`evidence/pancakeswap/live-benefit-report.json` 在同一 BSC mainnet 区块上，通过官方 V3 Factory 发现四个 WBNB/USDT 直连手续费池，并用官方 QuoterV2 比较 `0.1 WBNB` 的输出。该报告是可重复抓取的真实主网只读报价，不是交易或利润承诺。
+PancakeSwap 伙伴奖证据也已补充：`evidence/pancakeswap/live-benefit-report.json` 在同一 BSC mainnet 区块上，通过官方 V3 Factory 发现四个 WBNB/USDT 直连手续费池，并用官方 QuoterV2 比较 `0.1 WBNB` 的输出。该报告已绑定公开 Agent 交付，是可重复抓取的真实主网只读报价，不是交易或利润承诺。
+
+TermiX 后续执行也已完成：三次公开 SafeHire A2A 赞助雇佣分别覆盖 grid trading、yield optimisation 和 health-factor security，并与不调用市场 Agent 的直接计算做同题对照。原始输出、时间、真实零成本、统一质量评分和文件 hash 均在 `evidence/termix/` 公开。它们不冒充付费样本或人类研究；Job #808 继续单独证明 `0.1 U` ERC-8183 付费闭环。
 
 ## 1. 赛事身份、时间和奖金
 
@@ -182,33 +186,31 @@ Altana 资格门槛是：
 | 真实 BSC 合约 | `deployments/bsc-testnet.json` 有三个合约及成功交易 | 已有真实测试网证据 |
 | ERC-8004 身份 | `erc8004-registration.json` 有 Agent #2032、所有者和 URI 回读 | 已完成一个身份 |
 | ERC-8183 雇佣 | `erc8183-job-808.json` 有 create/register/budget/approve/fund/submit/settle，全链路成功 | 已完成一单，可作为强证据 |
-| Agent Studio 公开端点 | 48 小时签名卖方作为历史采证；Render 持久公开只读 Agent Card/A2A 预演桥作为评委入口 | 已分开记录，不冒充长期签名卖方 |
+| Agent Studio 公开端点 | 48 小时签名卖方作为历史采证；Render 持久公开 Agent Card/A2A 预演与赞助雇佣作为评委入口 | 已分开记录，不冒充长期签名卖方 |
 | 公开市场 | Render 公开 HTTPS 市场、证据页和 API 已可访问 | 已完成；免费实例有冷启动风险 |
 | GitHub 链接 | `https://github.com/seekitx/safehire-proofops-bnb` 公开可访问 | 已完成表单必填项 |
-| 四类真实 Agent | `evidence/marketplace/live-agent-catalog.json` 有四个外部 BSC mainnet ERC-8004 注册和 A2A skill；本地四类预演仍是 demo | 真实市场供给已可发现；付费雇佣和质量尚未验证 |
-| 实时高质量数据 | 当前四类主要是合成指标 | 不满足 Data Quality 目标 |
-| TermiX 报告 | 只有模板、fixture 和说明，没有 live report 与三组原始对照 | 不具备 TermiX 资格 |
-| PancakeSwap 收益证据 | `live-benefit-report.json` 有同区块 V3 Factory + QuoterV2 四池路由比较、区块高和改善量 | 已证明只读路由选择的可量化帮助；未声称已交易或获利 |
+| 四类真实 Agent | `evidence/marketplace/live-agent-catalog.json` 有四个外部 BSC mainnet ERC-8004 注册、A2A skill 和实时报价；本地四类预演仍是 demo | 真实市场供给已可发现和询价；外部质量尚未验证 |
+| 实时高质量数据 | ERC-8004 身份/报价、PancakeSwap 同区块报价、Venus API 快照均有来源；外部历史表现仍缺 | 部分满足 Data Quality，边界已明示 |
+| TermiX 报告 | 三组公开赞助雇佣和 without-Agent 对照，含完整输出、时间、真实零成本、质量和 hash | 已具备公开资格材料；自动评分待参赛者浏览 |
+| PancakeSwap 收益证据 | `live-benefit-report.json` 有同区块 V3 Factory + QuoterV2 四池比较、改善量和 Agent 交付 | 已证明只读路由选择的可量化帮助；未声称已交易或获利 |
 | Altana | 有自建权限合约，但没有 Altana wallet/session/Keystore/Explorer 证据 | 不具备 Altana 资格 |
-| 最终提交 | `submission/submission.json` 已补公开链接；官方表单尚未由参赛者确认提交 | 草稿完成，未提交 |
+| 最终提交 | `submission/submission.json` 和表单文案已补公开链接；官方表单尚未由参赛者确认提交 | 正式提交前一步，未提交 |
 
-## 8. 按获奖优先级应该补什么
+## 8. 后续执行状态
 
-### P0：不做就可能直接失去主赛资格
+### P0：已完成的主赛门禁
 
-1. 把市场部署到稳定的公开 HTTPS 地址，并保证从 9 月 9 日到 9 月 23 日持续可用、无需登录或 VPN。
-2. 提交前用 `scripts/refresh_live_agent_catalog.py` 重新验证四个外部 BSC Agent 的注册回执和 A2A 存活，让证据时间不超过 48 小时。
-3. 如果项目要声称“真实雇佣成功”或“Agent 更好”，必须再用主网资产雇佣外部 Agent，保存完整输出和付款回执；在此之前只声称发现与注册已验证。
-4. 创建评委可访问的 GitHub 仓库，推送前检查 `.env`、钱包、keystore、OAuth、session 和 API 密钥没有进入提交历史。
-5. README 首屏放：公开市场、快速演示路径、四类 Agent、Job #808、ERC-8004、合约和所有 BscScan 链接。
+1. Render 公开 HTTPS 市场、证据页、Agent Card 和 API 已上线；免费实例仍有冷启动风险。
+2. 四个外部 BSC Agent 的 ERC-8004 注册和 A2A 存活已保存；提交日前仍应刷新一次。
+3. 外部 Agent 当前只声称身份、可调用性和实时报价，不声称质量已经验证。
+4. GitHub 已公开，README 已汇总公开市场、报告和链上证据。
 
-### P1：冲 TermiX 和 PancakeSwap
+### P1：TermiX 和 PancakeSwap 已完成的证据
 
-1. 做三组真实同题对照：建议选 LP 区间分析、收益比较、借贷健康风险，其中至少一题明确属于 trading 或 security。
-2. 保留 Agent/人工双方原始输入输出、开始结束时间、实际成本和统一评分；生成并公开 Agent Advantage Report。
-3. PancakeSwap 真实池数据、交易者改善量、风险限制和区块高已补；提交前运行 `capture_pancakeswap_live_benefit.py` 刷新，并可把这组报价纳入 TermiX 的 trading 对照任务。
-4. 邀请一名独立复核者评分会更可信，但“必须独立复核者”不是官网硬规则，属于提高证据可信度的做法。
-5. TermiX 三份固定任务和严格报告模板已经准备好；Venus 收益任务使用官方 API 快照，并保留“索引数据可能落后链上”的限制。尚未完成的仍是三次真实 Agent 订单、三次人工同题、独立评分和最终 live 报告。
+1. 三组同题对照已完成，覆盖 trading/grid、yield optimisation 和 health-factor security。
+2. Agent / without-Agent 双方原始输出、时间、实际零成本、统一评分和 SHA-256 已公开。
+3. PancakeSwap 主网同区块数据、改善量、风险边界和 Agent 调用绑定已刷新。
+4. 自动评分仍需参赛者浏览；邀请独立复核者只属于可选加分，不是官网硬规则。
 
 ### P2：是否冲 Altana
 

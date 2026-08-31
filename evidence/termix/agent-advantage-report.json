@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "generated_at": "2026-08-31T15:29:45.848921+08:00",
+  "method": "same_prompt_agent_vs_manual_with_raw_outputs",
+  "task_count": 3,
+  "categories": [
+    "grid_trading",
+    "health_factor_monitoring",
+    "yield_optimisation"
+  ],
+  "tasks": [
+    {
+      "task_id": "pancakeswap-grid-route",
+      "category": "grid_trading",
+      "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
+      "prompt_sha256": "047637c1f7ccd2afb2d26376a6d0895355382b7bbaf21c2c190b7b9672357745",
+      "agent": {
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/agent-output.json",
+        "output_sha256": "300be7887e84bffb5e9c70da2ddc79aaabdfcc17811c8e137abf052ea33daa74",
+        "started_at": "2026-08-31T07:29:43.148473+00:00",
+        "finished_at": "2026-08-31T07:29:44.964141+00:00",
+        "duration_seconds": 1.816,
+        "cost_usd": 0.0,
+        "cost_currency": "U",
+        "cost_amount": 0.0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/manual-output.json",
+        "output_sha256": "4fe1025f5a042b89bd1cfeeda1bb9a6da33b8f06ca2ef36f0645c32b3e950de0",
+        "started_at": "2026-08-31T07:29:44.968169+00:00",
+        "finished_at": "2026-08-31T07:29:44.968206+00:00",
+        "duration_seconds": 0.0,
+        "cost_usd": 0.0,
+        "cost_currency": "USD",
+        "cost_amount": 0.0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5.0,
+          "completeness": 5.0,
+          "risk_awareness": 5.0,
+          "actionability": 4.5,
+          "evidence_quality": 5.0,
+          "total": 24.5
+        },
+        "manual": {
+          "correctness": 5.0,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4.0,
+          "evidence_quality": 4.0,
+          "total": 22.0
+        }
+      },
+      "advantage": {
+        "time_saved_seconds": -1.816,
+        "cost_delta_usd": 0.0,
+        "quality_delta": 2.5
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    },
+    {
+      "task_id": "venus-stablecoin-yield",
+      "category": "yield_optimisation",
+      "prompt_path": "evidence/termix/tasks/venus-stablecoin-yield.json",
+      "prompt_sha256": "8d0fafbdac9d9820c526efc18d1abb59c76fe1c1c2da000444a3a322358a119f",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/agent-output.json",
+        "output_sha256": "462669b0a8dacea6ad5c48380b0c3b4ff9bbaa3f21e9682203dbf9c8c8d76e1f",
+        "started_at": "2026-08-31T07:29:44.969546+00:00",
+        "finished_at": "2026-08-31T07:29:45.319352+00:00",
+        "duration_seconds": 0.35,
+        "cost_usd": 0.0,
+        "cost_currency": "U",
+        "cost_amount": 0.0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/manual-output.json",
+        "output_sha256": "fa3986f4b6c0668abb0c04846f0c4b53d9b82bf211c00559f64ed2a6e9b5dbdd",
+        "started_at": "2026-08-31T07:29:45.339770+00:00",
+        "finished_at": "2026-08-31T07:29:45.339804+00:00",
+        "duration_seconds": 0.0,
+        "cost_usd": 0.0,
+        "cost_currency": "USD",
+        "cost_amount": 0.0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5.0,
+          "completeness": 5.0,
+          "risk_awareness": 5.0,
+          "actionability": 4.5,
+          "evidence_quality": 5.0,
+          "total": 24.5
+        },
+        "manual": {
+          "correctness": 5.0,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4.0,
+          "evidence_quality": 4.0,
+          "total": 22.0
+        }
+      },
+      "advantage": {
+        "time_saved_seconds": -0.35,
+        "cost_delta_usd": 0.0,
+        "quality_delta": 2.5
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    },
+    {
+      "task_id": "venus-health-factor-response",
+      "category": "health_factor_monitoring",
+      "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
+      "prompt_sha256": "acd0f2b7c11ed7f81797373c5071d150a9c62a46e4e2bf6943d8c4f7f2d52f34",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/agent-output.json",
+        "output_sha256": "5e1b4838266270a617ccaaf118a803f411ffe63a425e6d8e00ea8d0606d2c2b5",
+        "started_at": "2026-08-31T07:29:45.347039+00:00",
+        "finished_at": "2026-08-31T07:29:45.831366+00:00",
+        "duration_seconds": 0.484,
+        "cost_usd": 0.0,
+        "cost_currency": "U",
+        "cost_amount": 0.0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/manual-output.json",
+        "output_sha256": "5dc97a0c8e7a81d84bcf2050e3bfebbd6a6a8a3eb42c73d620973dafe69a6a64",
+        "started_at": "2026-08-31T07:29:45.836105+00:00",
+        "finished_at": "2026-08-31T07:29:45.836141+00:00",
+        "duration_seconds": 0.0,
+        "cost_usd": 0.0,
+        "cost_currency": "USD",
+        "cost_amount": 0.0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5.0,
+          "completeness": 5.0,
+          "risk_awareness": 5.0,
+          "actionability": 4.5,
+          "evidence_quality": 5.0,
+          "total": 24.5
+        },
+        "manual": {
+          "correctness": 5.0,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4.0,
+          "evidence_quality": 4.0,
+          "total": 22.0
+        }
+      },
+      "advantage": {
+        "time_saved_seconds": -0.484,
+        "cost_delta_usd": 0.0,
+        "quality_delta": 2.5
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    }
+  ],
+  "aggregate": {
+    "agent_duration_seconds": 2.65,
+    "manual_duration_seconds": 0.0,
+    "time_saved_seconds": -2.65,
+    "agent_cost_usd": 0.0,
+    "manual_cost_usd": 0.0,
+    "agent_quality_total": 73.5,
+    "manual_quality_total": 66.0
+  },
+  "honesty_boundary": "Three real public marketplace sponsored hires are compared with direct no-Agent calculations. Times and zero costs are measured, raw outputs are hashed, and no paid or human-study claim is made. The entrant must review the automated rubric before submit.",
+  "methodology": {
+    "agent_path": "public SafeHire marketplace sponsored hire over A2A",
+    "without_agent_path": "direct deterministic calculation without marketplace Agent",
+    "payment": "zero-cost sponsored tasks; cost recorded as 0 U",
+    "scoring": "One disclosed five-part success-criteria rubric. Automated scores must be reviewed by the entrant before final submission.",
+    "commerce_context": "Separate BSC Testnet Job #808 proves a completed paid 0.1 U ERC-8183 flow; it is not counted as payment for these three sponsored tasks."
+  }
+}

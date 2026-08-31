@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "task_id": "venus-health-factor-response",
+  "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
+  "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
+  "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
+  "started_at": "2026-08-31T07:29:45.347039+00:00",
+  "finished_at": "2026-08-31T07:29:45.831366+00:00",
+  "duration_seconds": 0.484391,
+  "cost": {
+    "amount": 0,
+    "currency": "U",
+    "mode": "sponsored"
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "id": "termix-venus-health-factor-response",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "messageId": "termix-venus-health-factor-response",
+        "parts": [
+          {
+            "kind": "data",
+            "data": {
+              "skill": "hire_analysis",
+              "task_id": "termix-venus-health-factor-response",
+              "agent_id": "hf-shield-demo",
+              "input": {
+                "collateral_usd": 1500,
+                "debt_usd": 1000,
+                "liquidation_threshold": 0.8,
+                "alert_health_factor": 1.25,
+                "target_health_factor": 1.5,
+                "source": "disclosed_termix_benchmark_scenario_not_live_account_data"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": "termix-venus-health-factor-response",
+    "result": {
+      "status": "completed",
+      "hire_receipt": {
+        "record_id": "ev_eb733197e28380e5a9a2",
+        "record_hash": "eb733197e28380e5a9a29b769db968c8819ae08e762adbc17ec6345629e890e4",
+        "occurred_at": "2026-08-31T07:29:45.777048+00:00",
+        "task_id": "termix-venus-health-factor-response",
+        "agent_id": "hf-shield-demo",
+        "price_amount": 0,
+        "price_currency": "U",
+        "payment_mode": "sponsored"
+      },
+      "agent_result": {
+        "invocation_id": "inv_20260831072945773511",
+        "agent_id": "hf-shield-demo",
+        "agent_version": "0.1.0",
+        "observed_at": "2026-08-31T07:29:45.773534+00:00",
+        "category": "health_factor_monitoring",
+        "action": "repay_or_add_collateral",
+        "executable": true,
+        "confidence": 0.9,
+        "result": {
+          "health_factor": 1.2,
+          "alert_health_factor": 1.25,
+          "target_health_factor": 1.5,
+          "repay_to_target_usd": 200.0,
+          "status": "at_risk",
+          "no_liquidation_prevention_guarantee": true
+        },
+        "risk_checks": [
+          "positive_debt",
+          "liquidation_threshold_validated",
+          "target_above_alert",
+          "execution_requires_scoped_permission"
+        ],
+        "source_labels": [
+          "disclosed_termix_benchmark_scenario_not_live_account_data"
+        ]
+      },
+      "evidence_boundary": "A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808."
+    }
+  },
+  "boundary": "Real public SafeHire marketplace activation with a hash-chain receipt. It is a zero-cost sponsored hire, not a paid ERC-8183 job."
+}

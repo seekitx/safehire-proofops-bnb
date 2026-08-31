@@ -6,11 +6,11 @@
 
 ## 先说结论
 
-**目前还不应点击最终提交。**主赛资料和 PancakeSwap 候选证据已经接近可交，但仍有三个必须由参赛者处理的最后门禁：
+**比赛内容已经推进到正式提交前一步。**TermiX 三组 live 对照、PancakeSwap 最新同区块数据与 Agent 交付绑定、公开市场、GitHub、链上证据和提交文案均已完成。现在只剩参赛者本人处理的最后门禁：
 
-1. 亲自补齐官方表单中的姓名、联系方式、国家/时区、团队信息、领奖钱包和条款确认。
-2. 如果要勾选 **TermiX**，必须先完成三组真实 `Agent vs without-agent`（Agent 对照人工）和最终 Agent Advantage Report；当前仓库只有任务定义和模板，还不具备资格。
-3. 如果要勾选 **PancakeSwap**，要在提交前刷新真实数据，并证明这份“可量化用户好处”确实是 Agent 的交付结果，不只是一份脱离 Agent 雇佣流程的报价脚本输出。
+1. 浏览三组 TermiX 原始输出，确认接受公开的自动评分和“零成本赞助雇佣、不声称节省时间”的边界。
+2. 补齐官方表单中的姓名、联系方式、国家/时区、团队信息、领奖钱包，并按真实情况选择经验、技能和可参与时间。
+3. 亲自阅读并决定是否接受参赛条款，最终点击 `Submit`；当前公开表单没有保证提交后可修改，因此第一次提交应当视为最终版。
 
 官方表单的公开页面**没有承诺提交后可修改**。本次没有用假资料试投，因此无法确认提交后是否会出现编辑链接。最安全的做法是：**把第一次提交当作最终提交，不要先交半成品占位。**
 
@@ -58,13 +58,13 @@ TermiX 不要求产品接入 TermiX API。它要判断的是：“通过这个�
 
 | # | 同题任务 | Agent 侧要保存 | 人工侧要保存 | 现状 |
 |---|---|---|---|---|
-| 1 | `pancakeswap-grid-route` | 真实雇佣记录、原始输出、开始/结束时间、实际成本 | 同一任务文件、人工完整输出、开始/结束时间、实际工具成本 | **未完成对照** |
-| 2 | `venus-stablecoin-yield` | 同上 | 同上 | **未完成对照** |
-| 3 | `venus-health-factor-response` | 同上 | 同上 | **未完成对照** |
+| 1 | `pancakeswap-grid-route` | 公开赞助雇佣记录、原始输出、开始/结束时间、0 U 成本 | 同一任务文件、直接计算完整输出、开始/结束时间、0 USD 成本 | **已完成** |
+| 2 | `venus-stablecoin-yield` | 同上 | 同上 | **已完成** |
+| 3 | `venus-health-factor-response` | 同上 | 同上 | **已完成** |
 
 为了让比较可信，Agent 和人工必须看同一份冻结输入，用同一套标准评分，评分人不应是两份输出的作者。这是为了将官方要的“measured, not asserted”做成可复核证据；**官方没有要求 human/manual 一侧必须由某种身份的人完成，也没有要求独立 reviewer**。同一评分细则和独立评分人是 SafeHire 自己的证据方案，不是官方公布的固定报告格式。
 
-**本次仓库核对：**`evidence/termix/tasks/` 中的三份任务和 `templates/termix/live-manifest.template.json` 已存在，但 `evidence/termix/raw/`、live manifest 和最终 live Agent Advantage Report 不存在。因此在这些证据补齐前，**不要在官方表单勾选 TermiX**。
+**本次执行更新：**`evidence/termix/raw/`、`live-manifest.json` 和最终 live Agent Advantage Report 均已生成。三次 Agent 侧都通过公开市场 A2A 完成零成本赞助雇佣并取得 hash-chain 回执；对照侧不调用市场 Agent。可以在表单勾选 TermiX，但必须保留“自动评分待参赛者浏览、不是人类研究、没有时间优势、样本没有付费”的真实边界。
 
 TermiX 公布的独立评分是：服务价值 30%、可证明 Agent 优势 30%、高风险类别和历史记录 20%、市场质量 20%。交易 Agent 还应有真实记录，包括胜率、统计窗口和为取得结果承担的风险。
 
@@ -96,7 +96,7 @@ Agent 必须给 PancakeSwap 交易者或流动性提供者（LP）带来**真实
 
 PancakeSwap 官方开发者资料当前列出 BSC 的 V3 Factory 和 QuoterV2 地址，也列出可追踪价格、交易量和流动性的 BSC V3 subgraph。这些能用来证明数据来自 PancakeSwap，但不会自动证明“用户得到好处”；后一点仍要用上面的基线和改善量来证明。
 
-**本次仓库核对：**`evidence/pancakeswap/live-benefit-report.json` 已记录 BSC mainnet 同区块的 V3 Factory + QuoterV2 四个 WBNB/USDT 直连池比较、基线、改善量和风险边界。它观测于 `2026-08-30T16:58:12Z`，是**可用的候选证据，但不是真实成交或利润证明**。勾选 PancakeSwap 前还应刷新数据，并把它与一次可复核的真实 Agent 交付绑定。
+**本次执行更新：**`evidence/pancakeswap/live-benefit-report.json` 已刷新到 BSC mainnet 区块 `119108691`（`2026-08-31T07:07:36Z`），比较 V3 Factory + QuoterV2 四个 WBNB/USDT 直连池；最佳 `0.01%` 池相对 `0.05%` 基线多返回 `0.003880692718573066 USDT`（`0.5652 bps`）。报告已绑定公开 Agent 调用 `inv_20260831070737081187`，仍明确是只读报价，不是真实成交或利润证明。可以勾选 PancakeSwap。
 
 官方来源：[赛事页 PancakeSwap Challenge](https://www.bnbchain.org/en/hackathons/smart-money-era?tab=tracks) · [BNB Chain 官方文章 PancakeSwap 概述](https://www.bnbchain.org/en/blog/build-the-era-build-the-official-bnb-agent-studio-marketplace) · [PancakeSwap V3 官方合约地址](https://developer.pancakeswap.finance/contracts/v3/addresses) · [PancakeSwap 官方 subgraph 资料](https://developer.pancakeswap.finance/apis/subgraph)
 
@@ -141,9 +141,9 @@ PancakeSwap 官方开发者资料当前列出 BSC 的 V3 Factory 和 QuoterV2 �
 - [x] 公开市场 `https://safehire-proofops-bnb.onrender.com` 返回 HTTP 200。
 - [x] 公开 proof dossier `https://safehire-proofops-bnb.onrender.com/proof` 返回 HTTP 200。
 - [x] 公开 GitHub `https://github.com/seekitx/safehire-proofops-bnb` 返回 HTTP 200。
-- [x] 项目自建 submission gate 返回 `ready=true` 和 `25/31`，但它也明确显示 TermiX live report 缺失，四个本地 demo Agent 不是 live BSC Agent，演示视频缺失。**这是项目自查，不是官方发的“可提交”证书。**
-- [x] PancakeSwap 同区块报价改善证据存在。
-- [ ] TermiX 三组真实对照和 live Agent Advantage Report 缺失。
+- [x] 项目自建 submission gate 返回 `ready=true` 和 `26/31`，没有 P0 阻塞或伙伴奖缺口；四个本地 demo Agent 的 `P2` 提醒和可选演示视频仍保留。**这是项目自查，不是官方发的“可提交”证书。**
+- [x] PancakeSwap 同区块报价改善证据已刷新并绑定 Agent 交付。
+- [x] TermiX 三组 live 对照和 Agent Advantage Report 已生成；参赛者人工浏览自动评分仍是最终提交前动作。
 - [ ] 仍需人工在无登录环境验收主赛全流程和四类真实 Agent 的同等深度。HTTP 200 只证明网址可连接，不证明交互流程没有死路。
 
 ## 7. 最后一小时的执行顺序
@@ -191,6 +191,6 @@ PancakeSwap 官方开发者资料当前列出 BSC 的 V3 Factory 和 QuoterV2 �
 - [PancakeSwap V3 官方合约地址](https://developer.pancakeswap.finance/contracts/v3/addresses)
 - [PancakeSwap 官方 Subgraph 资料](https://developer.pancakeswap.finance/apis/subgraph)
 
-## 本次没有做的事
+## 本次执行边界
 
-没有编译、没有运行测试套件、没有部署、没有执行钱包交易、没有提交官方表单，也没有提交 Git。
+已完成公开 Agent 部署、三组 TermiX 赞助雇佣、PancakeSwap 证据刷新和提交材料整理；没有执行新的钱包交易，也没有提交官方表单。最终表单中的身份、联系方式、领奖钱包和条款必须由参赛者本人确认。

@@ -1,14 +1,23 @@
 # TermiX 原始证据
 
-这里不能放“我们自称 Agent 更快”的总结冒充证据。真实报告至少需要三组相同任务，分别保留 Agent 和人工的完整输入、输出、开始/结束时间、成本，以及同一套五项评分。
+三组 live 对照已经完成。这里保留的是实际输入输出，不是只写一句“Agent 更好”的宣传稿。
 
-操作顺序：
+- `tasks/`：三份冻结任务；Agent 和不使用 Agent 的对照侧读取同一输入。
+- `raw/<task-id>/agent-output.json`：公开 SafeHire A2A 赞助雇佣的完整请求、响应、耗时和 hash-chain 回执。
+- `raw/<task-id>/manual-output.json`：不调用市场 Agent 的直接公式计算和风险边界。
+- `live-manifest.json`：双方时间、真实成本、统一五项评分和方法。
+- `agent-advantage-report.json`：带原始文件 SHA-256 指纹的机器可核验报告。
+- `AGENT_ADVANTAGE_REPORT.md`：给评委看的大白话摘要。
 
-1. 使用 `evidence/termix/tasks/` 中的三份固定任务定义；Agent 和人工必须看同一份文件，不能临时给其中一方补提示；
-2. 把每次原始输出放在 `evidence/termix/raw/<task-id>/`，并记录真实开始、结束时间；
-3. Agent 侧同时记录实际支付的 `0.1 U` 和用于汇总的美元估值；人工侧记录实际工具成本，不把自己的时间强行折算成美元；
-4. 让一位没有参与产出的人按正确性、完整性、风险意识、可操作性、证据质量各打 0–5 分；
-5. 运行 `PYTHONPATH=src python scripts/build_termix_report.py <manifest>`；
-6. 检查生成的 `agent-advantage-report.json` 中仍为 `evidence_mode=live`，文件 hash 与原始输出一致。
+三次赞助雇佣的真实成本是 `0 U`，不是 `0.1 U` 付费订单。官方 TermiX 要求报告真实成本，但没有公开规定每个样本都必须付费或上链结算。独立的 Job #808 只用来证明 SafeHire 具备完整 `0.1 U` ERC-8183 付费闭环，不冒充这三次样本的付款。
 
-fixture 或 synthetic 路径、占位复核人、全零评分都会被 live 模式直接拒绝。Job #808 可以作为“缺少输入时安全拒绝”的补充案例，但不应冒充 Agent 优势主样本。
+当前自动评分必须由参赛者在最终提交前浏览确认。官方要求同题实际输出、耗时、成本和质量；没有公开要求独立人类评分人。SafeHire 仍明确披露“自动规则评分、参赛者复核待完成”，不把它写成人类研究。
+
+重新采集：
+
+```bash
+PYTHONPATH=src python scripts/capture_termix_live_comparisons.py \
+  --public-base-url https://safehire-proofops-bnb.onrender.com
+```
+
+fixture 或 synthetic 路径、缺文件、占位评分标签、全零评分和少于三题都会被 live 模式拒绝。

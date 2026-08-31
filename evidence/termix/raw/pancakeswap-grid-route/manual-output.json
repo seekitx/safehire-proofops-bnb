@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "task_id": "pancakeswap-grid-route",
+  "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
+  "started_at": "2026-08-31T07:29:44.968169+00:00",
+  "finished_at": "2026-08-31T07:29:44.968206+00:00",
+  "duration_seconds": 0.0001,
+  "cost": {
+    "amount": 0,
+    "currency": "USD"
+  },
+  "method": "Read the saved same-block quote, calculate a geometric nine-level grid and capital per level directly, then document execution safeguards without calling /a2a or /api/agents.",
+  "marketplace_agent_called": false,
+  "answer": {
+    "method": "direct geometric-grid calculation without a marketplace Agent",
+    "formula": "price[i] = lower * (upper/lower) ** (i/(levels-1))",
+    "grid_prices": [
+      652.2624756,
+      660.47381778,
+      668.78853267,
+      677.20792163,
+      685.73330241,
+      694.36600933,
+      703.10739353,
+      711.95882315,
+      720.92168356
+    ],
+    "capital_per_order_usd": 111.11,
+    "configured_max_drawdown_pct": 5.0,
+    "range_width_pct": 10.0,
+    "source": "pancakeswap_v3_block_119108691_same_block_quote",
+    "decision_boundary": "Recorded quote only. Before execution obtain a fresh quote, set slippage and deadline, review allowance and ask the wallet owner to confirm.",
+    "no_trade_or_profit_claim": true
+  },
+  "boundary": "Deterministic direct-calculation baseline. It did not call SafeHire A2A or any marketplace Agent; it is not represented as a timed human study."
+}

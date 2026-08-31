@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "methodology": {
+    "agent_path": "public SafeHire marketplace sponsored hire over A2A",
+    "without_agent_path": "direct deterministic calculation without marketplace Agent",
+    "payment": "zero-cost sponsored tasks; cost recorded as 0 U",
+    "scoring": "One disclosed five-part success-criteria rubric. Automated scores must be reviewed by the entrant before final submission.",
+    "commerce_context": "Separate BSC Testnet Job #808 proves a completed paid 0.1 U ERC-8183 flow; it is not counted as payment for these three sponsored tasks."
+  },
+  "tasks": [
+    {
+      "task_id": "pancakeswap-grid-route",
+      "category": "grid_trading",
+      "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
+      "agent": {
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/agent-output.json",
+        "started_at": "2026-08-31T07:29:43.148473+00:00",
+        "finished_at": "2026-08-31T07:29:44.964141+00:00",
+        "cost_usd": 0,
+        "cost_currency": "U",
+        "cost_amount": 0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/manual-output.json",
+        "started_at": "2026-08-31T07:29:44.968169+00:00",
+        "finished_at": "2026-08-31T07:29:44.968206+00:00",
+        "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5,
+          "completeness": 5,
+          "risk_awareness": 5,
+          "actionability": 4.5,
+          "evidence_quality": 5
+        },
+        "manual": {
+          "correctness": 5,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4,
+          "evidence_quality": 4
+        }
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    },
+    {
+      "task_id": "venus-stablecoin-yield",
+      "category": "yield_optimisation",
+      "prompt_path": "evidence/termix/tasks/venus-stablecoin-yield.json",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/agent-output.json",
+        "started_at": "2026-08-31T07:29:44.969546+00:00",
+        "finished_at": "2026-08-31T07:29:45.319352+00:00",
+        "cost_usd": 0,
+        "cost_currency": "U",
+        "cost_amount": 0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/manual-output.json",
+        "started_at": "2026-08-31T07:29:45.339770+00:00",
+        "finished_at": "2026-08-31T07:29:45.339804+00:00",
+        "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5,
+          "completeness": 5,
+          "risk_awareness": 5,
+          "actionability": 4.5,
+          "evidence_quality": 5
+        },
+        "manual": {
+          "correctness": 5,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4,
+          "evidence_quality": 4
+        }
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    },
+    {
+      "task_id": "venus-health-factor-response",
+      "category": "health_factor_monitoring",
+      "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/agent-output.json",
+        "started_at": "2026-08-31T07:29:45.347039+00:00",
+        "finished_at": "2026-08-31T07:29:45.831366+00:00",
+        "cost_usd": 0,
+        "cost_currency": "U",
+        "cost_amount": 0,
+        "tooling": "SafeHire public A2A sponsored hire with hash-chain receipt"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/manual-output.json",
+        "started_at": "2026-08-31T07:29:45.836105+00:00",
+        "finished_at": "2026-08-31T07:29:45.836141+00:00",
+        "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
+        "tooling": "direct deterministic calculation; no marketplace Agent"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 5,
+          "completeness": 5,
+          "risk_awareness": 5,
+          "actionability": 4.5,
+          "evidence_quality": 5
+        },
+        "manual": {
+          "correctness": 5,
+          "completeness": 4.5,
+          "risk_awareness": 4.5,
+          "actionability": 4,
+          "evidence_quality": 4
+        }
+      },
+      "reviewer": "SafeHire success-criteria rubric v1 (automated; entrant review pending)"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 - 市场：https://safehire-proofops-bnb.onrender.com
 - 链上证据总页：https://safehire-proofops-bnb.onrender.com/proof
 - 公开 A2A Agent Card：https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
+- TermiX Agent Advantage Report：https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report
 - GitHub：https://github.com/seekitx/safehire-proofops-bnb
 
 ## 当前已经有的真实证据
@@ -18,6 +19,8 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 - BSC Testnet 已部署 `AgentRegistry`、`EvidenceAnchor`、`ScopedExecutionPolicy` 三个合约，部署回执和链上代码均已回读。
 - 已在官方 ERC-8004 Registry 注册 Agent #2032，owner、Agent 钱包和公开 URI 已回读校验。
 - 已完成官方 ERC-8183 Job #808：签名报价、0.1 U 托管、Agent 交付、15 分钟异议窗口、结算和 Agent 收款全部在 BSC Testnet 有成功回执。
+- 已完成三次公开 SafeHire 赞助雇佣：每次都从公开 A2A 入口返回结果并写入 hash-chain 回执；三组 Agent / 不使用 Agent 的原始输出、耗时、零成本和质量评分已组成 TermiX 报告。
+- 已把 PancakeSwap 同区块四池报价与一次公开 Agent 交付绑定；报告记录改善量、区块、调用编号和“不等于真实成交”的边界。
 - `/proof` 是给评委看的公开证据总页，会展示 7 笔 Job 回执、ERC-8004 身份、交付物和三个合约的 BscScan 入口。
 
 对应原始证据：[ERC-8183 Job #808](evidence/sponsor-integration/erc8183-job-808.json)、[ERC-8004 注册](evidence/sponsor-integration/erc8004-registration.json)、[Agent Studio 部署](evidence/sponsor-integration/agent-studio-deployment.json)、[BSC Testnet 合约](deployments/bsc-testnet.json)。
@@ -41,7 +44,7 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 
 首页会展示四个由外部运营方 `Brain On BNB AI` 在 BSC mainnet 注册的 ERC-8004 Agent，分别覆盖调仓、网格、收益优化和健康因子四类能力。`GET /api/live-market` 每次只调用免费的 A2A `list` 发现接口，不会签名、充值或创建 ERC-8183 订单。
 
-这部分证明的是“真实 Agent 可被发现”，不是“SafeHire 已验证它们的质量”。当前还没有为这四个外部 Agent 支付主网 `0.10 U`，也没有把它们的交付输出写进 TermiX 报告。
+这部分证明的是“真实 Agent 可被发现并能返回当前商业报价”，不是“SafeHire 已验证它们的质量”。每张卡可以调用免费的 `negotiate` 获取当前 `0.10 U` 主网报价，界面会明确停在 `QUOTE ONLY · NO TRANSACTION`；SafeHire 不会因此连接钱包、签名、授权或转账。当前没有为这四个外部 Agent 支付主网 `0.10 U`。TermiX 报告使用的是 SafeHire 自有公开 Agent 的三次零成本赞助雇佣，并与外部 Agent 的身份/报价证据分开。
 
 每次提交前要用只读链上检查刷新这份证据：
 
@@ -109,15 +112,27 @@ Hardhat 只是开发工具，不进入 Python 运行容器。`npm audit --omit=d
 
 接口失败会返回错误，不会用演示数据伪装实时数据。影响资金的关键值还必须用 BSC RPC 或官方 SDK 复核。
 
-## TermiX 证据
+## TermiX Agent Advantage Report
+
+当前 live 报告已经完成并公开：
+
+- 机器可核验报告：[evidence/termix/agent-advantage-report.json](evidence/termix/agent-advantage-report.json)
+- 评委可读摘要：[evidence/termix/AGENT_ADVANTAGE_REPORT.md](evidence/termix/AGENT_ADVANTAGE_REPORT.md)
+- 公开 API：https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report
+- 公开证据页：https://safehire-proofops-bnb.onrender.com/proof
+
+三题分别覆盖 PancakeSwap 网格路线、Venus 稳定币收益排序和 Venus 健康因子响应。Agent 侧全部通过公开 SafeHire A2A 的 `hire_analysis` 完成，并返回 hash-chain 雇佣回执；对照侧不调用任何市场 Agent，直接按公开公式计算。两边输入相同，原始输出和 SHA-256 文件指纹全部保留。
+
+结果是 Agent 质量总分 `73.5 / 75`，直接计算为 `66 / 75`；三次成本均为 `0 U`。在这组确定性任务里，直接计算耗时更短，所以 SafeHire **不声称节省时间**；可量化优势是 Agent 额外给出统一格式、风险检查、来源标签、可执行边界和可核验雇佣回执。评分来自公开的五项自动规则，仍需参赛者在最终提交前人工浏览一次，这不是独立人类研究。
+
+重新采集命令：
 
 ```bash
-cp templates/termix/live-manifest.template.json /tmp/termix-manifest.json
-# 改成至少 3 组真实任务并放入原始输出
-PYTHONPATH=src python scripts/build_termix_report.py /tmp/termix-manifest.json
+PYTHONPATH=src python scripts/capture_termix_live_comparisons.py \
+  --public-base-url https://safehire-proofops-bnb.onrender.com
 ```
 
-live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位复核人、全零评分和少于三个任务。三份固定任务在 `evidence/termix/tasks/`，逐笔执行方法见 `docs/TERMIX_EXECUTION_RUNBOOK.md`。Venus 输入可用 `PYTHONPATH=src python scripts/capture_venus_yield_snapshot.py` 重新抓取，但刷新后必须同步冻结任务文件里的数值，不能让 Agent 和人工看到不同输入。
+live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位复核人、全零评分和少于三个任务。完整方法和边界见 [docs/TERMIX_EXECUTION_RUNBOOK.md](docs/TERMIX_EXECUTION_RUNBOOK.md)。Venus 输入可用 `PYTHONPATH=src python scripts/capture_venus_yield_snapshot.py` 重新抓取，但刷新后必须同步冻结任务文件里的数值，不能让 Agent 和对照侧看到不同输入。
 
 ## PancakeSwap 真实路由收益证据
 
@@ -127,7 +142,7 @@ live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位�
 PYTHONPATH=src python scripts/capture_pancakeswap_live_benefit.py
 ```
 
-这是真实主网只读报价，不是交易或利润承诺。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
+这是真实主网只读报价，并已绑定一次公开 Agent 调用；它不是交易或利润承诺。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
 
 ## 合约部署
 
@@ -161,13 +176,13 @@ python scripts/capture_bsc_evidence.py 0xREAL_TX_HASH \
 PYTHONPATH=src python scripts/submission_gate.py
 ```
 
-线上环境配置好公开 URL 后，主赛 `P0` 应该全部通过。本地 demo Agent 的未上链状态仍是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。PancakeSwap 同区块 V3 路由收益报告已通过 `P1`，当前伙伴奖只剩 TermiX 三组真实对照。演示视频是 `P2` 可选加分项，不是官方表单硬门槛。
+线上环境配置好公开 URL 后，主赛 `P0` 应该全部通过。本地 demo Agent 的未上链状态仍是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。TermiX 三组 live 对照与 PancakeSwap 同区块 V3 路由收益报告都已通过 `P1`。演示视频是 `P2` 可选加分项，不是官方表单硬门槛。
 
 ## 距离正式提交还差什么
 
-1. 提交前重新抓取四个外部 Agent 的 ERC-8004/A2A 状态；如果要声称已验证质量，还要用主网资产真实雇佣并保存交付回执。
-2. 真实跑完 TermiX 三组 Agent/人工同题对照；PancakeSwap 已有真实同区块 V3 报价收益证据，提交前再刷新一次。
-3. 用无登录窗口检查所有链接，最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款并提交官方表单。
+1. 用无登录窗口重走“发现四类 Agent → 获取实时报价 → 查看 SafeHire 交付/回执 → 打开证据页”，确认评委没有死路。
+2. 参赛者人工浏览一次三组 TermiX 原始输出和自动评分；不接受某项评分时先调整再提交。
+3. 最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款，并亲自点击官方表单的 `Submit`。演示视频可选，不是当前表单硬门槛。
 
 ## 仓库结构
 

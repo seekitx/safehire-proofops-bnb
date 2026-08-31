@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "task_id": "venus-health-factor-response",
+  "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
+  "started_at": "2026-08-31T07:29:45.836105+00:00",
+  "finished_at": "2026-08-31T07:29:45.836141+00:00",
+  "duration_seconds": 0.000109,
+  "cost": {
+    "amount": 0,
+    "currency": "USD"
+  },
+  "method": "Calculate health factor, safe debt and repay-to-target directly from the disclosed formulas, then document the live-data and wallet boundaries without calling /a2a or /api/agents.",
+  "marketplace_agent_called": false,
+  "answer": {
+    "method": "direct health-factor calculation without a marketplace Agent",
+    "formula": "HF = collateral*threshold/debt; repay = debt-collateral*threshold/target",
+    "health_factor": 1.2,
+    "status": "at_risk",
+    "repay_to_target_usd": 200.0,
+    "source": "disclosed_termix_benchmark_scenario_not_live_account_data",
+    "data_boundary": "Disclosed benchmark scenario only. Re-read the live account, oracle and protocol pause state before asking the wallet owner to approve any response.",
+    "no_repayment_or_liquidation_guarantee": true
+  },
+  "boundary": "Deterministic direct-calculation baseline. It did not call SafeHire A2A or any marketplace Agent; it is not represented as a timed human study."
+}
