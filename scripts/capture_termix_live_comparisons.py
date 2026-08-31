@@ -156,7 +156,7 @@ async def capture(public_base_url: str) -> dict[str, Any]:
             task = json.loads(task_path.read_text(encoding="utf-8"))
             agent_request = task.get("agent_request")
             if not isinstance(agent_request, dict):
-                raise ValueError(f"{task_id} has no structured agent_request")
+                raise TypeError(f"{task_id} has no structured agent_request")
 
             agent_started = _iso_now()
             agent_clock = time.perf_counter()

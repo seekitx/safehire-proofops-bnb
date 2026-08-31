@@ -155,7 +155,7 @@ async def request_live_agent_quote(project_root: Path, *, skill_id: str) -> dict
         payload = response.json()
     if not isinstance(payload, dict):
         raise TypeError("live Agent returned an unexpected quote response")
-    if isinstance(payload.get("error"), dict):
+    if payload.get("error") is not None:
         raise ValueError("live Agent rejected the quote request")
     quote = payload.get("result")
     if not isinstance(quote, dict) or quote.get("accepted") is not True:

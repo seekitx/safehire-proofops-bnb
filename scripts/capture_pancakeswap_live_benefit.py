@@ -101,7 +101,7 @@ async def _safehire_grid_delivery(
     response.raise_for_status()
     payload = response.json()
     if not isinstance(payload, dict) or not isinstance(payload.get("result"), dict):
-        raise ValueError("SafeHire A2A preview returned no result")
+        raise TypeError("SafeHire A2A preview returned no result")
     result = payload["result"]
     if str(result.get("agent_id", "")) != "grid-sentinel-demo":
         raise ValueError("SafeHire A2A preview returned the wrong agent")
