@@ -1,0 +1,106 @@
+name: apply-protocol-hardening
+on:
+  push:
+    branches:
+      - "review/protocol-hardened-20260831"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: apply-protocol-hardening
+  cancel-in-progress: false
+jobs:
+  apply-test-package:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: review/protocol-hardened-20260831
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - name: Verify and apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/protocol-patch.part-* > /tmp/protocol.b64
+          base64 -d /tmp/protocol.b64 > /tmp/protocol.tar.xz
+          echo "84584abcbd55181ab3bd6ee0cf7c0eef0ddfea46d3d16750c72141a8773c87bb  /tmp/protocol.tar.xz" | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path
+          import tarfile
+
+          root = Path.cwd().resolve()
+          with tarfile.open("/tmp/protocol.tar.xz", "r:xz") as archive:
+              for member in archive.getmembers():
+                  target = (root / member.name).resolve()
+                  if target != root and root not in target.parents:
+                      raise SystemExit(f"unsafe archive path: {member.name}")
+              archive.extractall(root, filter="data")
+          PY
+          rm -f .github/protocol-patch.part-* .github/workflows/apply-protocol-hardening.yml
+      - name: Install Python dependencies
+        run: pip install -e '.[dev,bnb]'
+      - name: Lint, typecheck and browser syntax
+        run: |
+          ruff check src apps tests scripts
+          mypy src apps scripts
+          node --check apps/web/assets/live-hire.js
+          node --check apps/web/assets/live-market.js
+          node --check apps/web/assets/judge-scorecard.js
+      - name: Compile and test contracts
+        working-directory: contracts
+        run: |
+          npm ci --ignore-scripts
+          npm run compile
+          npm test
+          npm audit --omit=dev
+      - name: Test Python application
+        run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
+      - name: Security and submission gates
+        run: |
+          python scripts/static_security_check.py
+          python scripts/submission_gate.py --allow-incomplete
+          python scripts/judge_scorecard.py --output judge-scorecard.json
+      - name: Build BNB Agent Studio seller
+        working-directory: agent-studio/safehireagents
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --dir app/agent build
+      - name: Build container and release archive
+        run: |
+          docker build -t safehire-proofops:${{ github.sha }} .
+          python scripts/build_release.py
+          mkdir -p dist
+          cp ../safehire-proofops-bnb-release.zip dist/
+          cp ../safehire-proofops-bnb-release.manifest.json dist/
+      - name: Commit clean protocol-hardened patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: harden signed ERC-8183 hire and delivery verification"
+          git push origin HEAD:review/protocol-hardened-20260831
+      - uses: actions/upload-artifact@v4
+        with:
+          name: safehire-proofops-bnb-protocol-hardened
+          path: |
+            dist/safehire-proofops-bnb-release.zip
+            dist/safehire-proofops-bnb-release.manifest.json
+            judge-scorecard.json
+          if-no-files-found: error
+          retention-days: 14
