@@ -13,9 +13,17 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
       - run: pip install -e '.[dev,bnb]'
       - run: ruff check src apps tests scripts
       - run: mypy src apps scripts
+      - name: Compile contracts for API tests
+        working-directory: contracts
+        run: npm ci --ignore-scripts && npm run compile
       - run: pytest --cov=proofops --cov=apps --cov-report=term-missing --cov-fail-under=75
       - run: python scripts/static_security_check.py
       - run: python scripts/submission_gate.py --allow-incomplete
