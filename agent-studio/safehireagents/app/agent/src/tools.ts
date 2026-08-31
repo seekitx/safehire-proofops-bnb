@@ -39,7 +39,9 @@ const safeHireAgentId = z.enum([
 ]);
 
 function safeHireApiBaseUrl(): URL {
-  const raw = process.env.SAFEHIRE_API_BASE_URL ?? "http://127.0.0.1:8000";
+  const raw =
+    process.env.SAFEHIRE_API_BASE_URL ??
+    "https://safehire-proofops-bnb.onrender.com/";
   const url = new URL(raw.endsWith("/") ? raw : `${raw}/`);
   const local = url.hostname === "127.0.0.1" || url.hostname === "localhost";
   if (url.protocol !== "https:" && !(local && url.protocol === "http:")) {

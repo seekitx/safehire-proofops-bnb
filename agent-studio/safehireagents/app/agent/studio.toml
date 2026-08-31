@@ -108,11 +108,11 @@ max_per_month_usd = 15.0
 [deploy.platform]
 terms_accepted_at = "2026-08-30T13:52:59Z"
 slug = "safehire-proofops"
-deployment_id = "01M19F53Z2QQD5XZTQ9AEHF7CR"
+deployment_id = "01M1B4NE1QPZ4KGYV5BQVF9FWD"
 backend = "aws"
 agent_id = "01M19F53Z2SRN65TBHKWXY1K54"
 invoke_url = "https://bnbagent-api.bnbchain.world/v1/rt/01M19F53Z2SRN65TBHKWXY1K54/.well-known/agent-card.json"
-last_deploy_at = "2026-08-30T13:54:20Z"
+last_deploy_at = "2026-08-31T05:29:08Z"
 
 [identity]
 endpoint = "https://bnbagent-api.bnbchain.world/v1/rt/01M19F53Z2SRN65TBHKWXY1K54/.well-known/agent-card.json"
