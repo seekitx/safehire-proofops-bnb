@@ -18,6 +18,8 @@ SafeHire / ProofOps 参加的是 BNB Chain 的 **The Smart Money Era: Build the 
 
 ### 实现后更新（2026-08-31）
 
+公开基础交付现已完成：市场部署在 https://safehire-proofops-bnb.onrender.com，代码仓库是 https://github.com/seekitx/safehire-proofops-bnb，并提供评委可直接访问的 `/proof` 和 `/.well-known/agent-card.json`。Render 免费实例可能休眠，所以“已公开部署”不等于“没有冷启动风险”。
+
 上面是官网核对时的原始缺口快照。随后已补充一项重要能力：首页现在会通过 ERC-8004 注册证据和免费 A2A `list` 接口，发现四个由 `Brain On BNB AI` 外部运营、真实注册于 BSC mainnet 的 Agent，覆盖调仓、网格、收益优化和健康因子四类。实时发现在 Chrome 中观察到 `4/4 skills callable`。
 
 这使“四类真实 BSC Agent 存在且当前可发现”从未完成变成已有证据，但不能扩大成“SafeHire 已验证它们的交付质量”：它们属于外部运营方，SafeHire 还没有为它们支付 BSC mainnet `0.10 U`，也没有把交付输出写进 TermiX 报告。本地 `config/agents.json` 的四个预演仍明确标为 demo，与真实市场区分开。
@@ -180,15 +182,15 @@ Altana 资格门槛是：
 | 真实 BSC 合约 | `deployments/bsc-testnet.json` 有三个合约及成功交易 | 已有真实测试网证据 |
 | ERC-8004 身份 | `erc8004-registration.json` 有 Agent #2032、所有者和 URI 回读 | 已完成一个身份 |
 | ERC-8183 雇佣 | `erc8183-job-808.json` 有 create/register/budget/approve/fund/submit/settle，全链路成功 | 已完成一单，可作为强证据 |
-| Agent Studio 公开端点 | `agent-studio-deployment.json` 记录了公开 A2A/MCP/x402，但 9 月 1 日过期 | 不满足 9 月 9–23 日评审期可用要求 |
-| 公开市场 | 仓库里没有正式公开 HTTPS 市场记录 | 未完成 |
-| GitHub 链接 | 当前仓库没有 Git remote | 未完成表单必填项 |
+| Agent Studio 公开端点 | 48 小时签名卖方作为历史采证；Render 持久公开只读 Agent Card/A2A 预演桥作为评委入口 | 已分开记录，不冒充长期签名卖方 |
+| 公开市场 | Render 公开 HTTPS 市场、证据页和 API 已可访问 | 已完成；免费实例有冷启动风险 |
+| GitHub 链接 | `https://github.com/seekitx/safehire-proofops-bnb` 公开可访问 | 已完成表单必填项 |
 | 四类真实 Agent | `evidence/marketplace/live-agent-catalog.json` 有四个外部 BSC mainnet ERC-8004 注册和 A2A skill；本地四类预演仍是 demo | 真实市场供给已可发现；付费雇佣和质量尚未验证 |
 | 实时高质量数据 | 当前四类主要是合成指标 | 不满足 Data Quality 目标 |
 | TermiX 报告 | 只有模板、fixture 和说明，没有 live report 与三组原始对照 | 不具备 TermiX 资格 |
 | PancakeSwap 收益证据 | `live-benefit-report.json` 有同区块 V3 Factory + QuoterV2 四池路由比较、区块高和改善量 | 已证明只读路由选择的可量化帮助；未声称已交易或获利 |
 | Altana | 有自建权限合约，但没有 Altana wallet/session/Keystore/Explorer 证据 | 不具备 Altana 资格 |
-| 最终提交 | 没有 `submission/submission.json`，也没有官方表单提交凭证 | 未提交 |
+| 最终提交 | `submission/submission.json` 已补公开链接；官方表单尚未由参赛者确认提交 | 草稿完成，未提交 |
 
 ## 8. 按获奖优先级应该补什么
 

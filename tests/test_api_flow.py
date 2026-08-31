@@ -52,6 +52,54 @@ def test_public_agent_card_and_invoke(tmp_path, monkeypatch) -> None:
     assert invoke.json()["agent_id"] == "lp-guardian-demo"
 
 
+def test_public_marketplace_a2a_card_and_preview(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))
+    monkeypatch.setenv("EVIDENCE_LEDGER_PATH", str(tmp_path / "evidence.jsonl"))
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://safehire.example.com")
+
+    with TestClient(app) as client:
+        card = client.get("/.well-known/agent-card.json")
+        example = client.get("/agents/grid-sentinel-demo").json()["example_input"]
+        invoke = client.post(
+            "/a2a",
+            json={
+                "jsonrpc": "2.0",
+                "id": "preview-1",
+                "method": "message/send",
+                "params": {
+                    "message": {
+                        "role": "user",
+                        "messageId": "preview-message-1",
+                        "parts": [
+                            {
+                                "kind": "data",
+                                "data": {
+                                    "skill": "preview",
+                                    "agent_id": "grid-sentinel-demo",
+                                    "input": example,
+                                },
+                            }
+                        ],
+                    }
+                },
+            },
+        )
+
+    assert card.status_code == 200
+    assert card.json()["url"] == "https://safehire.example.com/a2a"
+    assert {skill["id"] for skill in card.json()["skills"]} == {
+        "list_live_agents",
+        "preview",
+        "public_proof",
+    }
+    assert invoke.status_code == 200
+    assert invoke.json()["id"] == "preview-1"
+    assert invoke.json()["result"]["agent_id"] == "grid-sentinel-demo"
+    assert invoke.json()["result"]["action"] == "propose_grid"
+    assert "no wallet signature" in invoke.json()["result"]["evidence_boundary"]
+
+
 def test_wallet_hire_approve_execute_and_revoke_flow(tmp_path, monkeypatch) -> None:
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_PATH", str(tmp_path / "api.db"))

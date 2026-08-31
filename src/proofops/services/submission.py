@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -14,7 +14,7 @@ from proofops.settings import Settings
 
 TX_HASH = re.compile(r"^0x[a-fA-F0-9]{64}$")
 ADDRESS = re.compile(r"^0x[a-fA-F0-9]{40}$")
-JUDGING_END = datetime(2026, 9, 23, 23, 59, 59, tzinfo=timezone.utc)
+JUDGING_END = datetime(2026, 9, 23, 23, 59, 59, tzinfo=UTC)
 
 
 @dataclass(frozen=True)
@@ -186,9 +186,7 @@ class SubmissionValidator:
         observed_at = None
         if catalog and catalog.get("observed_at"):
             try:
-                observed_at = datetime.fromisoformat(
-                    str(catalog["observed_at"]).replace("Z", "+00:00")
-                )
+                observed_at = datetime.fromisoformat(str(catalog["observed_at"]))
             except ValueError:
                 observed_at = None
         categories = {
@@ -211,7 +209,7 @@ class SubmissionValidator:
                 for item in agents
             )
         )
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         fresh = bool(
             observed_at
             and observed_at <= now
@@ -310,7 +308,7 @@ class SubmissionValidator:
         expires_at = None
         if record and record.get("expires_at"):
             try:
-                expires_at = datetime.fromisoformat(str(record["expires_at"]).replace("Z", "+00:00"))
+                expires_at = datetime.fromisoformat(str(record["expires_at"]))
             except ValueError:
                 expires_at = None
         environment = str(record.get("environment", "")) if record else ""

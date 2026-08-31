@@ -27,12 +27,14 @@ Working MVP
 
 ## Project GitHub Repo Link
 
-`PENDING_PUBLIC_GITHUB_URL`
+https://github.com/seekitx/safehire-proofops-bnb
 
 ## Additional Notes
 
-Public marketplace: `PENDING_PUBLIC_HTTPS_URL`
+Public marketplace: https://safehire-proofops-bnb.onrender.com
 
-On-chain proof dossier: `PENDING_PUBLIC_HTTPS_URL/proof`
+On-chain proof dossier: https://safehire-proofops-bnb.onrender.com/proof
+
+Public marketplace Agent Card: https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
 
 ERC-8183: completed Job #808 with seven successful lifecycle receipts and 0.1 U provider settlement on BSC Testnet. ERC-8004: Agent #2032 with owner, wallet and URI readback. PancakeSwap: same-block BSC mainnet V3 Factory + QuoterV2 comparison across four direct WBNB/USDT fee pools. Three fixed TermiX tasks now cover grid trading, Venus stablecoin yield ranking and health-factor response, but TermiX will only be linked here after three real Agent/manual comparisons pass the evidence gate.

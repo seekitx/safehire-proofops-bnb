@@ -38,7 +38,7 @@ async def capture() -> dict[str, Any]:
 
     rows = payload.get("result") if isinstance(payload, dict) else None
     if not isinstance(rows, list):
-        raise ValueError("Venus markets response has no result list")
+        raise TypeError("Venus markets response has no result list")
 
     markets: list[dict[str, Any]] = []
     for symbol in SYMBOLS:

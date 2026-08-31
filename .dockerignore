@@ -7,6 +7,10 @@
 contracts/node_modules
 contracts/artifacts
 contracts/cache
+agent-studio/**/.studio
+agent-studio/**/.env*
+agent-studio/**/node_modules
+agent-studio/**/dist
 .pytest_cache
 .mypy_cache
 .ruff_cache

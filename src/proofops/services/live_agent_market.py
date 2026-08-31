@@ -18,7 +18,7 @@ def _load_catalog(project_root: Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("live BSC agent catalog is missing or malformed") from exc
     if not isinstance(payload, dict) or not isinstance(payload.get("agents"), list):
-        raise ValueError("live BSC agent catalog has an unexpected schema")
+        raise TypeError("live BSC agent catalog has an unexpected schema")
     return payload
 
 

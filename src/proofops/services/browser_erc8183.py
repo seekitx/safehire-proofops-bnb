@@ -259,7 +259,7 @@ async def job_status(project_root: Path, *, job_id: int) -> dict[str, Any]:
         response.raise_for_status()
         policy_payload = response.json()
     if not isinstance(policy_payload, list):
-        raise ValueError("BSC Testnet policy read returned an unexpected response")
+        raise TypeError("BSC Testnet policy read returned an unexpected response")
     responses = {int(item.get("id", 0)): item for item in policy_payload if isinstance(item, dict)}
     if len(responses) != len(policy_calls):
         raise ValueError("BSC Testnet policy read returned an incomplete batch")

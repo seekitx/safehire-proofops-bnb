@@ -10,6 +10,7 @@ COPY fixtures ./fixtures
 COPY scripts ./scripts
 COPY docs ./docs
 COPY contracts/src ./contracts/src
+COPY agent-studio ./agent-studio
 COPY evidence ./evidence
 COPY deployments ./deployments
 COPY submission ./submission

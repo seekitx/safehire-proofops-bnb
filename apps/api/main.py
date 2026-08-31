@@ -50,6 +50,13 @@ class AgentInvokeRequest(BaseModel):
     input: dict[str, Any]
 
 
+class PublicA2ARequest(BaseModel):
+    jsonrpc: Literal["2.0"] = "2.0"
+    id: str | int | None = None
+    method: str
+    params: dict[str, Any] = Field(default_factory=dict)
+
+
 class LpSimulationRequest(BaseModel):
     current_price: float = Field(gt=0)
     lower_price: float = Field(gt=0)
@@ -778,6 +785,143 @@ async def verify_evidence(application: ApplicationDep) -> dict[str, Any]:
 @app.get("/api/submission/validate")
 async def validate_submission(application: ApplicationDep) -> dict[str, Any]:
     return application.submission.run()
+
+
+def _a2a_data_part(params: dict[str, Any]) -> dict[str, Any] | None:
+    direct = params.get("data")
+    if isinstance(direct, dict):
+        return direct
+    message = params.get("message")
+    if not isinstance(message, dict):
+        return None
+    parts = message.get("parts")
+    if not isinstance(parts, list):
+        return None
+    for raw_part in parts:
+        if not isinstance(raw_part, dict):
+            continue
+        part = raw_part.get("root", raw_part)
+        if not isinstance(part, dict):
+            continue
+        if part.get("kind", part.get("type")) != "data":
+            continue
+        data = part.get("data")
+        if isinstance(data, dict):
+            return data
+    return None
+
+
+def _a2a_result(request_id: str | int | None, payload: dict[str, Any]) -> dict[str, Any]:
+    return {"jsonrpc": "2.0", "id": request_id, "result": payload}
+
+
+def _a2a_error(
+    request_id: str | int | None, code: int, message: str
+) -> dict[str, Any]:
+    return {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "error": {"code": code, "message": message},
+    }
+
+
+@app.get("/.well-known/agent-card.json", include_in_schema=False)
+async def marketplace_agent_card(application: ApplicationDep) -> dict[str, Any]:
+    base_url = application.settings.public_base_url.rstrip("/")
+    return {
+        "name": "SafeHire ProofOps Marketplace Agent",
+        "description": (
+            "Read-only BNB Chain marketplace assistant for discovering live ERC-8004 agents, "
+            "checking SafeHire on-chain proof, and running deterministic risk previews. It does "
+            "not sign transactions, move funds, or claim that demo previews are live track records."
+        ),
+        "url": f"{base_url}/a2a",
+        "version": "1.0.0",
+        "protocolVersion": "0.3.0",
+        "preferredTransport": "JSONRPC",
+        "capabilities": {"streaming": False},
+        "defaultInputModes": ["application/json"],
+        "defaultOutputModes": ["application/json"],
+        "skills": [
+            {
+                "id": "list_live_agents",
+                "name": "List live BSC agents",
+                "description": (
+                    "Return the four-category ERC-8004 registration snapshot plus a current "
+                    "read-only A2A reachability check. This never starts or funds a job."
+                ),
+                "tags": ["bnb-chain", "erc-8004", "discovery", "read-only"],
+                "inputModes": ["application/json"],
+                "outputModes": ["application/json"],
+            },
+            {
+                "id": "preview",
+                "name": "Preview a SafeHire risk engine",
+                "description": (
+                    "Run one deterministic, caller-supplied preview for rebalancing, grid "
+                    "trading, yield optimisation, or health-factor monitoring."
+                ),
+                "tags": ["safehire", "risk-preview", "deterministic", "no-execution"],
+                "inputModes": ["application/json"],
+                "outputModes": ["application/json"],
+            },
+            {
+                "id": "public_proof",
+                "name": "Read SafeHire on-chain proof",
+                "description": (
+                    "Return reviewable BSC Testnet ERC-8004, ERC-8183, contract and "
+                    "PancakeSwap evidence with explicit honesty boundaries."
+                ),
+                "tags": ["safehire", "bsc-testnet", "proof", "read-only"],
+                "inputModes": ["application/json"],
+                "outputModes": ["application/json"],
+            },
+        ],
+    }
+
+
+@app.post("/a2a", include_in_schema=False)
+async def marketplace_a2a(
+    body: PublicA2ARequest, application: ApplicationDep
+) -> dict[str, Any]:
+    if body.method != "message/send":
+        return _a2a_error(body.id, -32601, "Only message/send is supported")
+    data = _a2a_data_part(body.params)
+    if data is None:
+        return _a2a_error(body.id, -32602, "A JSON data part is required")
+    skill = data.get("skill")
+    if skill == "list_live_agents":
+        return _a2a_result(body.id, await live_agent_market(PROJECT_ROOT))
+    if skill == "public_proof":
+        return _a2a_result(body.id, await public_proof())
+    if skill != "preview":
+        return _a2a_error(
+            body.id,
+            -32602,
+            "skill must be list_live_agents, preview, or public_proof",
+        )
+    agent_id = data.get("agent_id")
+    agent_input = data.get("input")
+    if not isinstance(agent_id, str) or not isinstance(agent_input, dict):
+        return _a2a_error(
+            body.id,
+            -32602,
+            "preview requires string agent_id and object input",
+        )
+    try:
+        result = application.agents.invoke(agent_id, agent_input)
+    except (KeyError, TypeError, ValueError) as exc:
+        return _a2a_error(body.id, -32602, str(exc))
+    return _a2a_result(
+        body.id,
+        {
+            **result,
+            "evidence_boundary": (
+                "Deterministic preview from caller-supplied inputs; no wallet signature, "
+                "payment, or fund execution occurred."
+            ),
+        },
+    )
 
 
 WEB_ROOT = Path(__file__).resolve().parents[1] / "web"

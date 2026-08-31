@@ -6,6 +6,13 @@ SafeHire 是一个 BNB Chain DeFi Agent 市场与权限防火墙。用户先比�
 Compare → Preview → Connect wallet → Set limits → Approve → Receipt → Revoke
 ```
 
+评委公开入口：
+
+- 市场：https://safehire-proofops-bnb.onrender.com
+- 链上证据总页：https://safehire-proofops-bnb.onrender.com/proof
+- 公开 A2A Agent Card：https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
+- GitHub：https://github.com/seekitx/safehire-proofops-bnb
+
 ## 当前已经有的真实证据
 
 - BSC Testnet 已部署 `AgentRegistry`、`EvidenceAnchor`、`ScopedExecutionPolicy` 三个合约，部署回执和链上代码均已回读。
@@ -48,7 +55,9 @@ PYTHONPATH=src python scripts/refresh_live_agent_catalog.py
 
 开箱默认是 `demo` 模式。demo receipt 有合成 hash，但永远标记 `demo_fixture`，不会被提交门禁当成 BSC 交易。当前 `config/agents.json` 里四个类别卡片仍是本地演示 Agent；它们与首页上方的外部 BSC mainnet Agent 分开展示。Job #808 证明了 SafeHire 一次真实的注册和雇佣闭环，不代表已验证外部 Agent 的交付质量。
 
-当前 BNB 托管的 Agent Studio 记录是 48 小时试用，到期时间是 2026-09-01T13:54:15Z，不能当作覆盖 9 月 9–23 日评审期的长期托管。
+原 BNB 托管 Agent Studio 卖方运行时是 48 小时试用，到期时间是 2026-09-01T13:54:15Z，只作为 Job #808 的历史采证环境。评委期公开入口已换成 Render 上的市场 Agent Card 和只读 A2A 预演桥；它不会伪装成 Agent Studio 签名卖方，也不会保存或使用钱包私钥。
+
+Render 免费实例长时间无访问会休眠，首次唤醒可能需要等待约 50 秒。这不影响链上证据，但对评委首次打开体验有风险；如果要去掉休眠，需要用户另行确认付费方案。
 
 合约未经第三方审计，BSC mainnet 默认禁用。比赛写链只应使用一次性 BSC Testnet 钱包和小额资产。
 
@@ -152,16 +161,13 @@ python scripts/capture_bsc_evidence.py 0xREAL_TX_HASH \
 PYTHONPATH=src python scripts/submission_gate.py
 ```
 
-`ready=false` 是目前的正常、诚实结果。主赛 `P0` 会拦住本地 URL、非公开 GitHub 和短期 Agent 托管；本地 demo Agent 的未上链状态是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。PancakeSwap 同区块 V3 路由收益报告已通过 `P1`，当前伙伴奖只剩 TermiX 三组真实对照。演示视频是 `P2` 可选加分项，不再冒充官方表单硬门槛。
+线上环境配置好公开 URL 后，主赛 `P0` 应该全部通过。本地 demo Agent 的未上链状态仍是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。PancakeSwap 同区块 V3 路由收益报告已通过 `P1`，当前伙伴奖只剩 TermiX 三组真实对照。演示视频是 `P2` 可选加分项，不是官方表单硬门槛。
 
 ## 距离正式提交还差什么
 
-1. 部署一个无需登录的长期公开 HTTPS 市场，并覆盖整个评审期。
-2. 在提交前重新抓取四个外部 Agent 的 ERC-8004/A2A 状态；如果要声称已验证质量，还要用主网资产真实雇佣并保存交付回执。
-3. 用 AWS/Azure 或其他稳定托管替换 48 小时 Agent Studio 试用。
-4. 建立评委可访问的公开 GitHub，再补全 `submission/submission.json`。
-5. 真实跑完 TermiX 三组 Agent/人工同题对照；PancakeSwap 已有真实同区块 V3 报价收益证据，提交前再刷新一次。
-6. 用无登录窗口检查所有链接，最后由用户确认官方表单和参赛条款并提交。
+1. 提交前重新抓取四个外部 Agent 的 ERC-8004/A2A 状态；如果要声称已验证质量，还要用主网资产真实雇佣并保存交付回执。
+2. 真实跑完 TermiX 三组 Agent/人工同题对照；PancakeSwap 已有真实同区块 V3 报价收益证据，提交前再刷新一次。
+3. 用无登录窗口检查所有链接，最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款并提交官方表单。
 
 ## 仓库结构
 
