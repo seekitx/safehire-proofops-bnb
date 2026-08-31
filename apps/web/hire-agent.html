@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>SafeHire · 0.1 U ERC-8183 hire</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/assets/deploy-testnet.css" />
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>ERC-8183 HIRE</small></a>
+    <div class="network-pill"><span class="dot" id="hireDot"></span><span id="hireNetwork">Wallet not connected</span></div>
+  </header>
+
+  <main class="deploy-shell shell">
+    <section class="deploy-hero">
+      <div class="eyebrow">BSC TESTNET · EXACTLY 0.1 U</div>
+      <h1>Hire the deployed ProofOps Agent with a signed quote.</h1>
+      <p>This uses the official ERC-8183 contracts. U is the BNB testnet payment token—not USDT, USDC, or a strategy asset. Every write remains visible for wallet confirmation.</p>
+    </section>
+
+    <section class="deploy-warning">
+      <strong>Hard safety limits</strong>
+      <ul>
+        <li>Approved buyer: the dedicated OKX development wallet only.</li>
+        <li>Budget and token allowance: exactly 0.1 U; no unlimited approval.</li>
+        <li>Provider: the dedicated SafeHire Agent wallet registered as ERC-8004 agent #2032.</li>
+        <li>Network: BSC Testnet (chain ID 97); mainnet is rejected.</li>
+      </ul>
+    </section>
+
+    <section class="deploy-card">
+      <div class="deploy-head">
+        <div><small>Connected buyer</small><strong id="buyer">—</strong></div>
+        <button class="button secondary compact" id="connectHireWallet" type="button">Connect wallet</button>
+      </div>
+      <div class="deploy-cost"><span>Signed quote</span><strong id="quoteStatus">Not loaded</strong></div>
+      <ol class="deploy-steps">
+        <li data-step="create_job"><span>01</span><div><strong>Create signed job</strong><small>Waiting for wallet</small></div></li>
+        <li data-step="register_job"><span>02</span><div><strong>Bind official policy</strong><small>Waiting</small></div></li>
+        <li data-step="set_budget"><span>03</span><div><strong>Set 0.1 U budget</strong><small>Waiting</small></div></li>
+        <li data-step="approve_u"><span>04</span><div><strong>Approve exactly 0.1 U</strong><small>Waiting</small></div></li>
+        <li data-step="fund_job"><span>05</span><div><strong>Fund 0.1 U escrow</strong><small>Waiting</small></div></li>
+        <li data-step="settle_job"><span>06</span><div><strong>Settle verified delivery</strong><small>Waits for Agent submission</small></div></li>
+      </ol>
+      <div class="deploy-cost"><span>Next wallet action</span><strong id="nextAction">—</strong></div>
+      <button class="button full" id="hireNext" type="button" disabled>Connect wallet first</button>
+      <button class="button secondary full" id="checkDelivery" type="button" disabled>Check Agent delivery</button>
+      <button class="button full" id="settleJob" type="button" disabled>Settle after verified submission</button>
+      <button class="button full" id="refundJob" type="button" disabled>Refund expired 0.1 U escrow</button>
+      <p class="fine-print" id="hireNote">No transaction is sent until you press the relevant button and approve it in OKX Wallet.</p>
+    </section>
+
+    <section class="deploy-result hidden" id="hireResult">
+      <div class="eyebrow">ERC-8183 LIVE EVIDENCE</div>
+      <h2 id="hireResultTitle">Job funding confirmed.</h2>
+      <p id="hireResultText">Keep this page open while Codex asks the public Agent to deliver.</p>
+      <pre class="result" id="hireJson"></pre>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/hire-agent.js" defer></script>
+</body>
+</html>

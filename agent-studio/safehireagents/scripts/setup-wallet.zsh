@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir=${0:A:h}
 project_root=${script_dir:h}
 env_file="$project_root/.studio/.env.local"
-bag_cli="/Users/hun/.npm/_npx/c27bb315ea011150/node_modules/@bnbagent/studio-cli/dist/bag.js"
+bag_package="@bnbagent/studio-cli@0.0.13"
 
 mkdir -p "$project_root/.studio"
 touch "$env_file"
@@ -38,5 +38,5 @@ export WALLET_PASSWORD="$wallet_password"
 unset wallet_password
 
 cd "$project_root"
-node "$bag_cli" wallet new
+npx --yes "$bag_package" wallet new
 print "Agent wallet created. The password was not printed."

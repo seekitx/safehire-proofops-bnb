@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import secrets
 import time
 import uuid
@@ -8,6 +9,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
+import httpx
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -27,6 +29,14 @@ from proofops.services.browser_deployment import (
     base_deployment_plan,
     scoped_policy_creation_data,
 )
+from proofops.services.browser_erc8183 import (
+    followup_job_plan,
+    initial_job_plan,
+    job_status,
+    refund_job_plan,
+    settle_job_plan,
+)
+from proofops.services.live_agent_market import live_agent_market
 from proofops.settings import Settings
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
@@ -120,6 +130,14 @@ class ScopedPolicyPlanRequest(BaseModel):
     owner: str = Field(pattern=EVM_ADDRESS_PATTERN)
     registry_address: str = Field(pattern=EVM_ADDRESS_PATTERN)
     expires_at: int = Field(gt=0)
+
+
+class BrowserBuyerRequest(BaseModel):
+    buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
+
+
+class BrowserJobRequest(BrowserBuyerRequest):
+    job_id: int = Field(gt=0)
 
 
 class DebateRequest(BaseModel):
@@ -364,6 +382,55 @@ async def scoped_policy_plan(
     )
 
 
+@app.post("/api/dev/erc8183/initial-plan")
+async def browser_erc8183_initial(
+    body: BrowserBuyerRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_development(application)
+    try:
+        return initial_job_plan(Path.cwd(), buyer=body.buyer)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/dev/erc8183/followup-plan")
+async def browser_erc8183_followup(
+    body: BrowserJobRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    _require_development(application)
+    try:
+        return followup_job_plan(Path.cwd(), buyer=body.buyer, job_id=body.job_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/dev/erc8183/status/{job_id}")
+async def browser_erc8183_status(job_id: int, application: ApplicationDep) -> dict[str, Any]:
+    _require_development(application)
+    try:
+        return await job_status(Path.cwd(), job_id=job_id)
+    except (ValueError, httpx.HTTPError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/dev/erc8183/settle-plan/{job_id}")
+async def browser_erc8183_settle(job_id: int, application: ApplicationDep) -> dict[str, Any]:
+    _require_development(application)
+    try:
+        return await settle_job_plan(Path.cwd(), job_id=job_id)
+    except (ValueError, httpx.HTTPError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/dev/erc8183/refund-plan/{job_id}")
+async def browser_erc8183_refund(job_id: int, application: ApplicationDep) -> dict[str, Any]:
+    _require_development(application)
+    try:
+        return refund_job_plan(Path.cwd(), job_id=job_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @app.get("/api/sources/readiness")
 async def official_source_readiness(application: ApplicationDep) -> dict[str, Any]:
     return await application.official_sources.readiness()
@@ -376,6 +443,11 @@ async def official_agents(
     limit: int = 20,
 ) -> dict[str, Any]:
     return await application.official_sources.scan8004_agents(chain_id=chain_id, limit=limit)
+
+
+@app.get("/api/live-market")
+async def live_market() -> dict[str, Any]:
+    return await live_agent_market(Path(__file__).resolve().parents[2])
 
 
 @app.get("/api/sources/venus/pools")
@@ -709,7 +781,122 @@ async def validate_submission(application: ApplicationDep) -> dict[str, Any]:
 
 
 WEB_ROOT = Path(__file__).resolve().parents[1] / "web"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 app.mount("/assets", StaticFiles(directory=WEB_ROOT / "assets"), name="assets")
+
+
+def _public_evidence_json(relative_path: str) -> dict[str, Any]:
+    try:
+        payload = json.loads((PROJECT_ROOT / relative_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=503, detail=f"Public evidence is unavailable: {relative_path}") from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=503, detail=f"Public evidence is malformed: {relative_path}")
+    return payload
+
+
+@app.get("/api/public-proof")
+async def public_proof() -> dict[str, Any]:
+    job = _public_evidence_json("evidence/sponsor-integration/erc8183-job-808.json")
+    registration = _public_evidence_json(
+        "evidence/sponsor-integration/erc8004-registration.json"
+    )
+    deployment = _public_evidence_json(
+        "evidence/sponsor-integration/agent-studio-deployment.json"
+    )
+    contracts = _public_evidence_json("deployments/bsc-testnet.json")
+    pancake = _public_evidence_json(
+        "evidence/pancakeswap/live-benefit-report.json"
+    )
+    explorer = "https://testnet.bscscan.com"
+    return {
+        "schema_version": "1.0",
+        "network": "BSC Testnet",
+        "erc8183": {
+            "job_id": job.get("job_id"),
+            "status": job.get("verification", {}).get("final_status"),
+            "budget_u": job.get("payment", {}).get("budget_u"),
+            "provider_paid_u": job.get("payment", {}).get("paid_to_provider_u"),
+            "dispute_window_seconds": job.get("verification", {}).get(
+                "dispute_window_seconds"
+            ),
+            "deliverable_url": job.get("delivery", {}).get("deliverable_url"),
+            "transactions": [
+                {
+                    "step": item.get("step"),
+                    "tx_hash": item.get("tx_hash"),
+                    "block_number": item.get("block_number"),
+                    "block_timestamp": item.get("block_timestamp"),
+                    "explorer_url": f"{explorer}/tx/{item.get('tx_hash')}",
+                }
+                for item in job.get("transactions", [])
+                if isinstance(item, dict) and item.get("receipt_status") == 1
+            ],
+        },
+        "erc8004": {
+            "agent_id": registration.get("agent_id"),
+            "registry_address": registration.get("registry_address"),
+            "registration_url": registration.get("explorer_url"),
+            "uri_update_url": registration.get("agent_uri_update_explorer_url"),
+            "readback_verified": all(
+                registration.get("verification", {}).get(key) is True
+                for key in (
+                    "owner_readback_matches",
+                    "wallet_readback_matches",
+                    "endpoint_readback_matches",
+                )
+            ),
+        },
+        "agent_studio": {
+            "status": deployment.get("status"),
+            "environment": deployment.get("environment"),
+            "endpoint": deployment.get("endpoint"),
+            "a2a_url": deployment.get("a2a_invoke_url"),
+            "expires_at": deployment.get("expires_at"),
+        },
+        "contracts": [
+            {
+                "name": name,
+                "address": item.get("address"),
+                "tx_hash": item.get("deployment_tx_hash"),
+                "address_url": f"{explorer}/address/{item.get('address')}",
+                "transaction_url": f"{explorer}/tx/{item.get('deployment_tx_hash')}",
+            }
+            for name, item in contracts.get("contracts", {}).items()
+            if isinstance(item, dict)
+        ],
+        "pancakeswap_v3": {
+            "network": pancake.get("network"),
+            "observed_block": pancake.get("observed_block"),
+            "observed_at": pancake.get("observed_at"),
+            "source_url": pancake.get("source_url"),
+            "input": pancake.get("input"),
+            "quotes": [
+                {
+                    "fee_percent": item.get("fee_percent"),
+                    "pool_address": item.get("pool_address"),
+                    "pool_url": item.get("pool_url"),
+                    "amount_out_usdt": item.get("amount_out_usdt"),
+                    "initialized_ticks_crossed": item.get("initialized_ticks_crossed"),
+                }
+                for item in pancake.get("quotes", [])
+                if isinstance(item, dict)
+            ],
+            "decision": pancake.get("decision"),
+            "measurable_benefit": pancake.get("measurable_benefit"),
+            "risk_boundary": pancake.get("risk_boundary"),
+        },
+        "honesty_boundary": {
+            "verified": (
+                "One ERC-8004 identity, one completed ERC-8183 hire and three custom "
+                "contracts on BSC Testnet, plus a same-block PancakeSwap V3 route comparison."
+            ),
+            "not_claimed": (
+                "The four local ProofOps Lab cards remain demo-only. The four external BSC "
+                "market registrations prove discovery, not paid execution history or output quality."
+            ),
+        },
+    }
 
 
 @app.get("/", include_in_schema=False)
@@ -717,7 +904,18 @@ async def index() -> FileResponse:
     return FileResponse(WEB_ROOT / "index.html")
 
 
+@app.get("/proof", include_in_schema=False)
+async def proof_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "proof.html")
+
+
 @app.get("/dev/deploy-testnet", include_in_schema=False)
 async def deploy_testnet_page(application: ApplicationDep) -> FileResponse:
     _require_development(application)
     return FileResponse(WEB_ROOT / "deploy-testnet.html")
+
+
+@app.get("/dev/hire-agent", include_in_schema=False)
+async def hire_agent_page(application: ApplicationDep) -> FileResponse:
+    _require_development(application)
+    return FileResponse(WEB_ROOT / "hire-agent.html")

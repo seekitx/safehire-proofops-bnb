@@ -1,0 +1,118 @@
+{
+  "evidence_mode": "live",
+  "source": "bsc_testnet_rpc_and_agent_studio",
+  "network": "bsc-testnet",
+  "chain_id": 97,
+  "job_id": 808,
+  "contracts": {
+    "commerce": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de",
+    "router": "0xd7d36d66d2f1b608a0f943f722d27e3744f66f25",
+    "policy": "0xd6a4217588f6b1f5657a92a3e94e6422ad771cea",
+    "payment_token": "0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565"
+  },
+  "payment": {
+    "symbol": "U",
+    "decimals": 18,
+    "budget_raw": "100000000000000000",
+    "budget_u": "0.1",
+    "paid_to_provider_raw": "100000000000000000",
+    "paid_to_provider_u": "0.1"
+  },
+  "participants": {
+    "client": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+    "provider": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+    "evaluator": "0xd7d36d66d2f1b608A0F943f722D27e3744f66F25",
+    "provider_erc8004_agent_id": 2032
+  },
+  "quote": {
+    "negotiation_hash": "0xf4c563d87cee52fcc82aa2205e9ee85bdc25b4a113599187338bc875af67abb7",
+    "negotiated_at": 1788103371,
+    "quote_expires_at": 1788104271,
+    "job_expires_at": 1788106077,
+    "signature_verified_before_funding": true
+  },
+  "delivery": {
+    "submitted_at": 1788104003,
+    "deliverable_hash": "0xcba015719243e2aa8d7999e44188b52c532782d178c69efbf81904c110aa493b",
+    "deliverable_url": "https://bnbagent-api.bnbchain.world/v1/deliverables/sha256/e20a74494205ce4f93a34b7c5b7b22bee4d0eea8fbee469eb838126146b620cc.json",
+    "content_type": "text/plain"
+  },
+  "transactions": [
+    {
+      "step": "create_job",
+      "actor": "client",
+      "tx_hash": "0x1c57798e080fefab629f8d8de63eb0c430346dc70030cad967e7c5e87aab4f4a",
+      "block_number": 128127083,
+      "block_timestamp": "2026-08-30T15:28:07Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "register_job",
+      "actor": "client",
+      "tx_hash": "0x84d182ef7c755e14ebe85a59a8c6ba4de97b8a731e7910ddff88357d11c94af5",
+      "block_number": 128127360,
+      "block_timestamp": "2026-08-30T15:30:12Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "set_budget",
+      "actor": "client",
+      "tx_hash": "0x819a10829dc96086e98b188dc1f8ac0855e0369520b3dd2e724e090a3a4ee7df",
+      "block_number": 128127385,
+      "block_timestamp": "2026-08-30T15:30:23Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "approve_u",
+      "actor": "client",
+      "tx_hash": "0x9c0c052e2799c306224582cb723a558ea6734e3b65f7a81040a1d4b90fba0ee4",
+      "block_number": 128127408,
+      "block_timestamp": "2026-08-30T15:30:33Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "fund_job",
+      "actor": "client",
+      "tx_hash": "0x0c17824885567249a9e3098fe0f31833880989f36f865237f89dcb8e385a5df5",
+      "block_number": 128127423,
+      "block_timestamp": "2026-08-30T15:30:40Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "submit_delivery",
+      "actor": "provider",
+      "tx_hash": "0x378c31a87dccc74c93e0db35a61308d822055e1e1e5a6dd1555d52b94e6d4f5f",
+      "block_number": 128127784,
+      "block_timestamp": "2026-08-30T15:33:23Z",
+      "receipt_status": 1
+    },
+    {
+      "step": "settle_job",
+      "actor": "client",
+      "tx_hash": "0xe43fbfdd7c21c13670edea4271b70745d9bbdc4416440567acf63638ecd0f942",
+      "block_number": 128131320,
+      "block_timestamp": "2026-08-30T15:59:54Z",
+      "receipt_status": 1
+    }
+  ],
+  "verification": {
+    "all_receipts_successful": true,
+    "funded_inside_signed_quote_window": true,
+    "funded_status_observed": true,
+    "submitted_status_observed": true,
+    "dispute_window_seconds": 900,
+    "settled_after_dispute_window": true,
+    "final_status": "COMPLETED",
+    "final_status_value": 3,
+    "completed": true,
+    "provider_payment_transfer_observed": true,
+    "can_refund_after_completion": false
+  },
+  "explorer_urls": {
+    "create_job": "https://testnet.bscscan.com/tx/0x1c57798e080fefab629f8d8de63eb0c430346dc70030cad967e7c5e87aab4f4a",
+    "fund_job": "https://testnet.bscscan.com/tx/0x0c17824885567249a9e3098fe0f31833880989f36f865237f89dcb8e385a5df5",
+    "submit_delivery": "https://testnet.bscscan.com/tx/0x378c31a87dccc74c93e0db35a61308d822055e1e1e5a6dd1555d52b94e6d4f5f",
+    "settle_job": "https://testnet.bscscan.com/tx/0xe43fbfdd7c21c13670edea4271b70745d9bbdc4416440567acf63638ecd0f942"
+  },
+  "notes": "This is the successful replacement for expired/refunded job 807. Job 808 was funded inside its signed quote window, accepted by the public Agent Studio A2A endpoint, submitted by the registered provider, allowed through the full optimistic-policy dispute window, and settled permissionlessly on BSC Testnet."
+}

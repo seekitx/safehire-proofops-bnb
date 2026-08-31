@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "venus-health-factor-response",
+  "task_description": "Evaluate a disclosed Venus-style benchmark position and produce a safe response plan. Call safehire_preview exactly once with agent_id hf-shield-demo and input {\"collateral_usd\":1500,\"debt_usd\":1000,\"liquidation_threshold\":0.8,\"alert_health_factor\":1.25,\"target_health_factor\":1.5,\"source\":\"disclosed_termix_benchmark_scenario_not_live_account_data\"}. Report the calculated health factor, status, repay amount needed to reach the target, assumptions, and remaining permissions. This is not a real wallet position and must not be described as live. Do not repay, add collateral, sign, or promise liquidation prevention.",
+  "terms": {
+    "deliverables": "A concise health-factor report with the calculation, alert decision, repay-to-target amount, evidence label, and human confirmation boundary.",
+    "quality_standards": "Treat every number as a disclosed benchmark scenario, not a live account; do not move funds, sign, or guarantee liquidation prevention.",
+    "success_criteria": [
+      "The SafeHire health-factor preview is called with the exact supplied input.",
+      "Health factor, alert status, and repay-to-target amount are all reported.",
+      "The response states that a fresh live account and oracle read is required before action."
+    ]
+  },
+  "input_evidence": null,
+  "comparison_rule": "Agent and manual operator receive this exact JSON file; neither side receives extra hints."
+}

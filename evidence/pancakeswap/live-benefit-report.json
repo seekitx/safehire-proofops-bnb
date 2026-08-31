@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "beneficiary": "trader",
+  "network": "bsc-mainnet",
+  "chain_id": 56,
+  "observed_block": 118995462,
+  "observed_at": "2026-08-30T16:58:12.063201Z",
+  "source_url": "https://developer.pancakeswap.finance/contracts/v3/addresses",
+  "source": "pancakeswap_v3_factory_and_quoter_v2_same_block_rpc",
+  "contracts": {
+    "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+    "quoter_v2": "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997"
+  },
+  "input": {
+    "token_in": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "token_out": "0x55d398326f99059fF775485246999027B3197955",
+    "amount_in_raw": "100000000000000000",
+    "amount_in_display": "0.1 WBNB"
+  },
+  "quotes": [
+    {
+      "fee_hundredths_of_bip": 100,
+      "fee_percent": "0.01",
+      "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
+      "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
+      "amount_out_raw": "70329294406791795662",
+      "amount_out_usdt": "70.329294406791795662",
+      "initialized_ticks_crossed": 1,
+      "quoter_gas_estimate": 92059
+    },
+    {
+      "fee_hundredths_of_bip": 500,
+      "fee_percent": "0.05",
+      "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+      "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
+      "amount_out_raw": "70286950608255673379",
+      "amount_out_usdt": "70.286950608255673379",
+      "initialized_ticks_crossed": 1,
+      "quoter_gas_estimate": 115196
+    },
+    {
+      "fee_hundredths_of_bip": 2500,
+      "fee_percent": "0.25",
+      "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+      "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+      "amount_out_raw": "70033890027540757959",
+      "amount_out_usdt": "70.033890027540757959",
+      "initialized_ticks_crossed": 1,
+      "quoter_gas_estimate": 124461
+    },
+    {
+      "fee_hundredths_of_bip": 10000,
+      "fee_percent": "1",
+      "pool_address": "0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+      "pool_url": "https://bscscan.com/address/0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+      "amount_out_raw": "68813176418203043059",
+      "amount_out_usdt": "68.813176418203043059",
+      "initialized_ticks_crossed": 1,
+      "quoter_gas_estimate": 95461
+    }
+  ],
+  "decision": {
+    "selected_fee_hundredths_of_bip": 100,
+    "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
+    "selected_amount_out_usdt": "70.329294406791795662",
+    "baseline_fee_hundredths_of_bip": 500,
+    "baseline_amount_out_usdt": "70.286950608255673379",
+    "improvement_usdt": "0.042343798536122283",
+    "improvement_bps": "6.0244"
+  },
+  "measurable_benefit": "At BSC block 118995462, comparing direct PancakeSwap V3 fee tiers selected the 0.01% pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by 0.042343798536122283 USDT (6.0244 bps).",
+  "risk_boundary": "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. It excludes transaction gas and later price movement; execution still needs a fresh quote, user slippage limit, deadline, allowance review and wallet confirmation."
+}

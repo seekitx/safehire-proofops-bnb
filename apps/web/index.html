@@ -7,6 +7,8 @@
   <link rel="icon" href="data:," />
   <title>SafeHire · ProofOps for BNB Chain</title>
   <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/assets/proof-nav.css" />
+  <link rel="stylesheet" href="/assets/live-market.css" />
 </head>
 <body>
   <div class="page-glow"></div>
@@ -17,6 +19,7 @@
       <small>ProofOps</small>
     </a>
     <div class="nav-actions">
+      <a class="text-link proof-link" href="/proof">On-chain proof</a>
       <div class="network-pill"><span class="dot" id="networkDot"></span><span id="networkLabel">Checking BSC…</span></div>
       <button class="button secondary compact" id="walletButton" type="button">Connect wallet</button>
     </div>
@@ -29,7 +32,7 @@
         <h1>Hire the outcome.<br/><span>Limit the downside.</span></h1>
         <p>Compare job-specific proof, run a deterministic preview, set exactly what an agent may spend, and keep a verifiable receipt for every action.</p>
         <div class="hero-actions">
-          <a class="button" href="#marketplace">Explore agents</a>
+          <a class="button" href="#live-market">Explore live agents</a>
           <a class="text-link" href="#hire-console">See the hiring flow <span>↘</span></a>
         </div>
       </div>
@@ -52,10 +55,29 @@
       <article><label>Submission gate</label><strong id="gateStatus">Checking…</strong><small>Fails closed until real evidence exists</small></article>
     </section>
 
+    <section class="live-market shell" id="live-market">
+      <div class="live-market-head">
+        <div>
+          <div class="eyebrow">LIVE BSC MARKET / ERC-8004</div>
+          <h2>Four registered agents.<br/><span>One honest boundary.</span></h2>
+        </div>
+        <div class="live-market-status" id="liveMarketStatus">
+          <span class="live-pulse" aria-hidden="true"></span>
+          <div><strong>Checking the public A2A endpoint…</strong><small id="liveMarketMeta">No wallet action will be started.</small></div>
+        </div>
+      </div>
+      <div class="live-agent-grid" id="liveAgents" aria-live="polite"></div>
+      <div class="market-boundary">
+        <strong>What this proves</strong>
+        <p id="liveMarketBoundary">The page is checking current registration and discovery evidence. A paid hire and output-quality review are separate steps.</p>
+        <a href="/proof">Open SafeHire's own on-chain proof <span>↗</span></a>
+      </div>
+    </section>
+
     <section class="market-section shell" id="marketplace">
       <div class="section-head">
-        <div><div class="eyebrow">DISCOVER</div><h2>Purpose-built agents, comparable proof.</h2></div>
-        <p>Each category keeps its own decision metrics. AgentProof adds a shared evidence ceiling without pretending unlike strategies are identical.</p>
+        <div><div class="eyebrow">PROOFOPS LAB / DEMO ONLY</div><h2>Inspect the workflow without risking funds.</h2></div>
+        <p>These local deterministic previews demonstrate comparison and permission controls. They are not the live BSC agents above and do not count as on-chain track records.</p>
       </div>
       <div class="tabs" id="categories" role="tablist"></div>
       <div class="agent-grid" id="agents" aria-live="polite"></div>
@@ -154,5 +176,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <footer class="shell"><span>SafeHire · ProofOps for BNB Chain</span><span>Testnet-first · No profit guarantee · Mainnet disabled by default</span></footer>
   <script src="/assets/app.js" defer></script>
+  <script src="/assets/live-market.js" defer></script>
 </body>
 </html>

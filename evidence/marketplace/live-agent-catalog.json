@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "evidence_mode": "live",
+  "source": "8004scan_official_api_and_public_a2a",
+  "observed_at": "2026-08-30T16:36:18Z",
+  "chain_id": 56,
+  "network": "bsc-mainnet",
+  "registry_address": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+  "operator": "Brain On BNB AI",
+  "operator_external": true,
+  "agent_card_url": "https://agent.brainonbnb.com/.well-known/agent-card.json",
+  "a2a_endpoint": "https://agent.brainonbnb.com/a2a",
+  "a2a_list_verified": true,
+  "payment": {
+    "rail": "ERC-8183",
+    "price_raw": "100000000000000000",
+    "price_display": "0.10 U",
+    "network": "bsc-mainnet"
+  },
+  "agents": [
+    {
+      "category": "rebalancing",
+      "skill_id": "rebalance_plan",
+      "token_id": 304494,
+      "name": "Brain on BNB — Portfolio Rebalance Pricer",
+      "description": "Prices a BSC portfolio rebalance against the pools that would execute it, including swap fee, price impact and observed transfer tax.",
+      "required_inputs": {
+        "holdings": "array of token address and USD value",
+        "targets": "optional token-to-target-weight map"
+      },
+      "created_tx_hash": "0x372f29467ba738e982f1bae6e71e35d5f2f672bff843a4577b4df6e51c6f49fb",
+      "created_block_number": 118146212,
+      "registered_at": "2026-08-26T06:46:53Z",
+      "registration_url": "https://bscscan.com/tx/0x372f29467ba738e982f1bae6e71e35d5f2f672bff843a4577b4df6e51c6f49fb",
+      "registry_url": "https://8004scan.io/agents/bsc/304494"
+    },
+    {
+      "category": "grid_trading",
+      "skill_id": "grid_plan",
+      "token_id": 302258,
+      "name": "Brain on BNB — BSC Grid Planner",
+      "description": "Sizes a grid against a real BSC pool and reports fee, price impact, observed transfer tax and break-even spacing.",
+      "required_inputs": {
+        "token": "token or pool address",
+        "capitalUsd": "optional capital",
+        "levels": "optional number of levels",
+        "bandPct": "optional range percentage"
+      },
+      "created_tx_hash": "0xc992983dd069d51f8a0c670e1da6f0ae40d4700355ca6b472d806c3572298545",
+      "created_block_number": 117989311,
+      "registered_at": "2026-08-25T11:09:14Z",
+      "registration_url": "https://bscscan.com/tx/0xc992983dd069d51f8a0c670e1da6f0ae40d4700355ca6b472d806c3572298545",
+      "registry_url": "https://8004scan.io/agents/bsc/302258"
+    },
+    {
+      "category": "yield_optimisation",
+      "skill_id": "yield_plan",
+      "token_id": 304493,
+      "name": "Brain on BNB — Venus Yield Ranking",
+      "description": "Ranks Venus markets using measured BSC block time, cross-checks published APY and estimates when a move repays its gas cost.",
+      "required_inputs": {
+        "amountUsd": "optional position size",
+        "from": "optional current Venus market",
+        "currentApyPct": "optional current APY"
+      },
+      "created_tx_hash": "0x1f1c449227d5433d2ad0a6081b010425ab59f45bf9d7a8eae15d352f90a58492",
+      "created_block_number": 118146201,
+      "registered_at": "2026-08-26T06:46:48Z",
+      "registration_url": "https://bscscan.com/tx/0x1f1c449227d5433d2ad0a6081b010425ab59f45bf9d7a8eae15d352f90a58492",
+      "registry_url": "https://8004scan.io/agents/bsc/304493"
+    },
+    {
+      "category": "health_factor_monitoring",
+      "skill_id": "health_factor",
+      "token_id": 302257,
+      "name": "Brain on BNB — Venus Health Factor Monitor",
+      "description": "Reads a Venus position market by market, computes liquidation distance and cross-checks against the protocol account-liquidity result.",
+      "required_inputs": {
+        "address": "Venus account address"
+      },
+      "created_tx_hash": "0xe237457d3c1f3457bf1dba9f5e558d0c774f029da1c718e02aad0b9d1aaf0ba9",
+      "created_block_number": 117989307,
+      "registered_at": "2026-08-25T11:09:12Z",
+      "registration_url": "https://bscscan.com/tx/0xe237457d3c1f3457bf1dba9f5e558d0c774f029da1c718e02aad0b9d1aaf0ba9",
+      "registry_url": "https://8004scan.io/agents/bsc/302257"
+    }
+  ],
+  "trust_boundary": "These are externally operated agents discovered through the official ERC-8004 index. Registration and current A2A list access were checked, but SafeHire has not yet funded a paid mainnet job with them."
+}

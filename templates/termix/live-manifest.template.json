@@ -3,22 +3,106 @@
   "evidence_mode": "live",
   "tasks": [
     {
-      "task_id": "replace-with-real-task-1",
-      "category": "rebalancing",
-      "prompt_path": "evidence/termix/raw/task-1/prompt.txt",
+      "task_id": "pancakeswap-grid-route",
+      "category": "grid_trading",
+      "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
       "agent": {
-        "output_path": "evidence/termix/raw/task-1/agent-output.json",
-        "started_at": "2026-08-30T10:00:00+08:00",
-        "finished_at": "2026-08-30T10:01:00+08:00",
-        "cost_usd": 0.01,
-        "tooling": "SafeHire callable agent"
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/agent-output.json",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "cost_usd": 0.1,
+        "cost_currency": "U",
+        "cost_amount": 0.1,
+        "tooling": "SafeHire Agent Studio ERC-8183 job"
       },
       "manual": {
-        "output_path": "evidence/termix/raw/task-1/manual-output.md",
-        "started_at": "2026-08-30T10:05:00+08:00",
-        "finished_at": "2026-08-30T10:15:00+08:00",
+        "output_path": "evidence/termix/raw/pancakeswap-grid-route/manual-output.md",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
         "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
         "tooling": "documented browser and calculator workflow"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        },
+        "manual": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        }
+      },
+      "reviewer": "replace-with-independent-reviewer"
+    },
+    {
+      "task_id": "venus-stablecoin-yield",
+      "category": "yield_optimisation",
+      "prompt_path": "evidence/termix/tasks/venus-stablecoin-yield.json",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/agent-output.json",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "cost_usd": 0.1,
+        "cost_currency": "U",
+        "cost_amount": 0.1,
+        "tooling": "SafeHire Agent Studio ERC-8183 job"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-stablecoin-yield/manual-output.md",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
+        "tooling": "documented browser and calculator workflow"
+      },
+      "scores": {
+        "agent": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        },
+        "manual": {
+          "correctness": 0,
+          "completeness": 0,
+          "risk_awareness": 0,
+          "actionability": 0,
+          "evidence_quality": 0
+        }
+      },
+      "reviewer": "replace-with-independent-reviewer"
+    },
+    {
+      "task_id": "venus-health-factor-response",
+      "category": "health_factor_monitoring",
+      "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
+      "agent": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/agent-output.json",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "cost_usd": 0.1,
+        "cost_currency": "U",
+        "cost_amount": 0.1,
+        "tooling": "SafeHire Agent Studio ERC-8183 job"
+      },
+      "manual": {
+        "output_path": "evidence/termix/raw/venus-health-factor-response/manual-output.md",
+        "started_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "finished_at": "REPLACE_WITH_REAL_ISO_TIME",
+        "cost_usd": 0,
+        "cost_currency": "USD",
+        "cost_amount": 0,
+        "tooling": "documented calculator workflow"
       },
       "scores": {
         "agent": {

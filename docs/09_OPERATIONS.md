@@ -37,6 +37,20 @@ curl http://127.0.0.1:8000/health/ready
 - `REMOTE_AGENT_AUTH_TOKEN` 从 secret manager 注入
 - 生产 RPC、The Graph key、8004scan key 从 secret manager 注入
 
+## Render 公开预览
+
+仓库根目录的 `render.yaml` 可以创建一个 Docker Web Service。它默认是不花钱的预览配置，不会开启主网写入，也不会把钱包私钥放到服务器。
+
+创建 Blueprint 时需要手动填写：
+
+- `PUBLIC_BASE_URL`：Render 分配的最终 `https://...onrender.com` 地址。
+- `GITHUB_REPO_URL`：评委不登录也能打开的公开 GitHub 地址。
+- `CORS_ALLOW_ORIGINS`：与 `PUBLIC_BASE_URL` 填相同地址。
+
+重要：Render 免费 Web Service 会在长时间无访问后休眠，唤醒时评委可能需要等待。这份配置适合先拿到公开链接，不等于已满足“评审期间稳定在线”。正式提交前要么升级为不休眠的方案，要么换成其他长期托管；涉及付费时必须由用户确认。
+
+Render 的构建会安装 Python 依赖。按用户当前的验证规则，本次只准备配置，不会自动触发远程构建和发布。
+
 ## 监控
 
 | 信号 | 告警条件 |

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Public BSC mainnet and testnet evidence dossier for SafeHire ProofOps." />
+  <link rel="icon" href="data:," />
+  <title>SafeHire · On-chain proof dossier</title>
+  <link rel="stylesheet" href="/assets/proof.css" />
+  <link rel="stylesheet" href="/assets/proof-pancake.css" />
+</head>
+<body>
+  <header class="proof-nav frame">
+    <a class="proof-brand" href="/"><span>S</span> SafeHire / ProofOps</a>
+    <div class="network-stamp"><i></i>BSC MAINNET + TESTNET · PUBLIC EVIDENCE</div>
+  </header>
+
+  <main class="frame">
+    <section class="proof-hero">
+      <div class="hero-copy">
+        <p class="kicker">CHAIN OF CUSTODY / 2026</p>
+        <h1>Evidence,<br><em>not vibes.</em></h1>
+        <p class="lede">Every claim below resolves to a public BSC receipt, an official PancakeSwap contract, or an Agent Studio endpoint. Local ProofOps Lab cards and unpurchased external Agent outputs stay outside this proof boundary.</p>
+      </div>
+      <aside class="verdict-card">
+        <span>VERIFIED FLOW</span>
+        <strong>0.1 U</strong>
+        <p>signed quote → escrow → delivery → 15-minute review → provider payment</p>
+        <div class="seal">JOB <b id="heroJobId">—</b><small id="heroJobStatus">LOADING</small></div>
+      </aside>
+    </section>
+
+    <section class="proof-stats" aria-label="Evidence summary">
+      <article><small>Successful receipts</small><strong id="receiptCount">—</strong><span>ERC-8183 lifecycle</span></article>
+      <article><small>On-chain identity</small><strong id="agentId">—</strong><span>ERC-8004 Agent ID</span></article>
+      <article><small>Custom contracts</small><strong id="contractCount">—</strong><span>deployed with runtime code</span></article>
+      <article><small>Review window</small><strong id="reviewWindow">—</strong><span>optimistic policy</span></article>
+    </section>
+
+    <section class="dossier-section">
+      <div class="section-label"><span>01</span><div><small>ERC-8183</small><h2>One hire, fully settled.</h2></div></div>
+      <div class="timeline" id="jobTimeline" aria-live="polite"><p>Loading public receipts…</p></div>
+      <a class="deliverable-link" id="deliverableLink" href="#" target="_blank" rel="noreferrer">Open immutable Agent deliverable <span>↗</span></a>
+    </section>
+
+    <section class="dossier-section identity-section">
+      <div class="section-label"><span>02</span><div><small>IDENTITY + RUNTIME</small><h2>Who delivered the job?</h2></div></div>
+      <div class="identity-grid">
+        <article class="identity-card">
+          <p>ERC-8004 IDENTITY</p>
+          <strong id="identityTitle">Agent #—</strong>
+          <span id="identityReadback">Checking owner, wallet and URI readback…</span>
+          <div class="link-row"><a id="registrationLink" target="_blank" rel="noreferrer">Registration ↗</a><a id="uriLink" target="_blank" rel="noreferrer">URI update ↗</a></div>
+        </article>
+        <article class="identity-card warning" id="runtimeCard">
+          <p>AGENT STUDIO RUNTIME</p>
+          <strong id="runtimeStatus">Checking…</strong>
+          <span id="runtimeExpiry">Loading deployment record…</span>
+          <div class="link-row"><a id="agentCardLink" target="_blank" rel="noreferrer">Agent Card ↗</a><a id="a2aLink" target="_blank" rel="noreferrer">A2A endpoint ↗</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dossier-section">
+      <div class="section-label"><span>03</span><div><small>BSC TESTNET</small><h2>Contracts you can inspect.</h2></div></div>
+      <div class="contract-grid" id="contractGrid"></div>
+    </section>
+
+    <section class="dossier-section pancake-section">
+      <div class="section-label"><span>04</span><div><small>PANCAKESWAP V3 / BSC MAINNET</small><h2>One block. Four direct routes.</h2></div></div>
+      <div class="route-proof">
+        <article class="route-verdict">
+          <p>MEASURED QUOTE IMPROVEMENT</p>
+          <strong id="routeImprovement">—</strong>
+          <span id="routeMeta">Loading same-block QuoterV2 evidence…</span>
+          <a id="pancakeSource" target="_blank" rel="noreferrer">Official V3 contracts ↗</a>
+        </article>
+        <div class="route-quotes" id="routeQuotes"></div>
+      </div>
+      <div class="route-boundary"><strong id="routeBenefit">Loading measured benefit…</strong><p id="routeRisk">Loading risk boundary…</p></div>
+    </section>
+
+    <section class="truth-boundary">
+      <div><p>WHAT THIS PROVES</p><strong id="verifiedClaim">Loading…</strong></div>
+      <div><p>WHAT WE DO NOT CLAIM</p><strong id="unclaimedClaim">Loading…</strong></div>
+    </section>
+  </main>
+
+  <footer class="frame"><span>SafeHire / ProofOps</span><span>Public evidence dossier · no wallet connection required</span></footer>
+  <script src="/assets/proof.js" defer></script>
+</body>
+</html>

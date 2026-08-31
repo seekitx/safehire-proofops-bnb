@@ -1,0 +1,29 @@
+{
+  "evidence_mode": "live",
+  "source": "testnet_evidence",
+  "network": "bsc-testnet",
+  "chain_id": 97,
+  "registry_address": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+  "agent_id": 2032,
+  "owner": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+  "agent_wallet": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+  "tx_hash": "0xbf06bd375829627da49393cd2402a753a7f976105d74568f70b147579b998f44",
+  "agent_uri_update_tx_hash": "0xf7952da486c8c2f61f48c0fce1cbf4a5f3d065c87736b6b8989e922f5e88488a",
+  "endpoint": "https://bnbagent-api.bnbchain.world/v1/rt/01M19F53Z2SRN65TBHKWXY1K54/.well-known/agent-card.json",
+  "protocol": "A2A",
+  "explorer_url": "https://testnet.bscscan.com/tx/0xbf06bd375829627da49393cd2402a753a7f976105d74568f70b147579b998f44",
+  "agent_uri_update_explorer_url": "https://testnet.bscscan.com/tx/0xf7952da486c8c2f61f48c0fce1cbf4a5f3d065c87736b6b8989e922f5e88488a",
+  "successful": true,
+  "verification": {
+    "registration_receipt_status": 1,
+    "registration_block_number": 128115178,
+    "registration_gas_used": 690865,
+    "agent_uri_update_receipt_status": 1,
+    "agent_uri_update_block_number": 128115184,
+    "agent_uri_update_gas_used": 187656,
+    "owner_readback_matches": true,
+    "wallet_readback_matches": true,
+    "endpoint_readback_matches": true
+  },
+  "notes": "Registered and updated with the official @bnbagent/sdk directly because the optional 8004Scan indexer lookup returned HTTP 429. Both writes and the final owner, wallet and data-URI endpoint were independently read back from BSC Testnet RPC."
+}

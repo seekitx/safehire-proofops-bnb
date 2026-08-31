@@ -28,6 +28,7 @@ signer = "local"
 keystore_dir = "../../.studio/wallets"
 # address = "0x..."   # filled by `bag wallet new`
 address = "0x7ca564102be3C107EdA9075F490a9bB1bb74daED"
+platform_exposed_addresses = ["0x7ca564102be3C107EdA9075F490a9bB1bb74daED"]
 
 [llm]
 provider = "pieverse-llm"
@@ -103,3 +104,21 @@ enabled = false
 max_per_topup_usd = 1.0
 max_per_day_usd = 3.0
 max_per_month_usd = 15.0
+
+[deploy.platform]
+terms_accepted_at = "2026-08-30T13:52:59Z"
+slug = "safehire-proofops"
+deployment_id = "01M19F53Z2QQD5XZTQ9AEHF7CR"
+backend = "aws"
+agent_id = "01M19F53Z2SRN65TBHKWXY1K54"
+invoke_url = "https://bnbagent-api.bnbchain.world/v1/rt/01M19F53Z2SRN65TBHKWXY1K54/.well-known/agent-card.json"
+last_deploy_at = "2026-08-30T13:54:20Z"
+
+[identity]
+endpoint = "https://bnbagent-api.bnbchain.world/v1/rt/01M19F53Z2SRN65TBHKWXY1K54/.well-known/agent-card.json"
+agent_id = 2032
+registered_at = "2026-08-30T13:55:30Z"
+last_register_tx = "0xbf06bd375829627da49393cd2402a753a7f976105d74568f70b147579b998f44"
+
+[deploy]
+packaging = "zip"

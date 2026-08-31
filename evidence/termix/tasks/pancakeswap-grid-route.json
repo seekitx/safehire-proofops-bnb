@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "pancakeswap-grid-route",
+  "task_description": "Using the recorded PancakeSwap V3 BSC mainnet snapshot at block 118995462, prepare a bounded grid plan around the implied WBNB price. Call safehire_preview exactly once with agent_id grid-sentinel-demo and input {\"current_price\":703.2929440679179,\"lower_price\":668.128296864522,\"upper_price\":738.4575912713138,\"levels\":9,\"capital_usd\":1000,\"max_drawdown_pct\":5,\"source\":\"pancakeswap_v3_block_118995462_recorded_snapshot\"}. Explain the proposed levels, capital per order, drawdown boundary, why this recorded quote is not a fresh execution quote, and every permission still required. Do not execute a trade or promise profit.",
+  "terms": {
+    "deliverables": "A concise grid proposal containing all nine levels, capital per order, configured drawdown, evidence label, and remaining execution permissions.",
+    "quality_standards": "Use only the supplied recorded snapshot and SafeHire preview result; label it stale for execution, never imply a trade occurred, and never promise profit.",
+    "success_criteria": [
+      "The SafeHire grid preview is called with the exact supplied input.",
+      "All nine price levels and capital per order are reported.",
+      "The answer requires a fresh quote, slippage limit, allowance review, deadline, and wallet confirmation before any trade."
+    ]
+  },
+  "input_evidence": "evidence/pancakeswap/live-benefit-report.json",
+  "comparison_rule": "Agent and manual operator receive this exact JSON file; neither side receives extra hints."
+}

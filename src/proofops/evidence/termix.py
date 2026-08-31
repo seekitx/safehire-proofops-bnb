@@ -71,6 +71,12 @@ def _run_record(root: Path, raw: Any, *, label: str, live: bool) -> dict[str, An
     cost = float(raw.get("cost_usd", -1))
     if cost < 0:
         raise ValueError(f"{label}.cost_usd must be non-negative")
+    cost_currency = str(raw.get("cost_currency", "USD")).strip().upper()
+    if not cost_currency or len(cost_currency) > 12:
+        raise ValueError(f"{label}.cost_currency must be a short currency label")
+    cost_amount = float(raw.get("cost_amount", cost))
+    if cost_amount < 0:
+        raise ValueError(f"{label}.cost_amount must be non-negative")
     output_path = _resolve_file(root, str(raw.get("output_path", "")), live=live)
     return {
         "output_path": str(output_path.relative_to(root.resolve())),
@@ -79,6 +85,8 @@ def _run_record(root: Path, raw: Any, *, label: str, live: bool) -> dict[str, An
         "finished_at": finished.isoformat(),
         "duration_seconds": round(duration, 3),
         "cost_usd": cost,
+        "cost_currency": cost_currency,
+        "cost_amount": cost_amount,
         "tooling": str(raw.get("tooling", "unspecified")),
     }
 
@@ -130,6 +138,15 @@ def build_termix_report(manifest_path: Path, *, project_root: Path) -> dict[str,
             raise TypeError("scores must contain agent and manual objects")
         agent_scores = _scores(score_block.get("agent"), "scores.agent")
         manual_scores = _scores(score_block.get("manual"), "scores.manual")
+        reviewer = str(raw.get("reviewer", "")).strip()
+        if live and (
+            not reviewer
+            or reviewer.lower() in {"unassigned", "pending", "placeholder"}
+            or "replace-with" in reviewer.lower()
+        ):
+            raise ValueError(f"tasks[{index}].reviewer must name the real reviewer")
+        if live and (agent_scores["total"] == 0 or manual_scores["total"] == 0):
+            raise ValueError(f"tasks[{index}] live scores cannot be all zero")
         built.append(
             {
                 "task_id": task_id,
@@ -146,7 +163,7 @@ def build_termix_report(manifest_path: Path, *, project_root: Path) -> dict[str,
                     "cost_delta_usd": round(manual["cost_usd"] - agent["cost_usd"], 4),
                     "quality_delta": round(agent_scores["total"] - manual_scores["total"], 3),
                 },
-                "reviewer": str(raw.get("reviewer", "unassigned")),
+                "reviewer": reviewer or "unassigned",
             }
         )
 

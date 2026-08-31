@@ -1,0 +1,30 @@
+{
+  "evidence_mode": "live",
+  "source": "testnet_evidence",
+  "network": "bsc-testnet",
+  "chain_id": 97,
+  "commerce_address": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de",
+  "payment_token": "0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565",
+  "payment_token_symbol": "U",
+  "payment_token_decimals": 18,
+  "job_id": 807,
+  "client": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "provider": "0x7ca564102be3C107EdA9075F490a9bB1bb74daED",
+  "refund_recipient": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "refunded_amount_raw": "100000000000000000",
+  "refunded_amount_u": "0.1",
+  "refund_tx_hash": "0xed83ed2d12d05d2738ab10ab4d19bea0f7095cc8e33810764f5282c6c373b7a5",
+  "explorer_url": "https://testnet.bscscan.com/tx/0xed83ed2d12d05d2738ab10ab4d19bea0f7095cc8e33810764f5282c6c373b7a5",
+  "successful": true,
+  "verification": {
+    "receipt_status": 1,
+    "block_number": 128125540,
+    "block_timestamp": "2026-08-30T15:16:33Z",
+    "job_status": "EXPIRED",
+    "job_status_value": 5,
+    "can_refund_after_transaction": false,
+    "client_balance_after_refund_raw": "10000000000000000000",
+    "client_balance_after_refund_u": "10"
+  },
+  "notes": "Job 807 was funded after its signed quote window had expired, so it was not sent to the Agent and is not valid completion evidence. The escrowed 0.1 U was returned to the original client with claimRefund and independently verified from BSC Testnet RPC. A new job with a fresh quote is required for the successful ERC-8183 hiring proof."
+}

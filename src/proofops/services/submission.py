@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -13,6 +14,7 @@ from proofops.settings import Settings
 
 TX_HASH = re.compile(r"^0x[a-fA-F0-9]{64}$")
 ADDRESS = re.compile(r"^0x[a-fA-F0-9]{40}$")
+JUDGING_END = datetime(2026, 9, 23, 23, 59, 59, tzinfo=timezone.utc)
 
 
 @dataclass(frozen=True)
@@ -113,6 +115,7 @@ class SubmissionValidator:
             )
         )
         for agent in agents:
+            demo_only = "demo" in agent.tags
             missing = missing_category_metrics(agent.category, dict(agent.metrics.category_metrics))
             checks.append(
                 GateCheck(
@@ -128,7 +131,7 @@ class SubmissionValidator:
                 GateCheck(
                     f"public_endpoint:{agent.agent_id}",
                     endpoint_ok,
-                    "P0",
+                    "P2" if demo_only else "P0",
                     "Callable public HTTPS endpoint present"
                     if endpoint_ok
                     else "Agent endpoint is local or does not use HTTPS",
@@ -154,7 +157,7 @@ class SubmissionValidator:
                 GateCheck(
                     f"live_bsc:{agent.agent_id}",
                     live_ok,
-                    "P0",
+                    "P2" if demo_only else "P0",
                     "Live BSC contract and transaction evidence present"
                     if live_ok
                     else "Agent is fixture-only or lacks valid BSC contract/transaction evidence",
@@ -174,6 +177,67 @@ class SubmissionValidator:
                 )
             )
         return checks
+
+    def _check_live_market_catalog(self) -> GateCheck:
+        catalog = _read_json(
+            self._root / "evidence" / "marketplace" / "live-agent-catalog.json"
+        )
+        agents = catalog.get("agents") if catalog else None
+        observed_at = None
+        if catalog and catalog.get("observed_at"):
+            try:
+                observed_at = datetime.fromisoformat(
+                    str(catalog["observed_at"]).replace("Z", "+00:00")
+                )
+            except ValueError:
+                observed_at = None
+        categories = {
+            str(item.get("category"))
+            for item in agents or []
+            if isinstance(item, dict)
+        }
+        required_categories = {item.value for item in AgentCategory}
+        records_valid = bool(
+            isinstance(agents, list)
+            and len(agents) >= 4
+            and all(
+                isinstance(item, dict)
+                and int(item.get("token_id", 0)) > 0
+                and TX_HASH.fullmatch(str(item.get("created_tx_hash", "")))
+                and _public_https(str(item.get("registration_url", "")))
+                and _public_https(str(item.get("registry_url", "")))
+                and str(item.get("skill_id", "")).strip()
+                and isinstance(item.get("required_inputs"), dict)
+                for item in agents
+            )
+        )
+        now = datetime.now(timezone.utc)
+        fresh = bool(
+            observed_at
+            and observed_at <= now
+            and (now - observed_at).total_seconds() <= 48 * 60 * 60
+        )
+        ready = bool(
+            catalog
+            and catalog.get("evidence_mode") == "live"
+            and catalog.get("chain_id") == 56
+            and catalog.get("operator_external") is True
+            and catalog.get("a2a_list_verified") is True
+            and _public_https(str(catalog.get("agent_card_url", "")))
+            and _public_https(str(catalog.get("a2a_endpoint", "")))
+            and categories == required_categories
+            and records_valid
+            and fresh
+        )
+        return GateCheck(
+            "live_bsc_market_catalog",
+            ready,
+            "P0",
+            "Four current BSC mainnet Agent registrations cover every required category"
+            if ready
+            else "Live BSC Agent catalog is missing, stale, malformed, or incomplete",
+            "Refresh the public ERC-8004/A2A snapshot within 48 hours and preserve all four registration links.",
+        )
 
     def _check_required_files(self) -> GateCheck:
         required = [
@@ -232,11 +296,106 @@ class SubmissionValidator:
         return GateCheck(
             "termix_live_advantage_report",
             ready,
-            "P0",
+            "P1",
             "Live TermiX report with raw-output hashes is present"
             if ready
             else "Live TermiX report is missing, fixture-only, or has fewer than three valid tasks",
             "Run real same-prompt agent/manual tasks and build the strict TermiX report.",
+        )
+
+    def _check_long_lived_runtime(self) -> GateCheck:
+        record = _read_json(
+            self._root / "evidence" / "sponsor-integration" / "agent-studio-deployment.json"
+        )
+        expires_at = None
+        if record and record.get("expires_at"):
+            try:
+                expires_at = datetime.fromisoformat(str(record["expires_at"]).replace("Z", "+00:00"))
+            except ValueError:
+                expires_at = None
+        environment = str(record.get("environment", "")) if record else ""
+        durable_without_expiry = bool(record and not record.get("expires_at") and environment != "trial")
+        ready = bool(
+            record
+            and record.get("evidence_mode") == "live"
+            and record.get("status") == "running"
+            and _public_https(str(record.get("endpoint", "")))
+            and (durable_without_expiry or (expires_at and expires_at >= JUDGING_END))
+        )
+        return GateCheck(
+            "long_lived_agent_runtime",
+            ready,
+            "P0",
+            "Public Agent runtime is recorded through the judging period"
+            if ready
+            else "Current Agent runtime is missing, temporary, or expires before judging ends",
+            "Deploy the Agent to durable hosting and record its public endpoint without a trial expiry.",
+        )
+
+    def _check_erc8183_hire(self) -> GateCheck:
+        record = _read_json(
+            self._root / "evidence" / "sponsor-integration" / "erc8183-job-808.json"
+        )
+        transactions = record.get("transactions") if record else None
+        expected_steps = {
+            "create_job",
+            "register_job",
+            "set_budget",
+            "approve_u",
+            "fund_job",
+            "submit_delivery",
+            "settle_job",
+        }
+        steps = {
+            str(item.get("step"))
+            for item in transactions or []
+            if isinstance(item, dict)
+            and item.get("receipt_status") == 1
+            and TX_HASH.fullmatch(str(item.get("tx_hash", "")))
+        }
+        verification = record.get("verification", {}) if record else {}
+        ready = bool(
+            record
+            and record.get("evidence_mode") == "live"
+            and record.get("chain_id") == 97
+            and int(record.get("job_id", 0)) > 0
+            and expected_steps.issubset(steps)
+            and verification.get("completed") is True
+            and verification.get("provider_payment_transfer_observed") is True
+            and str(record.get("payment", {}).get("budget_u")) == "0.1"
+        )
+        return GateCheck(
+            "erc8183_completed_hire",
+            ready,
+            "P1",
+            "Completed ERC-8183 0.1 U hire evidence is present"
+            if ready
+            else "Completed ERC-8183 hire evidence is missing or incomplete",
+            "Preserve create, fund, submit and settle receipts plus the final provider payment proof.",
+        )
+
+    def _check_pancakeswap_benefit(self) -> GateCheck:
+        report = _read_json(
+            self._root / "evidence" / "pancakeswap" / "live-benefit-report.json"
+        )
+        ready = bool(
+            report
+            and report.get("evidence_mode") == "live"
+            and report.get("beneficiary") in {"trader", "liquidity_provider"}
+            and isinstance(report.get("observed_block"), int)
+            and report.get("observed_block", 0) > 0
+            and _public_https(str(report.get("source_url", "")))
+            and str(report.get("measurable_benefit", "")).strip()
+            and str(report.get("risk_boundary", "")).strip()
+        )
+        return GateCheck(
+            "pancakeswap_live_benefit",
+            ready,
+            "P1",
+            "Live PancakeSwap user-benefit report is present"
+            if ready
+            else "PancakeSwap benefit is not yet backed by a live pool or position observation",
+            "Use real PancakeSwap data at a recorded block and explain the measurable benefit and risk limit.",
         )
 
     def _check_contract_deployment(self) -> GateCheck:
@@ -321,9 +480,6 @@ class SubmissionValidator:
             metadata
             and _public_https(str(metadata.get("project_url", "")))
             and _public_https(str(metadata.get("github_url", "")))
-            and _public_https(str(metadata.get("demo_video_url", "")))
-            and isinstance(metadata.get("demo_video_seconds"), (int, float))
-            and 0 < float(metadata["demo_video_seconds"]) <= 300
             and str(metadata.get("title", "")).strip()
             and str(metadata.get("one_liner", "")).strip()
         )
@@ -331,16 +487,37 @@ class SubmissionValidator:
             "submission_metadata",
             ready,
             "P0",
-            "Submission links and sub-five-minute demo metadata present"
+            "Required project and repository submission metadata present"
             if ready
-            else "Submission metadata, public links, or <=5 minute demo is missing",
+            else "Submission metadata or required public links are missing",
             "Complete submission/submission.json only with public URLs that judges can open.",
+        )
+
+    def _check_optional_demo_video(self) -> GateCheck:
+        metadata = _read_json(self._root / "submission" / "submission.json")
+        url = str(metadata.get("demo_video_url", "")).strip() if metadata else ""
+        seconds = metadata.get("demo_video_seconds") if metadata else None
+        ready = bool(
+            url
+            and _public_https(url)
+            and isinstance(seconds, (int, float))
+            and 0 < float(seconds) <= 300
+        )
+        return GateCheck(
+            "optional_demo_video",
+            ready,
+            "P2",
+            "Optional public demo video is under five minutes"
+            if ready
+            else "Optional demo video is not provided or is longer than five minutes",
+            "Add a concise public demo only if it improves judge comprehension; it is not a current form requirement.",
         )
 
     def run(self) -> dict[str, Any]:
         checks = [
             *self._check_public_delivery(),
             *self._check_agents(),
+            self._check_live_market_catalog(),
             self._check_required_files(),
         ]
         ledger_result = self._ledger.verify()
@@ -356,13 +533,18 @@ class SubmissionValidator:
         checks.extend(
             [
                 self._check_termix(),
+                self._check_long_lived_runtime(),
                 self._check_contract_deployment(),
                 self._check_transactions(),
                 self._check_agent_registration(),
+                self._check_erc8183_hire(),
+                self._check_pancakeswap_benefit(),
                 self._check_submission_metadata(),
+                self._check_optional_demo_video(),
             ]
         )
         blockers = [check for check in checks if check.severity == "P0" and not check.passed]
+        partner_gaps = [check for check in checks if check.severity == "P1" and not check.passed]
         return {
             "ready": not blockers,
             "summary": {
@@ -372,6 +554,7 @@ class SubmissionValidator:
                 "p0_blockers": len(blockers),
             },
             "blockers": [check.to_dict() for check in blockers],
+            "partner_prize_gaps": [check.to_dict() for check in partner_gaps],
             "checks": [check.to_dict() for check in checks],
             "honesty_boundary": (
                 "The gate validates saved evidence structure. Final URLs, BscScan receipts, platform state and prize eligibility still require live review."

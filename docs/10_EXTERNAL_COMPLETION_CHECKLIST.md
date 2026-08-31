@@ -6,22 +6,26 @@
 
 ## 按顺序执行
 
-- [ ] 确认当届黑客松报名、地区/KYC/领奖资格和截止时间。
+- [x] 核对官网截止时间、当前表单和已公布赛道要求；地区/KYC/领奖审核细节仍等主办方后续通知。
 - [ ] 创建公开 GitHub 仓库，推送代码，确保无 `.env`、私钥、wallet/session 文件。
 - [ ] 创建公开 HTTPS 部署，评委无需 VPN/登录即可打开。
 - [x] 用官方 `@bnbagent/studio-cli@0.0.13` 生成 Agent Studio TypeScript workspace，并完成 SafeHire 只读能力接入。
-- [ ] 在 `.studio/.env.local` 配置 LLM/存储/平台凭据和一次性测试网钱包（不得提交）。
-- [ ] 部署 Agent endpoint，跑 `bag deploy verify`、A2A card、MCP tools、audit。
-- [ ] 在 BSC Testnet 领取足够 tBNB/测试 token；如水龙头要求验证，由你手动完成。
-- [ ] 部署三个合约，用 BscScan 确认地址和交易，保存 deployment manifest。
-- [ ] 注册 ERC-8004，保存 registry、agent id、owner、tx、endpoint，用 resolve/8004scan/RPC 交叉复核。
-- [ ] 跑一单完整 ERC-8183 job，保留 funded/submit/settle 证据。
+- [x] 已在 `.studio/.env.local` 配置并使用一次性 BSC Testnet Agent 钱包；该目录仍被 Git 忽略。
+- [x] 已部署并验证 BNB 48 小时试用 Agent endpoint；这不是长期托管，还需 AWS/Azure 或其他覆盖评审期的方案。
+- [x] 已在 BSC Testnet 获得并使用小额 tBNB 和 U，不需再为已完成的 Job 领币。
+- [x] 已部署三个合约，并保存 BscScan 交易和 deployment manifest。
+- [x] 已注册 ERC-8004 Agent #2032，并回读 owner、Agent 钱包和公开 URI。
+- [x] 已完成 ERC-8183 Job #808，保留 create/register/budget/approve/fund/submit/settle 七笔成功回执。
+- [x] 已接入四个外部 BSC mainnet ERC-8004 Agent 的公开身份和 A2A 只读发现；尚未支付主网 0.10 U 或验证输出质量。
 - [ ] 如申请 B402 奖项，申请 Binance 商户、RSA 凭据和固定出口 IP，完成一次正价付费。
-- [ ] 配置 The Graph API key，用 Pancake 官方 V3 subgraph 读 position/pool，用 BSC RPC 复核关键块高。
-- [ ] 用小额完成一次 BSC Testnet 受控动作，保存真实回执；不做未验证的 LP 自动调仓。
-- [ ] 找一位独立复核者，跑至少三组 TermiX 同题对照并评分。
-- [ ] 录制不超过 5 分钟演示，上传公开链接。
-- [ ] 补 `submission/submission.json`，运行 `python scripts/submission_gate.py`直至 `ready=true`。
+- [x] 已在同一 BSC mainnet 区块用 PancakeSwap 官方 V3 Factory + QuoterV2 比较四个 WBNB/USDT 直连池，不需 The Graph key；如后续补指定 LP position 才需要 subgraph key。
+- [x] 已通过 ERC-8183 Job #808 用 0.1 U 完成一次 BSC Testnet 受控支付和结算；没有做未验证的 LP 自动调仓。
+- [x] 固定三份 TermiX 同题任务、原始证据目录、成本字段和防占位校验。
+- [x] 保存 Venus 官方索引 API 的 BSC 主网稳定币收益快照，并明确它不能替代链上执行读数。
+- [ ] 先部署公开 SafeHire HTTPS 接口，再让云端 Agent 配置 `SAFEHIRE_API_BASE_URL`。
+- [ ] 找一位独立复核者，真实跑完三组 Agent/人工同题对照并评分。
+- [ ] 可选：录制不超过 5 分钟演示并上传公开链接；当前官方表单没有把视频列为必填。
+- [ ] 补 `submission/submission.json`，运行 `PYTHONPATH=src python scripts/submission_gate.py`直至 `ready=true`。
 - [ ] 从新浏览器/无登录环境打开所有链接，再正式提交。
 
 ## 你不用担心的事

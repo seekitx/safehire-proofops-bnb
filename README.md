@@ -6,9 +6,18 @@ SafeHire 是一个 BNB Chain DeFi Agent 市场与权限防火墙。用户先比�
 Compare → Preview → Connect wallet → Set limits → Approve → Receipt → Revoke
 ```
 
-## 已实现
+## 当前已经有的真实证据
 
-- 四个真正可调用的确定性 Agent：LP 区间调整、网格、收益优化、健康因子。
+- BSC Testnet 已部署 `AgentRegistry`、`EvidenceAnchor`、`ScopedExecutionPolicy` 三个合约，部署回执和链上代码均已回读。
+- 已在官方 ERC-8004 Registry 注册 Agent #2032，owner、Agent 钱包和公开 URI 已回读校验。
+- 已完成官方 ERC-8183 Job #808：签名报价、0.1 U 托管、Agent 交付、15 分钟异议窗口、结算和 Agent 收款全部在 BSC Testnet 有成功回执。
+- `/proof` 是给评委看的公开证据总页，会展示 7 笔 Job 回执、ERC-8004 身份、交付物和三个合约的 BscScan 入口。
+
+对应原始证据：[ERC-8183 Job #808](evidence/sponsor-integration/erc8183-job-808.json)、[ERC-8004 注册](evidence/sponsor-integration/erc8004-registration.json)、[Agent Studio 部署](evidence/sponsor-integration/agent-studio-deployment.json)、[BSC Testnet 合约](deployments/bsc-testnet.json)。
+
+## 本地产品能力
+
+- 四个本地可调用的确定性演示 Agent：LP 区间调整、网格、收益优化、健康因子。
 - 按类别比较的 AgentProof；证据弱或仅是 fixture 时自动限分。
 - 钱包签名 challenge/session，钱包私钥不进后端。
 - 持久化 permission/task，覆盖预演、人工批准、风险门、执行、回执和撤销。
@@ -21,9 +30,25 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 - 官方 `@bnbagent/studio-cli@0.0.13` 生成的 A2A + MCP + X402 卖方 Agent，已接通 SafeHire 只读预演。
 - 完整 Web 评委路径、FastAPI、Docker、CI 和 fail-closed 提交门禁。
 
+## 真实 BSC Agent 市场供给
+
+首页会展示四个由外部运营方 `Brain On BNB AI` 在 BSC mainnet 注册的 ERC-8004 Agent，分别覆盖调仓、网格、收益优化和健康因子四类能力。`GET /api/live-market` 每次只调用免费的 A2A `list` 发现接口，不会签名、充值或创建 ERC-8183 订单。
+
+这部分证明的是“真实 Agent 可被发现”，不是“SafeHire 已验证它们的质量”。当前还没有为这四个外部 Agent 支付主网 `0.10 U`，也没有把它们的交付输出写进 TermiX 报告。
+
+每次提交前要用只读链上检查刷新这份证据：
+
+```bash
+PYTHONPATH=src python scripts/refresh_live_agent_catalog.py
+```
+
+脚本会确认 BSC mainnet chain id、四笔注册交易都成功，并且四个 skill 仍在 A2A 免费列表里。它不会签名或发起付费。
+
 ## 诚实边界
 
-开箱默认是 `demo` 模式。demo receipt 有合成 hash，但永远标记 `demo_fixture`，不会被提交门禁当成 BSC 交易。当前 `config/agents.json` 也明确是演示 Agent；在公开 Agent Studio endpoint、ERC-8004 注册和真实交易出现前，不能声称“已完成链上闭环”。
+开箱默认是 `demo` 模式。demo receipt 有合成 hash，但永远标记 `demo_fixture`，不会被提交门禁当成 BSC 交易。当前 `config/agents.json` 里四个类别卡片仍是本地演示 Agent；它们与首页上方的外部 BSC mainnet Agent 分开展示。Job #808 证明了 SafeHire 一次真实的注册和雇佣闭环，不代表已验证外部 Agent 的交付质量。
+
+当前 BNB 托管的 Agent Studio 记录是 48 小时试用，到期时间是 2026-09-01T13:54:15Z，不能当作覆盖 9 月 9–23 日评审期的长期托管。
 
 合约未经第三方审计，BSC mainnet 默认禁用。比赛写链只应使用一次性 BSC Testnet 钱包和小额资产。
 
@@ -80,10 +105,20 @@ Hardhat 只是开发工具，不进入 Python 运行容器。`npm audit --omit=d
 ```bash
 cp templates/termix/live-manifest.template.json /tmp/termix-manifest.json
 # 改成至少 3 组真实任务并放入原始输出
-python scripts/build_termix_report.py /tmp/termix-manifest.json
+PYTHONPATH=src python scripts/build_termix_report.py /tmp/termix-manifest.json
 ```
 
-live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间和少于三个任务。
+live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位复核人、全零评分和少于三个任务。三份固定任务在 `evidence/termix/tasks/`，逐笔执行方法见 `docs/TERMIX_EXECUTION_RUNBOOK.md`。Venus 输入可用 `PYTHONPATH=src python scripts/capture_venus_yield_snapshot.py` 重新抓取，但刷新后必须同步冻结任务文件里的数值，不能让 Agent 和人工看到不同输入。
+
+## PancakeSwap 真实路由收益证据
+
+`scripts/capture_pancakeswap_live_benefit.py` 会在同一个 BSC mainnet 区块，从 PancakeSwap 官方 V3 Factory 发现 WBNB/USDT 的直连手续费池，再用官方 QuoterV2 比较 `0.1 WBNB` 的输出。当前报告保存在 [evidence/pancakeswap/live-benefit-report.json](evidence/pancakeswap/live-benefit-report.json)，记录了区块、四个池、报价、选择结果和风险边界。
+
+```bash
+PYTHONPATH=src python scripts/capture_pancakeswap_live_benefit.py
+```
+
+这是真实主网只读报价，不是交易或利润承诺。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
 
 ## 合约部署
 
@@ -114,10 +149,19 @@ python scripts/capture_bsc_evidence.py 0xREAL_TX_HASH \
 ## 提交门禁
 
 ```bash
-python scripts/submission_gate.py
+PYTHONPATH=src python scripts/submission_gate.py
 ```
 
-`ready=false` 是本地环境的正常、诚实结果。它会继续拦住：本地 URL、非公开 GitHub、演示 Agent、缺真实合约/交易、缺 ERC-8004、缺 TermiX live 报告、缺五分钟视频。
+`ready=false` 是目前的正常、诚实结果。主赛 `P0` 会拦住本地 URL、非公开 GitHub 和短期 Agent 托管；本地 demo Agent 的未上链状态是 `P2` 明示警告，四类实时市场供给由独立的 ERC-8004/A2A 证据门检查。PancakeSwap 同区块 V3 路由收益报告已通过 `P1`，当前伙伴奖只剩 TermiX 三组真实对照。演示视频是 `P2` 可选加分项，不再冒充官方表单硬门槛。
+
+## 距离正式提交还差什么
+
+1. 部署一个无需登录的长期公开 HTTPS 市场，并覆盖整个评审期。
+2. 在提交前重新抓取四个外部 Agent 的 ERC-8004/A2A 状态；如果要声称已验证质量，还要用主网资产真实雇佣并保存交付回执。
+3. 用 AWS/Azure 或其他稳定托管替换 48 小时 Agent Studio 试用。
+4. 建立评委可访问的公开 GitHub，再补全 `submission/submission.json`。
+5. 真实跑完 TermiX 三组 Agent/人工同题对照；PancakeSwap 已有真实同区块 V3 报价收益证据，提交前再刷新一次。
+6. 用无登录窗口检查所有链接，最后由用户确认官方表单和参赛条款并提交。
 
 ## 仓库结构
 
