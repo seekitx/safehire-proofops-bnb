@@ -1,16 +1,16 @@
-name: build-judge-ready-artifact
+name: publish-judge-ready-delivery
 on:
   push:
     branches:
       - "review/judge-winning-proofops-20260831"
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
-  group: build-judge-ready-artifact
+  group: publish-judge-ready-delivery
   cancel-in-progress: false
 jobs:
-  validate-and-package:
+  validate-package-and-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -84,12 +84,66 @@ jobs:
         run: |
           docker build -t safehire-proofops:${{ github.sha }} .
           python scripts/build_release.py
+          mkdir -p dist
+          cp ../safehire-proofops-bnb-release.zip dist/
+          cp ../safehire-proofops-bnb-release.manifest.json dist/
       - uses: actions/upload-artifact@v4
         with:
           name: safehire-proofops-bnb-judge-ready
           path: |
-            ../safehire-proofops-bnb-release.zip
-            ../safehire-proofops-bnb-release.manifest.json
+            dist/safehire-proofops-bnb-release.zip
+            dist/safehire-proofops-bnb-release.manifest.json
             judge-scorecard.json
           if-no-files-found: error
           retention-days: 14
+      - name: Publish clean non-workflow patch to final branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            AGENTS.md
+            Makefile
+            README.md
+            agent.md
+            apps/web/assets/judge-scorecard.css
+            apps/web/assets/judge-scorecard.html
+            apps/web/assets/judge-scorecard.js
+            docs/05_MULTI_AGENT_ADVERSARIAL_REVIEW.md
+            docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md
+            docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md
+            docs/HACKATHON_SUBMISSION_READINESS_2026-08-31.md
+            docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md
+            evidence/judging-notes/adversarial-consensus-2026-08-31.json
+            evidence/judging-notes/adversarial-decision.json
+            scripts/judge_scorecard.py
+            src/proofops/judging/__init__.py
+            src/proofops/judging/scorecard.py
+            src/proofops/plugins/adversarial.py
+            submission/submission.json
+            tests/test_judge_scorecard.py
+            tests/test_lp_benchmark_debate.py
+          )
+          tar -czf /tmp/nonworkflow-patch.tar.gz "${files[@]}"
+          git fetch origin main review/judge-ready-final-20260831
+          git reset --hard origin/main
+          git clean -fdx
+          tar -xzf /tmp/nonworkflow-patch.tar.gz
+          python -m compileall -q src/proofops/judging src/proofops/plugins/adversarial.py scripts/judge_scorecard.py tests/test_judge_scorecard.py tests/test_lp_benchmark_debate.py
+          node --check apps/web/assets/judge-scorecard.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for path in (
+              Path("submission/submission.json"),
+              Path("evidence/judging-notes/adversarial-consensus-2026-08-31.json"),
+              Path("evidence/judging-notes/adversarial-decision.json"),
+          ):
+              json.loads(path.read_text(encoding="utf-8"))
+          PY
+          test -z "$(git diff --name-only origin/main -- .github/workflows)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${files[@]}"
+          git commit -m "feat: add judge-ready proof-carrying marketplace review"
+          git push origin HEAD:review/judge-ready-final-20260831
