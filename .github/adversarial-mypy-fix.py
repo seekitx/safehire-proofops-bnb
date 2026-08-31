@@ -36,4 +36,11 @@ block = re.sub(r"\battacks\b", "evidence_attacks", block)
 block = re.sub(r"\bchanges\b", "evidence_changes", block)
 text = text[:start] + block + text[end:]
 
+text = text.replace(
+    "            altana_attacks = ()\n            altana_changes = ()\n",
+    "            altana_attacks: tuple[str, ...] = ()\n"
+    "            altana_changes: tuple[str, ...] = ()\n",
+    1,
+)
+
 SOURCE.write_text(text, encoding="utf-8")
