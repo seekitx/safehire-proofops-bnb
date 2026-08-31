@@ -74,15 +74,22 @@ jobs:
               text = text.replace(f'raise ValueError("{message}")', f'raise TypeError("{message}")')
           path.write_text(text, encoding="utf-8")
           PY
-      - name: Publish clean review branch before validation
+      - name: Publish clean business-only review branch
         shell: bash
         run: |
           set -euo pipefail
+          git fetch origin main review/protocol-hardened-final-20260831
+          git diff --binary origin/main -- . \
+            ':(exclude).github/workflows/**' \
+            ':(exclude).github/protocol-patch.part-*' > /tmp/business.patch
+          git reset --hard origin/main
+          git clean -fdx
+          git apply /tmp/business.patch
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "feat: harden signed ERC-8183 hire and delivery verification"
-          git push origin HEAD:review/protocol-hardened-20260831
+          git push --force origin HEAD:review/protocol-hardened-final-20260831
       - name: Lint, typecheck and browser syntax
         run: |
           ruff check src apps tests scripts
