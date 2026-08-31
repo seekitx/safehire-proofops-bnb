@@ -62,7 +62,9 @@ async def refresh() -> dict[str, Any]:
         payload = response.json()
 
     result = payload.get("result") if isinstance(payload, dict) else None
-    services = result.get("services") if isinstance(result, dict) else None
+    if not isinstance(result, dict):
+        raise ValueError("A2A endpoint returned no result object")
+    services = result.get("services")
     if not isinstance(services, list) or result.get("can_sign") is not True:
         raise ValueError("A2A endpoint no longer advertises signed hiring")
     live_skill_ids = {
@@ -74,17 +76,18 @@ async def refresh() -> dict[str, Any]:
 
     catalog["observed_at"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     catalog["a2a_list_verified"] = True
-    catalog["verification"] = {
+    verification: dict[str, Any] = {
         "chain_id": 56,
         "successful_registration_receipts": successful_receipts,
         "a2a_can_sign": True,
         "a2a_skill_ids": sorted(expected_skill_ids),
     }
+    catalog["verification"] = verification
     CATALOG_PATH.write_text(
         json.dumps(catalog, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    return catalog["verification"]
+    return verification
 
 
 if __name__ == "__main__":

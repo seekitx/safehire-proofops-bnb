@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
-from eth_utils import keccak
+from eth_utils.crypto import keccak
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = PROJECT_ROOT / "evidence" / "pancakeswap" / "live-benefit-report.json"
