@@ -35,6 +35,14 @@ function titleForStep(step) {
   }[step] || String(step).replaceAll("_", " ");
 }
 
+function titleForTermixTask(taskId) {
+  return {
+    "pancakeswap-grid-route": "PancakeSwap grid route",
+    "venus-stablecoin-yield": "Venus stablecoin yield",
+    "venus-health-factor-response": "Venus health-factor response",
+  }[taskId] || String(taskId).replaceAll("-", " ");
+}
+
 async function loadProof() {
   const response = await fetch("/api/public-proof", { headers: { Accept: "application/json" } });
   if (!response.ok) throw new Error(`Evidence API returned HTTP ${response.status}`);
@@ -108,6 +116,45 @@ async function loadProof() {
   }).join("");
   byId("routeBenefit").textContent = pancake.measurable_benefit;
   byId("routeRisk").textContent = pancake.risk_boundary;
+
+  const delivery = pancake.agent_delivery;
+  if (delivery?.output?.invocation_id) {
+    byId("pancakeAgentBinding").innerHTML = `
+      <span>AGENT DELIVERY</span>
+      <strong>${escapeHtml(delivery.output.action)} · ${Math.round(Number(delivery.output.confidence) * 100)}% confidence</strong>
+      <p>SafeHire A2A invocation ${escapeHtml(short(delivery.output.invocation_id))} completed in ${escapeHtml(delivery.latency_ms)} ms at zero cost. It used block ${escapeHtml(pancake.observed_block)} data and sent no trade.</p>`;
+  } else {
+    byId("pancakeAgentBinding").classList.add("missing");
+    byId("pancakeAgentBinding").innerHTML = "<span>AGENT DELIVERY</span><strong>Not linked</strong><p>The route evidence exists, but no public Agent output is attached.</p>";
+  }
+
+  const termix = proof.termix || {};
+  byId("termixTaskCount").textContent = termix.published ? String(termix.task_count) : "0";
+  if (termix.published && Array.isArray(termix.tasks)) {
+    byId("termixTasks").innerHTML = termix.tasks.map((task) => `
+      <article class="termix-card">
+        <small>${escapeHtml(task.category)}</small>
+        <strong>${escapeHtml(titleForTermixTask(task.task_id))}</strong>
+        <div class="termix-metrics">
+          <div><span>AGENT TIME</span><b>${Number(task.agent?.duration_seconds || 0).toFixed(3)} s</b></div>
+          <div><span>DIRECT TIME</span><b>${Number(task.manual?.duration_seconds || 0).toFixed(3)} s</b></div>
+          <div><span>AGENT COST</span><b>${Number(task.agent?.cost_amount || 0)} ${escapeHtml(task.agent?.cost_currency || "U")}</b></div>
+          <div><span>QUALITY</span><b>${Number(task.scores?.agent?.total || 0).toFixed(1)} / 25</b></div>
+        </div>
+        <div class="termix-links">
+          <a href="${escapeHtml(safeHttpsUrl(new URL(task.agent_output_url, location.origin).href))}" target="_blank" rel="noreferrer">Agent raw ↗</a>
+          <a href="${escapeHtml(safeHttpsUrl(new URL(task.manual_output_url, location.origin).href))}" target="_blank" rel="noreferrer">No-Agent raw ↗</a>
+        </div>
+      </article>`).join("");
+    const aggregate = termix.aggregate || {};
+    byId("termixAggregate").textContent = `${termix.task_count} public sponsored hires · Agent quality ${Number(aggregate.agent_quality_total || 0).toFixed(1)} vs direct ${Number(aggregate.manual_quality_total || 0).toFixed(1)}.`;
+    byId("termixBoundary").textContent = termix.honesty_boundary;
+    byId("termixReportLink").href = safeHttpsUrl(new URL(termix.report_url, location.origin).href);
+  } else {
+    byId("termixTasks").innerHTML = '<p class="termix-empty">The live three-task report has not been published yet.</p>';
+    byId("termixAggregate").textContent = "TermiX report pending.";
+    byId("termixBoundary").textContent = "No Agent Advantage claim is made until all three raw comparisons are public.";
+  }
 
   byId("verifiedClaim").textContent = proof.honesty_boundary.verified;
   byId("unclaimedClaim").textContent = proof.honesty_boundary.not_claimed;

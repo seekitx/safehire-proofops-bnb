@@ -4,8 +4,8 @@
   "beneficiary": "trader",
   "network": "bsc-mainnet",
   "chain_id": 56,
-  "observed_block": 118995462,
-  "observed_at": "2026-08-30T16:58:12.063201Z",
+  "observed_block": 119108691,
+  "observed_at": "2026-08-31T07:07:36.945685Z",
   "source_url": "https://developer.pancakeswap.finance/contracts/v3/addresses",
   "source": "pancakeswap_v3_factory_and_quoter_v2_same_block_rpc",
   "contracts": {
@@ -24,51 +24,118 @@
       "fee_percent": "0.01",
       "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
       "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
-      "amount_out_raw": "70329294406791795662",
-      "amount_out_usdt": "70.329294406791795662",
+      "amount_out_raw": "68659207957773973223",
+      "amount_out_usdt": "68.659207957773973223",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 92059
+      "quoter_gas_estimate": 92187
     },
     {
       "fee_hundredths_of_bip": 500,
       "fee_percent": "0.05",
       "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
       "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
-      "amount_out_raw": "70286950608255673379",
-      "amount_out_usdt": "70.286950608255673379",
+      "amount_out_raw": "68655327265055400157",
+      "amount_out_usdt": "68.655327265055400157",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 115196
+      "quoter_gas_estimate": 115399
     },
     {
       "fee_hundredths_of_bip": 2500,
       "fee_percent": "0.25",
       "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
       "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
-      "amount_out_raw": "70033890027540757959",
-      "amount_out_usdt": "70.033890027540757959",
-      "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 124461
+      "amount_out_raw": "68485431562213872960",
+      "amount_out_usdt": "68.48543156221387296",
+      "initialized_ticks_crossed": 0,
+      "quoter_gas_estimate": 124509
     },
     {
       "fee_hundredths_of_bip": 10000,
       "fee_percent": "1",
       "pool_address": "0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
       "pool_url": "https://bscscan.com/address/0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
-      "amount_out_raw": "68813176418203043059",
-      "amount_out_usdt": "68.813176418203043059",
+      "amount_out_raw": "68058340283542690143",
+      "amount_out_usdt": "68.058340283542690143",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 95461
+      "quoter_gas_estimate": 95387
     }
   ],
   "decision": {
     "selected_fee_hundredths_of_bip": 100,
     "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
-    "selected_amount_out_usdt": "70.329294406791795662",
+    "selected_amount_out_usdt": "68.659207957773973223",
     "baseline_fee_hundredths_of_bip": 500,
-    "baseline_amount_out_usdt": "70.286950608255673379",
-    "improvement_usdt": "0.042343798536122283",
-    "improvement_bps": "6.0244"
+    "baseline_amount_out_usdt": "68.655327265055400157",
+    "improvement_usdt": "0.003880692718573066",
+    "improvement_bps": "0.5652"
   },
-  "measurable_benefit": "At BSC block 118995462, comparing direct PancakeSwap V3 fee tiers selected the 0.01% pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by 0.042343798536122283 USDT (6.0244 bps).",
-  "risk_boundary": "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. It excludes transaction gas and later price movement; execution still needs a fresh quote, user slippage limit, deadline, allowance review and wallet confirmation."
+  "measurable_benefit": "At BSC block 119108691, comparing direct PancakeSwap V3 fee tiers selected the 0.01% pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by 0.003880692718573066 USDT (0.5652 bps).",
+  "agent_delivery": {
+    "evidence_mode": "live",
+    "transport": "A2A JSON-RPC message/send",
+    "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
+    "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
+    "agent_id": "grid-sentinel-demo",
+    "started_at": "2026-08-31T07:07:35.210925Z",
+    "finished_at": "2026-08-31T07:07:36.945424Z",
+    "latency_ms": 1734.494,
+    "cost": {
+      "amount": 0,
+      "currency": "U",
+      "mode": "public_preview"
+    },
+    "input": {
+      "current_price": 686.5920795777397,
+      "lower_price": 652.2624755988528,
+      "upper_price": 720.9216835566267,
+      "levels": 9,
+      "capital_usd": 1000,
+      "max_drawdown_pct": 5,
+      "source": "pancakeswap_v3_block_119108691_same_block_quote"
+    },
+    "output": {
+      "invocation_id": "inv_20260831070737081187",
+      "agent_id": "grid-sentinel-demo",
+      "agent_version": "0.1.0",
+      "observed_at": "2026-08-31T07:07:37.081217+00:00",
+      "category": "grid_trading",
+      "action": "propose_grid",
+      "executable": true,
+      "confidence": 0.78,
+      "result": {
+        "grid_prices": [
+          652.2624756,
+          660.47381778,
+          668.78853267,
+          677.20792163,
+          685.73330241,
+          694.36600933,
+          703.10739353,
+          711.95882315,
+          720.92168356
+        ],
+        "capital_per_order_usd": 111.11,
+        "configured_max_drawdown_pct": 5.0,
+        "range_width_pct": 10.0,
+        "orders": 9,
+        "no_profit_guarantee": true
+      },
+      "risk_checks": [
+        "price_inside_range",
+        "order_count_capped",
+        "drawdown_budget_capped",
+        "execution_requires_scoped_permission"
+      ],
+      "source_labels": [
+        "pancakeswap_v3_block_119108691_same_block_quote"
+      ],
+      "evidence_boundary": "Deterministic preview from caller-supplied inputs; no wallet signature, payment, or fund execution occurred."
+    },
+    "commerce_proof": {
+      "separate_completed_job_id": 808,
+      "public_proof_url": "https://safehire-proofops-bnb.onrender.com/proof",
+      "boundary": "This PancakeSwap delivery is a free public A2A preview. Job #808 separately proves the 0.1 U ERC-8183 payment lifecycle; it did not fund this preview."
+    }
+  },
+  "risk_boundary": "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. It excludes transaction gas and later price movement; execution still needs a fresh quote, user slippage limit, deadline, allowance review and wallet confirmation. The linked SafeHire result is a free deterministic A2A preview; no token was paid."
 }

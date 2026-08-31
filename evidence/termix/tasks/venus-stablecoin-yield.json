@@ -1,16 +1,32 @@
 {
   "schema_version": "1.0",
   "task_id": "venus-stablecoin-yield",
-  "task_description": "Rank three recorded Venus Core stablecoin supply markets for a 10000 USD, 30-day benchmark. Call safehire_preview exactly once with agent_id yield-scout-demo and input {\"capital_usd\":10000,\"horizon_days\":30,\"candidates\":[{\"protocol\":\"Venus Core USDT\",\"gross_apy\":2.641578970755844,\"risk_score\":22,\"tvl_usd\":201849679.49,\"transaction_cost_usd\":0.09},{\"protocol\":\"Venus Core USDC\",\"gross_apy\":2.022305783471508,\"risk_score\":18,\"tvl_usd\":49274102.15,\"transaction_cost_usd\":0.09},{\"protocol\":\"Venus Core FDUSD\",\"gross_apy\":2.642751438290715,\"risk_score\":30,\"tvl_usd\":6042098.46,\"transaction_cost_usd\":0.09}],\"source\":\"venus_api_recorded_snapshot_plus_disclosed_benchmark_risk_scores\"}. Report the full ranking and net/risk-adjusted yields. The risk scores and transaction cost are benchmark assumptions, not Venus facts. Explain that the indexed API can lag and that no deposit or profit is guaranteed.",
+  "task_description": "Rank three recorded Venus Core stablecoin supply markets for a 10000 USD, 30-day benchmark. Call safehire_preview exactly once with agent_id yield-scout-demo and the exact agent_request input below. Report the full ranking and net/risk-adjusted yields. The risk scores and transaction cost are benchmark assumptions, not Venus facts. Explain that the indexed API can lag and that no deposit or profit is guaranteed.",
+  "agent_request": {
+    "skill": "hire_analysis",
+    "task_id": "termix-venus-stablecoin-yield",
+    "agent_id": "yield-scout-demo",
+    "input": {
+      "capital_usd": 10000,
+      "horizon_days": 30,
+      "candidates": [
+        {"protocol": "Venus Core USDT", "gross_apy": 2.975616188446897, "risk_score": 22, "tvl_usd": 190614548.69, "transaction_cost_usd": 0.09},
+        {"protocol": "Venus Core USDC", "gross_apy": 1.9986062981714069, "risk_score": 18, "tvl_usd": 49528414.08, "transaction_cost_usd": 0.09},
+        {"protocol": "Venus Core FDUSD", "gross_apy": 2.64298762335899, "risk_score": 30, "tvl_usd": 6041582.55, "transaction_cost_usd": 0.09}
+      ],
+      "source": "venus_api_2026-08-31_recorded_snapshot_plus_disclosed_benchmark_risk_scores"
+    }
+  },
   "terms": {
     "deliverables": "A three-market ranking with estimated net yield, risk-adjusted yield, selected market, source labels, and a clear separation between live API fields and benchmark assumptions.",
     "quality_standards": "Do not present risk scores or transaction cost assumptions as Venus data; state that the API is indexed and can lag; do not execute a deposit or promise yield.",
     "success_criteria": [
-      "The SafeHire yield preview is called with the exact supplied input.",
+      "The SafeHire sponsored hire is called with the exact supplied input.",
       "All three markets are ranked and the calculation horizon is stated.",
       "Live source values, benchmark assumptions, and remaining user permissions are separated."
     ]
   },
   "input_evidence": "evidence/venus/stablecoin-yield-snapshot.json",
+  "no_agent_method": "Use the disclosed APY, risk score, cost, capital and horizon in a calculator; compute net yield and apply the same risk penalty directly without calling /a2a or /api/agents.",
   "comparison_rule": "Agent and manual operator receive this exact JSON file; neither side receives extra hints."
 }

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import time
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -18,6 +20,9 @@ RPC_URL = "https://bsc-dataseed.bnbchain.org"
 FACTORY = "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865"
 QUOTER_V2 = "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997"
 SOURCE_URL = "https://developer.pancakeswap.finance/contracts/v3/addresses"
+PUBLIC_BASE_URL = os.getenv(
+    "PUBLIC_BASE_URL", "https://safehire-proofops-bnb.onrender.com"
+).rstrip("/")
 
 # Canonical BSC WBNB and Binance-Peg USDT. Both use 18 decimals.
 WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
@@ -52,6 +57,76 @@ async def _rpc(
     if not isinstance(payload, dict) or payload.get("error") or "result" not in payload:
         raise ValueError(f"BSC RPC rejected {method}")
     return payload["result"]
+
+
+async def _safehire_grid_delivery(
+    client: httpx.AsyncClient,
+    *,
+    block_number: int,
+    current_price: Decimal,
+) -> dict[str, Any]:
+    started_at = datetime.now(UTC)
+    started_clock = time.perf_counter()
+    agent_input = {
+        "current_price": float(current_price),
+        "lower_price": float(current_price * Decimal("0.95")),
+        "upper_price": float(current_price * Decimal("1.05")),
+        "levels": 9,
+        "capital_usd": 1000,
+        "max_drawdown_pct": 5,
+        "source": f"pancakeswap_v3_block_{block_number}_same_block_quote",
+    }
+    request = {
+        "jsonrpc": "2.0",
+        "id": f"pancakeswap-grid-{block_number}",
+        "method": "message/send",
+        "params": {
+            "message": {
+                "role": "user",
+                "messageId": f"pancakeswap-grid-{block_number}",
+                "parts": [
+                    {
+                        "kind": "data",
+                        "data": {
+                            "skill": "preview",
+                            "agent_id": "grid-sentinel-demo",
+                            "input": agent_input,
+                        },
+                    }
+                ],
+            }
+        },
+    }
+    response = await client.post(f"{PUBLIC_BASE_URL}/a2a", json=request)
+    response.raise_for_status()
+    payload = response.json()
+    if not isinstance(payload, dict) or not isinstance(payload.get("result"), dict):
+        raise ValueError("SafeHire A2A preview returned no result")
+    result = payload["result"]
+    if str(result.get("agent_id", "")) != "grid-sentinel-demo":
+        raise ValueError("SafeHire A2A preview returned the wrong agent")
+    finished_at = datetime.now(UTC)
+    return {
+        "evidence_mode": "live",
+        "transport": "A2A JSON-RPC message/send",
+        "endpoint": f"{PUBLIC_BASE_URL}/a2a",
+        "agent_card_url": f"{PUBLIC_BASE_URL}/.well-known/agent-card.json",
+        "agent_id": "grid-sentinel-demo",
+        "started_at": started_at.isoformat().replace("+00:00", "Z"),
+        "finished_at": finished_at.isoformat().replace("+00:00", "Z"),
+        "latency_ms": round((time.perf_counter() - started_clock) * 1000, 3),
+        "cost": {"amount": 0, "currency": "U", "mode": "public_preview"},
+        "input": agent_input,
+        "output": result,
+        "commerce_proof": {
+            "separate_completed_job_id": 808,
+            "public_proof_url": f"{PUBLIC_BASE_URL}/proof",
+            "boundary": (
+                "This PancakeSwap delivery is a free public A2A preview. Job #808 separately "
+                "proves the 0.1 U ERC-8183 payment lifecycle; it did not fund this preview."
+            ),
+        },
+    }
 
 
 def _decode_words(raw: str) -> list[int]:
@@ -133,6 +208,14 @@ async def capture() -> dict[str, Any]:
         str(baseline["amount_out_usdt"])
     )
     improvement_bps = improvement / Decimal(str(baseline["amount_out_usdt"])) * 10_000
+    implied_wbnb_price = Decimal(str(best["amount_out_usdt"])) / Decimal("0.1")
+
+    async with httpx.AsyncClient(timeout=25) as client:
+        agent_delivery = await _safehire_grid_delivery(
+            client,
+            block_number=block_number,
+            current_price=implied_wbnb_price,
+        )
 
     report = {
         "schema_version": "1.0",
@@ -170,10 +253,12 @@ async def capture() -> dict[str, Any]:
             f"pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by "
             f"{improvement} USDT ({improvement_bps.quantize(Decimal('0.0001'))} bps)."
         ),
+        "agent_delivery": agent_delivery,
         "risk_boundary": (
             "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. "
             "It excludes transaction gas and later price movement; execution still needs a fresh "
-            "quote, user slippage limit, deadline, allowance review and wallet confirmation."
+            "quote, user slippage limit, deadline, allowance review and wallet confirmation. "
+            "The linked SafeHire result is a free deterministic A2A preview; no token was paid."
         ),
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)

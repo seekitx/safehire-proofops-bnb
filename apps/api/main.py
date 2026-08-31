@@ -36,7 +36,7 @@ from proofops.services.browser_erc8183 import (
     refund_job_plan,
     settle_job_plan,
 )
-from proofops.services.live_agent_market import live_agent_market
+from proofops.services.live_agent_market import live_agent_market, request_live_agent_quote
 from proofops.settings import Settings
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
@@ -145,6 +145,15 @@ class BrowserBuyerRequest(BaseModel):
 
 class BrowserJobRequest(BrowserBuyerRequest):
     job_id: int = Field(gt=0)
+
+
+class LiveMarketQuoteRequest(BaseModel):
+    skill_id: Literal[
+        "rebalance_plan",
+        "grid_plan",
+        "yield_plan",
+        "health_factor",
+    ]
 
 
 class DebateRequest(BaseModel):
@@ -455,6 +464,17 @@ async def official_agents(
 @app.get("/api/live-market")
 async def live_market() -> dict[str, Any]:
     return await live_agent_market(Path(__file__).resolve().parents[2])
+
+
+@app.post("/api/live-market/quote")
+async def live_market_quote(body: LiveMarketQuoteRequest) -> dict[str, Any]:
+    try:
+        return await request_live_agent_quote(PROJECT_ROOT, skill_id=body.skill_id)
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="live Agent quote service is temporarily unavailable",
+        ) from exc
 
 
 @app.get("/api/sources/venus/pools")
@@ -831,9 +851,10 @@ async def marketplace_agent_card(application: ApplicationDep) -> dict[str, Any]:
     return {
         "name": "SafeHire ProofOps Marketplace Agent",
         "description": (
-            "Read-only BNB Chain marketplace assistant for discovering live ERC-8004 agents, "
-            "checking SafeHire on-chain proof, and running deterministic risk previews. It does "
-            "not sign transactions, move funds, or claim that demo previews are live track records."
+            "BNB Chain marketplace assistant for discovering live ERC-8004 agents, requesting "
+            "commercial quotes, checking SafeHire on-chain proof, and hiring sponsored "
+            "deterministic analyses. It does not sign transactions, move funds, or claim that "
+            "sponsored previews are paid track records."
         ),
         "url": f"{base_url}/a2a",
         "version": "1.0.0",
@@ -866,6 +887,18 @@ async def marketplace_agent_card(application: ApplicationDep) -> dict[str, Any]:
                 "outputModes": ["application/json"],
             },
             {
+                "id": "hire_analysis",
+                "name": "Hire a sponsored SafeHire analysis",
+                "description": (
+                    "Create an evidence-ledger receipt and run one deterministic analysis at "
+                    "zero cost. This is a real marketplace activation for evaluation, not a "
+                    "token payment or fund-execution claim."
+                ),
+                "tags": ["safehire", "termix", "sponsored-hire", "zero-cost"],
+                "inputModes": ["application/json"],
+                "outputModes": ["application/json"],
+            },
+            {
                 "id": "public_proof",
                 "name": "Read SafeHire on-chain proof",
                 "description": (
@@ -894,11 +927,11 @@ async def marketplace_a2a(
         return _a2a_result(body.id, await live_agent_market(PROJECT_ROOT))
     if skill == "public_proof":
         return _a2a_result(body.id, await public_proof())
-    if skill != "preview":
+    if skill not in {"preview", "hire_analysis"}:
         return _a2a_error(
             body.id,
             -32602,
-            "skill must be list_live_agents, preview, or public_proof",
+            "skill must be list_live_agents, preview, hire_analysis, or public_proof",
         )
     agent_id = data.get("agent_id")
     agent_input = data.get("input")
@@ -906,12 +939,57 @@ async def marketplace_a2a(
         return _a2a_error(
             body.id,
             -32602,
-            "preview requires string agent_id and object input",
+            f"{skill} requires string agent_id and object input",
+        )
+    task_id = data.get("task_id")
+    if skill == "hire_analysis" and (
+        not isinstance(task_id, str) or not task_id.strip() or len(task_id) > 128
+    ):
+        return _a2a_error(
+            body.id,
+            -32602,
+            "hire_analysis requires a non-empty task_id of at most 128 characters",
         )
     try:
         result = application.agents.invoke(agent_id, agent_input)
     except (KeyError, TypeError, ValueError) as exc:
         return _a2a_error(body.id, -32602, str(exc))
+    if skill == "hire_analysis":
+        assert isinstance(task_id, str)
+        receipt = application.harness.resolve("evidence.ledger").append(
+            kind="sponsored_agent_hire",
+            source="public.a2a",
+            payload={
+                "task_id": task_id,
+                "agent_id": agent_id,
+                "invocation_id": result.get("invocation_id"),
+                "price_amount": 0,
+                "price_currency": "U",
+                "payment_mode": "sponsored",
+            },
+        )
+        return _a2a_result(
+            body.id,
+            {
+                "status": "completed",
+                "hire_receipt": {
+                    "record_id": receipt.record_id,
+                    "record_hash": receipt.record_hash,
+                    "occurred_at": receipt.occurred_at,
+                    "task_id": task_id,
+                    "agent_id": agent_id,
+                    "price_amount": 0,
+                    "price_currency": "U",
+                    "payment_mode": "sponsored",
+                },
+                "agent_result": result,
+                "evidence_boundary": (
+                    "A sponsored zero-cost marketplace hire completed and was added to the "
+                    "SafeHire hash-chain ledger. No wallet signature, token payment or fund "
+                    "execution occurred; paid ERC-8183 capability is proven separately by Job #808."
+                ),
+            },
+        )
     return _a2a_result(
         body.id,
         {
@@ -939,6 +1017,37 @@ def _public_evidence_json(relative_path: str) -> dict[str, Any]:
     return payload
 
 
+def _optional_public_evidence_json(relative_path: str) -> dict[str, Any]:
+    path = PROJECT_ROOT / relative_path
+    if not path.is_file():
+        return {}
+    return _public_evidence_json(relative_path)
+
+
+@app.get("/api/evidence/termix/report")
+async def public_termix_report() -> dict[str, Any]:
+    report = _optional_public_evidence_json(
+        "evidence/termix/agent-advantage-report.json"
+    )
+    if not report:
+        raise HTTPException(status_code=404, detail="TermiX live report is not published yet")
+    return report
+
+
+@app.get("/api/evidence/termix/raw/{task_id}/{side}")
+async def public_termix_raw(task_id: str, side: str) -> dict[str, Any]:
+    allowed_tasks = {
+        "pancakeswap-grid-route",
+        "venus-stablecoin-yield",
+        "venus-health-factor-response",
+    }
+    if task_id not in allowed_tasks or side not in {"agent", "manual"}:
+        raise HTTPException(status_code=404, detail="TermiX raw output was not found")
+    return _public_evidence_json(
+        f"evidence/termix/raw/{task_id}/{side}-output.json"
+    )
+
+
 @app.get("/api/public-proof")
 async def public_proof() -> dict[str, Any]:
     job = _public_evidence_json("evidence/sponsor-integration/erc8183-job-808.json")
@@ -951,6 +1060,9 @@ async def public_proof() -> dict[str, Any]:
     contracts = _public_evidence_json("deployments/bsc-testnet.json")
     pancake = _public_evidence_json(
         "evidence/pancakeswap/live-benefit-report.json"
+    )
+    termix = _optional_public_evidence_json(
+        "evidence/termix/agent-advantage-report.json"
     )
     explorer = "https://testnet.bscscan.com"
     return {
@@ -1031,7 +1143,38 @@ async def public_proof() -> dict[str, Any]:
             ],
             "decision": pancake.get("decision"),
             "measurable_benefit": pancake.get("measurable_benefit"),
+            "agent_delivery": pancake.get("agent_delivery"),
             "risk_boundary": pancake.get("risk_boundary"),
+        },
+        "termix": {
+            "published": bool(termix),
+            "evidence_mode": termix.get("evidence_mode"),
+            "generated_at": termix.get("generated_at"),
+            "task_count": termix.get("task_count", 0),
+            "categories": termix.get("categories", []),
+            "aggregate": termix.get("aggregate"),
+            "methodology": termix.get("methodology"),
+            "honesty_boundary": termix.get("honesty_boundary"),
+            "report_url": "/api/evidence/termix/report" if termix else None,
+            "tasks": [
+                {
+                    "task_id": item.get("task_id"),
+                    "category": item.get("category"),
+                    "agent": item.get("agent"),
+                    "manual": item.get("manual"),
+                    "scores": item.get("scores"),
+                    "advantage": item.get("advantage"),
+                    "reviewer": item.get("reviewer"),
+                    "agent_output_url": (
+                        f"/api/evidence/termix/raw/{item.get('task_id')}/agent"
+                    ),
+                    "manual_output_url": (
+                        f"/api/evidence/termix/raw/{item.get('task_id')}/manual"
+                    ),
+                }
+                for item in termix.get("tasks", [])
+                if isinstance(item, dict)
+            ],
         },
         "honesty_boundary": {
             "verified": (

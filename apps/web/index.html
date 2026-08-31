@@ -67,6 +67,18 @@
         </div>
       </div>
       <div class="live-agent-grid" id="liveAgents" aria-live="polite"></div>
+      <section class="live-quote-panel" id="liveQuotePanel" aria-live="polite" hidden>
+        <div class="quote-panel-head">
+          <div><small>LIVE COMMERCIAL HANDSHAKE</small><strong id="liveQuoteTitle">Preparing quote…</strong></div>
+          <span id="liveQuoteState">NO TRANSACTION</span>
+        </div>
+        <div class="quote-facts" id="liveQuoteFacts"></div>
+        <p id="liveQuoteBoundary">SafeHire will show the quote before any wallet or payment step.</p>
+        <div class="quote-actions">
+          <a id="liveQuoteIdentity" href="#" target="_blank" rel="noreferrer">Verify ERC-8004 identity ↗</a>
+          <button id="closeLiveQuote" type="button">Close quote</button>
+        </div>
+      </section>
       <div class="market-boundary">
         <strong>What this proves</strong>
         <p id="liveMarketBoundary">The page is checking current registration and discovery evidence. A paid hire and output-quality review are separate steps.</p>

@@ -3,7 +3,14 @@
   const status = document.getElementById("liveMarketStatus");
   const meta = document.getElementById("liveMarketMeta");
   const boundary = document.getElementById("liveMarketBoundary");
-  if (!agentContainer || !status || !meta || !boundary) return;
+  const quotePanel = document.getElementById("liveQuotePanel");
+  const quoteTitle = document.getElementById("liveQuoteTitle");
+  const quoteState = document.getElementById("liveQuoteState");
+  const quoteFacts = document.getElementById("liveQuoteFacts");
+  const quoteBoundary = document.getElementById("liveQuoteBoundary");
+  const quoteIdentity = document.getElementById("liveQuoteIdentity");
+  const closeQuote = document.getElementById("closeLiveQuote");
+  if (!agentContainer || !status || !meta || !boundary || !quotePanel) return;
 
   const categoryLabels = {
     rebalancing: "Portfolio rebalancing",
@@ -52,11 +59,58 @@
           <ul>${renderInputs(inputs)}</ul>
         </details>
         <div class="live-card-actions">
+          <button class="quote-button" type="button" data-live-quote="${escapeHtml(agent.skill_id)}">Prepare hire quote</button>
           <a href="${safeHttpsUrl(agent.registry_url)}" target="_blank" rel="noreferrer">8004 identity <span>↗</span></a>
           <a href="${safeHttpsUrl(agent.registration_url)}" target="_blank" rel="noreferrer">Registration tx <span>↗</span></a>
         </div>
-        <p class="no-auto-hire">SafeHire will not fund or sign a mainnet job from this discovery card.</p>
+        <p class="no-auto-hire">Quote is live. Mainnet funding remains a separate wallet action and is never automatic.</p>
       </article>`;
+  };
+
+  const shortAddress = (value) => {
+    const text = String(value || "");
+    return text.length > 18 ? `${text.slice(0, 10)}…${text.slice(-8)}` : text;
+  };
+
+  const prepareQuote = async (skillId, button) => {
+    quotePanel.hidden = false;
+    quotePanel.classList.add("loading");
+    quotePanel.classList.remove("error");
+    quoteTitle.textContent = "Contacting the live Agent…";
+    quoteState.textContent = "NO TRANSACTION";
+    quoteFacts.innerHTML = '<span class="quote-loading">Requesting current ERC-8183 terms…</span>';
+    quoteBoundary.textContent = "No wallet has been connected and no token approval has been requested.";
+    quoteIdentity.href = "#";
+    button.disabled = true;
+    quotePanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    try {
+      const response = await fetch("/api/live-market/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ skill_id: skillId }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
+      const quote = payload.quote || {};
+      quoteTitle.textContent = `${payload.agent?.name || skillId} accepted the request`;
+      quoteState.textContent = payload.transaction_sent ? "TRANSACTION SENT" : "QUOTE ONLY · NO TRANSACTION";
+      quoteFacts.innerHTML = `
+        <div><small>PRICE</small><strong>${escapeHtml(quote.price_display || quote.price)}</strong></div>
+        <div><small>NETWORK</small><strong>BSC MAINNET</strong></div>
+        <div><small>PROVIDER</small><strong title="${escapeHtml(quote.provider)}">${escapeHtml(shortAddress(quote.provider))}</strong></div>
+        <div><small>EST. DELIVERY</small><strong>${escapeHtml(quote.estimated_completion_seconds || "—")} sec</strong></div>`;
+      quoteBoundary.textContent = payload.evidence_boundary;
+      quoteIdentity.href = safeHttpsUrl(payload.agent?.registration_url);
+    } catch (error) {
+      quotePanel.classList.add("error");
+      quoteTitle.textContent = "Live quote unavailable";
+      quoteState.textContent = "NOT ACTIVATED";
+      quoteFacts.innerHTML = `<span class="quote-loading">${escapeHtml(error.message)}</span>`;
+      quoteBoundary.textContent = "No transaction was sent. Try again after the external Agent recovers.";
+    } finally {
+      quotePanel.classList.remove("loading");
+      button.disabled = false;
+    }
   };
 
   fetch("/api/live-market", { headers: { Accept: "application/json" } })
@@ -74,6 +128,9 @@
         : "Registration snapshot loaded; A2A is offline";
       meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString()} · read-only discovery`;
       boundary.textContent = payload.trust_boundary;
+      agentContainer.querySelectorAll("[data-live-quote]").forEach((button) => {
+        button.addEventListener("click", () => prepareQuote(button.dataset.liveQuote, button));
+      });
     })
     .catch((error) => {
       status.classList.add("offline");
@@ -81,4 +138,8 @@
       meta.textContent = error.message;
       agentContainer.innerHTML = '<p class="live-market-error">The page refused to replace missing live evidence with demo data.</p>';
     });
+
+  closeQuote?.addEventListener("click", () => {
+    quotePanel.hidden = true;
+  });
 })();
