@@ -54,7 +54,7 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
             payload = response.json()
         result = payload.get("result") if isinstance(payload, dict) else None
         if not isinstance(result, dict):
-            raise ValueError("A2A list response returned no result object")
+            raise TypeError("A2A list response returned no result object")
         services = result.get("services")
         if not isinstance(services, list) or result.get("can_sign") is not True:
             raise ValueError("A2A list response did not advertise signed hiring")
@@ -62,7 +62,7 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
             if isinstance(item, dict) and isinstance(item.get("id"), str):
                 live_services[item["id"]] = item
         endpoint_reachable = True
-    except (httpx.HTTPError, ValueError, json.JSONDecodeError) as exc:
+    except (httpx.HTTPError, TypeError, ValueError, json.JSONDecodeError) as exc:
         liveness_error = type(exc).__name__
 
     agents: list[dict[str, Any]] = []

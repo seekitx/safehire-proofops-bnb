@@ -63,7 +63,7 @@ async def refresh() -> dict[str, Any]:
 
     result = payload.get("result") if isinstance(payload, dict) else None
     if not isinstance(result, dict):
-        raise ValueError("A2A endpoint returned no result object")
+        raise TypeError("A2A endpoint returned no result object")
     services = result.get("services")
     if not isinstance(services, list) or result.get("can_sign") is not True:
         raise ValueError("A2A endpoint no longer advertises signed hiring")
