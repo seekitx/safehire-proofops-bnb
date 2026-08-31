@@ -77,6 +77,127 @@ class OfficialSourceClient:
             "trust_boundary": "Index data; identity owner and URI still require RPC verification.",
         }
 
+    async def scan8004_agent(self, *, chain_id: int, token_id: int) -> dict[str, Any]:
+        if chain_id not in {56, 97}:
+            raise ValueError("chain_id must be 56 or 97")
+        if token_id <= 0:
+            raise ValueError("token_id must be positive")
+        headers = {"X-API-Key": self._scan8004_api_key} if self._scan8004_api_key else {}
+        payload = await self._get(
+            f"{SCAN8004_BASE}/agents/{chain_id}/{token_id}",
+            headers=headers,
+        )
+        if not isinstance(payload, dict) or str(payload.get("token_id", "")) != str(token_id):
+            raise AdapterUnavailableError("8004scan returned an unexpected Agent schema")
+        return payload
+
+    async def validate_agent_intake(self, *, chain_id: int, token_id: int) -> dict[str, Any]:
+        """Build a read-only listing dossier from the official ERC-8004 index.
+
+        The endpoint intentionally does not call an arbitrary URL supplied by a visitor.
+        Endpoint health remains the indexer's claim until a controlled SafeHire probe is added.
+        """
+
+        payload = await self.scan8004_agent(chain_id=chain_id, token_id=token_id)
+        protocols = [str(item).upper() for item in payload.get("supported_protocols", [])]
+        raw_categories = payload.get("categories") or payload.get("tags") or []
+        category_text = " ".join(str(item).lower() for item in raw_categories)
+        name_and_description = (
+            f"{payload.get('name', '')} {payload.get('description', '')}".lower()
+        )
+        searchable = f"{category_text} {name_and_description}"
+        category_aliases = {
+            "rebalancing": ("rebalance", "rebalancing", "liquidity range", "lp range"),
+            "grid_trading": ("grid", "grid-trading", "grid trading"),
+            "yield_optimisation": (
+                "yield",
+                "yield-optimization",
+                "yield optimisation",
+                "yield optimization",
+            ),
+            "health_factor_monitoring": (
+                "health factor",
+                "health-factor",
+                "liquidation",
+            ),
+        }
+        matched_categories = [
+            category
+            for category, aliases in category_aliases.items()
+            if any(alias in searchable for alias in aliases)
+        ]
+        a2a_endpoint = payload.get("a2a_endpoint")
+        checks = [
+            {
+                "id": "active_registration",
+                "passed": payload.get("is_active") is True,
+                "detail": "ERC-8004 record is active",
+            },
+            {
+                "id": "a2a_metadata",
+                "passed": "A2A" in protocols and isinstance(a2a_endpoint, str),
+                "detail": "A2A protocol and endpoint are present in indexed metadata",
+            },
+            {
+                "id": "official_category",
+                "passed": bool(matched_categories),
+                "detail": "At least one official marketplace category can be identified",
+            },
+            {
+                "id": "endpoint_index_verification",
+                "passed": payload.get("is_endpoint_verified") is True,
+                "detail": "8004scan currently marks the endpoint as verified",
+            },
+            {
+                "id": "reputation_signal",
+                "passed": int(payload.get("total_feedbacks") or 0) > 0,
+                "detail": "At least one indexed feedback record exists",
+            },
+        ]
+        blocking_ids = {"active_registration", "a2a_metadata", "official_category"}
+        eligible = all(item["passed"] for item in checks if item["id"] in blocking_ids)
+        return {
+            "schema_version": "1.0",
+            "source": "8004scan_official_api",
+            "observed_at": datetime.now(UTC).isoformat(),
+            "chain_id": chain_id,
+            "token_id": str(token_id),
+            "agent": {
+                "name": payload.get("name"),
+                "description": payload.get("description"),
+                "owner_address": payload.get("owner_address"),
+                "agent_wallet": payload.get("agent_wallet"),
+                "a2a_endpoint": a2a_endpoint,
+                "supported_protocols": protocols,
+                "matched_categories": matched_categories,
+                "is_active": payload.get("is_active"),
+                "is_endpoint_verified": payload.get("is_endpoint_verified"),
+            },
+            "signals": {
+                "total_score": payload.get("total_score"),
+                "quality_score": payload.get("quality_score"),
+                "health_score": payload.get("health_score"),
+                "metadata_completeness_score": payload.get("metadata_completeness_score"),
+                "total_feedbacks": int(payload.get("total_feedbacks") or 0),
+                "total_validations": int(payload.get("total_validations") or 0),
+                "successful_validations": int(payload.get("successful_validations") or 0),
+                "endpoint_last_checked_at": payload.get("endpoint_last_checked_at"),
+                "health_status": payload.get("health_status"),
+            },
+            "checks": checks,
+            "eligible_for_review": eligible,
+            "listing_created": False,
+            "next_action": (
+                "submit evidence and a live commercial quote for curator review"
+                if eligible
+                else "fix the failed blocking checks before curator review"
+            ),
+            "trust_boundary": (
+                "This is a read-only intake preview, not an approved listing. SafeHire did not "
+                "call the indexed endpoint, accept funds or create an ERC-8004 record."
+            ),
+        }
+
     async def venus_pools(self, *, chain_id: int = 56) -> dict[str, Any]:
         if chain_id not in {56, 97}:
             raise ValueError("chain_id must be 56 or 97")

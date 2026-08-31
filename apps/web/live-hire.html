@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Hire a live BNB Chain Agent through exact-value ERC-8183 escrow." />
+  <title>SafeHire · Live ERC-8183 hire</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/assets/live-hire.css" />
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>LIVE HIRE</small></a>
+    <div class="network-pill"><span class="dot" id="networkDot"></span><span id="networkLabel">BSC Mainnet · wallet disconnected</span></div>
+  </header>
+
+  <main class="live-hire-shell shell">
+    <section class="hire-hero">
+      <div>
+        <div class="eyebrow">REAL EXTERNAL AGENT · ERC-8183</div>
+        <h1>The quote now has<br/><span>a finish line.</span></h1>
+        <p>Choose the task, verify the exact 0.10 U terms, fund escrow one wallet action at a time, inspect the delivery, then settle or refund.</p>
+      </div>
+      <aside class="risk-ticket">
+        <small>MAXIMUM SERVICE PAYMENT</small>
+        <strong>0.10 U</strong>
+        <span>plus BNB network gas</span>
+        <p>No unlimited allowance. No background signing. No automatic settlement.</p>
+      </aside>
+    </section>
+
+    <section class="truth-strip">
+      <strong>REAL MAINNET VALUE</strong>
+      <p>This page is production-capable. Do not continue unless the connected wallet intentionally holds BNB gas and at least 0.10 U.</p>
+      <a href="/proof">Review prior testnet proof ↗</a>
+    </section>
+
+    <section class="hire-grid">
+      <article class="brief-card">
+        <div class="card-heading"><div><small>01 · SERVICE</small><h2 id="agentName">Loading live Agent…</h2></div><span id="quoteState">CONTACTING</span></div>
+        <p id="agentDeliverable">Requesting current deliverables and price directly from the external A2A service.</p>
+        <div class="quote-ledger">
+          <div><small>PRICE</small><strong id="quotePrice">—</strong></div>
+          <div><small>PROVIDER</small><strong id="quoteProvider">—</strong></div>
+          <div><small>DELIVERY</small><strong id="quoteEta">—</strong></div>
+          <div><small>IDENTITY</small><a id="identityLink" target="_blank" rel="noreferrer">—</a></div>
+        </div>
+        <div class="task-head"><strong>Task input</strong><button id="resetTask" type="button">Reset reviewed example</button></div>
+        <ul class="needs" id="taskNeeds"></ul>
+        <textarea id="taskInput" rows="14" spellcheck="false" aria-label="External Agent task JSON"></textarea>
+        <p class="field-note">The task is written into the public job description. Do not include passwords, private keys or personal secrets.</p>
+      </article>
+
+      <article class="wallet-card">
+        <div class="card-heading"><div><small>02 · BUYER</small><h2>Wallet readiness</h2></div><button class="button secondary compact" id="connectWallet" type="button">Connect wallet</button></div>
+        <div class="wallet-address"><small>CONNECTED BUYER</small><strong id="buyerAddress">—</strong></div>
+        <div class="balance-grid">
+          <div><small>U BALANCE</small><strong id="uBalance">—</strong><span id="uReadiness">Needs 0.10 U</span></div>
+          <div><small>BNB GAS</small><strong id="bnbBalance">—</strong><span id="gasReadiness">Needs BNB</span></div>
+        </div>
+        <label class="risk-confirm"><input id="riskConfirm" type="checkbox"/><span>I understand this is BSC Mainnet and each confirmed wallet transaction can spend real assets.</span></label>
+        <button class="button full" id="prepareHire" type="button" disabled>Connect wallet to prepare exact transactions</button>
+        <p class="field-note" id="prepareNote">Preparing a plan is read-only. Sending starts only after a separate button press.</p>
+      </article>
+    </section>
+
+    <section class="execution-card">
+      <div class="execution-title"><div><small>03 · ESCROW → DELIVERY → SETTLEMENT</small><h2>Every state stays visible.</h2></div><strong id="jobBadge">NO JOB</strong></div>
+      <ol class="live-steps">
+        <li data-step="create_job"><span>01</span><div><strong>Create job</strong><small>Waiting</small></div></li>
+        <li data-step="register_job"><span>02</span><div><strong>Bind policy</strong><small>Waiting</small></div></li>
+        <li data-step="set_budget"><span>03</span><div><strong>Fix 0.10 U budget</strong><small>Waiting</small></div></li>
+        <li data-step="approve_u"><span>04</span><div><strong>Approve exactly 0.10 U</strong><small>Waiting</small></div></li>
+        <li data-step="fund_job"><span>05</span><div><strong>Fund escrow</strong><small>Waiting</small></div></li>
+        <li data-step="agent_delivery"><span>06</span><div><strong>External delivery</strong><small>Waiting</small></div></li>
+        <li data-step="settle_job"><span>07</span><div><strong>Settle or refund</strong><small>Waiting</small></div></li>
+      </ol>
+      <div class="next-action"><span>NEXT EXPLICIT ACTION</span><strong id="nextAction">Prepare a verified plan first</strong></div>
+      <div class="action-row">
+        <button class="button" id="sendNext" type="button" disabled>No transaction prepared</button>
+        <button class="button secondary" id="notifyAgent" type="button" disabled>Ask Agent to deliver</button>
+        <button class="button secondary" id="checkDelivery" type="button" disabled>Check on-chain delivery</button>
+        <button class="button" id="settleJob" type="button" disabled>Settle reviewed delivery</button>
+        <button class="danger-link" id="refundJob" type="button" disabled>Refund expired escrow</button>
+      </div>
+      <div class="receipt-panel" id="receiptPanel" hidden>
+        <div><small>PUBLIC RECEIPT DOSSIER</small><strong id="receiptTitle">Job prepared</strong></div>
+        <button id="downloadReceipt" type="button">Download JSON</button>
+        <pre id="receiptJson"></pre>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/live-hire.js" defer></script>
+</body>
+</html>

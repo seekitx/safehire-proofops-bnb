@@ -75,6 +75,7 @@
         <div class="quote-facts" id="liveQuoteFacts"></div>
         <p id="liveQuoteBoundary">SafeHire will show the quote before any wallet or payment step.</p>
         <div class="quote-actions">
+          <a id="continueLiveHire" class="quote-continue" href="#" hidden>Continue to real 0.10 U hire <span>→</span></a>
           <a id="liveQuoteIdentity" href="#" target="_blank" rel="noreferrer">Verify ERC-8004 identity ↗</a>
           <button id="closeLiveQuote" type="button">Close quote</button>
         </div>
@@ -84,6 +85,19 @@
         <p id="liveMarketBoundary">The page is checking current registration and discovery evidence. A paid hire and output-quality review are separate steps.</p>
         <a href="/proof">Open SafeHire's own on-chain proof <span>↗</span></a>
       </div>
+      <section class="provider-intake" aria-labelledby="providerIntakeTitle">
+        <div>
+          <small>OPEN MARKET INTAKE</small>
+          <h3 id="providerIntakeTitle">Bring a second ERC-8004 provider.</h3>
+          <p>Preview registration, endpoint metadata, category fit and reputation signals. This check never creates a listing or calls the provider.</p>
+        </div>
+        <form id="providerIntakeForm">
+          <label>Network<select id="providerChain"><option value="56">BSC Mainnet</option><option value="97">BSC Testnet</option></select></label>
+          <label>ERC-8004 token ID<input id="providerTokenId" type="number" min="1" required placeholder="e.g. 123" /></label>
+          <button class="button compact" type="submit">Preview listing dossier</button>
+        </form>
+        <div class="intake-result" id="providerIntakeResult" hidden></div>
+      </section>
     </section>
 
     <section class="market-section shell" id="marketplace">
@@ -182,11 +196,12 @@
         <article><span>02</span><strong>Raw outputs attached</strong><p>No summary-only evidence. Preserve timestamps, costs, inputs and complete responses.</p></article>
         <article><span>03</span><strong>Disclosed quality rubric</strong><p>Score correctness, completeness, risk awareness, actionability and evidence; entrant review remains explicit.</p></article>
       </div>
+      <div class="benchmark-cta"><div><small>EVIDENCE LAB</small><strong>Record honest human time and blind quality review.</strong></div><a class="button secondary compact" href="/benchmark">Open benchmark lab →</a></div>
     </section>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <footer class="shell"><span>SafeHire · ProofOps for BNB Chain</span><span>Testnet-first · No profit guarantee · Mainnet disabled by default</span></footer>
+  <footer class="shell"><span>SafeHire · ProofOps for BNB Chain</span><span>Testnet-first · No profit guarantee · External mainnet hire is explicit opt-in</span></footer>
   <script src="/assets/app.js" defer></script>
   <script src="/assets/live-market.js" defer></script>
 </body>

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -9,6 +10,7 @@ import httpx
 
 A2A_CARD_URL = "https://agent.brainonbnb.com/.well-known/agent-card.json"
 A2A_ENDPOINT = "https://agent.brainonbnb.com/a2a"
+SCAN8004_BASE = "https://api.8004scan.io/api/v1"
 
 
 def _load_catalog(project_root: Path) -> dict[str, Any]:
@@ -20,6 +22,60 @@ def _load_catalog(project_root: Path) -> dict[str, Any]:
     if not isinstance(payload, dict) or not isinstance(payload.get("agents"), list):
         raise TypeError("live BSC agent catalog has an unexpected schema")
     return payload
+
+
+def _safe_number(raw: Any) -> float | None:
+    if isinstance(raw, bool):
+        return None
+    try:
+        return round(float(raw), 3)
+    except (TypeError, ValueError):
+        return None
+
+
+async def _index_signals(client: httpx.AsyncClient, token_id: int) -> dict[str, Any]:
+    try:
+        response = await client.get(f"{SCAN8004_BASE}/agents/56/{token_id}")
+        response.raise_for_status()
+        payload = response.json()
+        if not isinstance(payload, dict) or str(payload.get("token_id", "")) != str(token_id):
+            raise TypeError("unexpected Agent detail schema")
+        health = payload.get("health_status")
+        health = health if isinstance(health, dict) else {}
+        services = health.get("services")
+        services = services if isinstance(services, dict) else {}
+        a2a = services.get("a2a")
+        a2a = a2a if isinstance(a2a, dict) else {}
+        return {
+            "available": True,
+            "source": "8004scan_official_api",
+            "is_active": payload.get("is_active") is True,
+            "is_verified": payload.get("is_verified") is True,
+            "is_endpoint_verified": payload.get("is_endpoint_verified") is True,
+            "index_health": health.get("overall_status"),
+            "index_a2a_health": a2a.get("status"),
+            "index_a2a_latency_ms": _safe_number(a2a.get("latency_ms")),
+            "health_score": _safe_number(payload.get("health_score")),
+            "quality_score": _safe_number(payload.get("quality_score")),
+            "total_score": _safe_number(payload.get("total_score")),
+            "metadata_completeness_score": _safe_number(
+                payload.get("metadata_completeness_score")
+            ),
+            "total_feedbacks": int(payload.get("total_feedbacks") or 0),
+            "total_validations": int(payload.get("total_validations") or 0),
+            "successful_validations": int(payload.get("successful_validations") or 0),
+            "owner_address": payload.get("owner_address"),
+            "supported_protocols": payload.get("supported_protocols") or [],
+            "supported_trust_models": payload.get("supported_trust_models") or [],
+            "endpoint_last_checked_at": payload.get("endpoint_last_checked_at"),
+            "updated_at": payload.get("updated_at"),
+        }
+    except (httpx.HTTPError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        return {
+            "available": False,
+            "source": "8004scan_official_api",
+            "error": type(exc).__name__,
+        }
 
 
 async def live_agent_market(project_root: Path) -> dict[str, Any]:
@@ -65,17 +121,39 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
     except (httpx.HTTPError, TypeError, ValueError, json.JSONDecodeError) as exc:
         liveness_error = type(exc).__name__
 
+    catalog_agents = [item for item in catalog["agents"] if isinstance(item, dict)]
+    async with httpx.AsyncClient(timeout=10) as client:
+        signal_rows = await asyncio.gather(
+            *(
+                _index_signals(client, int(item.get("token_id", 0)))
+                for item in catalog_agents
+            )
+        )
+    signals_by_token = {
+        str(item.get("token_id")): signals
+        for item, signals in zip(catalog_agents, signal_rows, strict=True)
+    }
+
     agents: list[dict[str, Any]] = []
-    for item in catalog["agents"]:
-        if not isinstance(item, dict):
-            continue
+    for item in catalog_agents:
         skill_id = str(item.get("skill_id", ""))
         current = live_services.get(skill_id)
+        market_signals = signals_by_token.get(str(item.get("token_id")), {})
+        callable_now = endpoint_reachable and current is not None
+        indexed_a2a_health = market_signals.get("index_a2a_health")
         agents.append(
             {
                 **item,
                 "current_capability": current,
-                "currently_callable": endpoint_reachable and current is not None,
+                "currently_callable": callable_now,
+                "market_signals": market_signals,
+                "signal_disagreement": (
+                    "SafeHire reached the A2A service now, while the indexer's cached health is "
+                    f"{indexed_a2a_health}. Both timestamps remain visible."
+                    if callable_now and indexed_a2a_health not in {None, "healthy"}
+                    else None
+                ),
+                "safehire_paid_deliveries": 0,
             }
         )
     return {
@@ -86,10 +164,18 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
         "agent_card_url": A2A_CARD_URL,
         "endpoint_reachable": endpoint_reachable,
         "liveness_error": liveness_error,
+        "operator": catalog.get("operator"),
+        "operator_count": len(
+            {
+                str(item.get("operator") or catalog.get("operator") or "unknown")
+                for item in catalog_agents
+            }
+        ),
         "agents": agents,
         "trust_boundary": (
-            "Registrations and endpoint discovery are verified. No paid job was started; "
-            "execution history and output quality remain unverified until a real hire is captured."
+            "Registrations, a current A2A probe and official-index signals are shown separately. "
+            "No paid external delivery has been captured by SafeHire yet; output quality remains "
+            "unverified until a real hire is completed."
         ),
     }
 
@@ -177,6 +263,7 @@ async def request_live_agent_quote(project_root: Path, *, skill_id: str) -> dict
         "quote": quote,
         "next_action": "review_mainnet_quote_before_wallet_funding",
         "transaction_sent": False,
+        "wallet_connected": False,
         "evidence_boundary": (
             "A live external Agent accepted the commercial request and returned its current "
             "provider, price and ERC-8183 funding instructions. SafeHire did not connect a "

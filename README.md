@@ -19,8 +19,8 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 - BSC Testnet 已部署 `AgentRegistry`、`EvidenceAnchor`、`ScopedExecutionPolicy` 三个合约，部署回执和链上代码均已回读。
 - 已在官方 ERC-8004 Registry 注册 Agent #2032，owner、Agent 钱包和公开 URI 已回读校验。
 - 已完成官方 ERC-8183 Job #808：签名报价、0.1 U 托管、Agent 交付、15 分钟异议窗口、结算和 Agent 收款全部在 BSC Testnet 有成功回执。
-- 已完成三次公开 SafeHire 赞助雇佣：每次都从公开 A2A 入口返回结果并写入 hash-chain 回执；三组 Agent / 不使用 Agent 的原始输出、耗时、零成本和质量评分已组成 TermiX 报告。
-- 已把 PancakeSwap 同区块四池报价与一次公开 Agent 交付绑定；报告记录改善量、区块、调用编号和“不等于真实成交”的边界。
+- 已完成三次公开 SafeHire 赞助分析：保留 A2A 完整输出、hash-chain 回执、耗时、零成本和自动规则评分。这是旧版可复核基线，不冒充独立人类盲评。
+- 已把 PancakeSwap 同区块直连池报价与一次公开 Agent 交付绑定；新报告比较 `0.01 / 0.1 / 1 WBNB` 三档，并显示扣除估算 Gas 后相对 `0.05%` 池的净改善。
 - `/proof` 是给评委看的公开证据总页，会展示 7 笔 Job 回执、ERC-8004 身份、交付物和三个合约的 BscScan 入口。
 
 对应原始证据：[ERC-8183 Job #808](evidence/sponsor-integration/erc8183-job-808.json)、[ERC-8004 注册](evidence/sponsor-integration/erc8004-registration.json)、[Agent Studio 部署](evidence/sponsor-integration/agent-studio-deployment.json)、[BSC Testnet 合约](deployments/bsc-testnet.json)。
@@ -46,6 +46,10 @@ Compare → Preview → Connect wallet → Set limits → Approve → Receipt �
 
 这部分证明的是“真实 Agent 可被发现并能返回当前商业报价”，不是“SafeHire 已验证它们的质量”。每张卡可以调用免费的 `negotiate` 获取当前 `0.10 U` 主网报价，界面会明确停在 `QUOTE ONLY · NO TRANSACTION`；SafeHire 不会因此连接钱包、签名、授权或转账。当前没有为这四个外部 Agent 支付主网 `0.10 U`。TermiX 报告使用的是 SafeHire 自有公开 Agent 的三次零成本赞助雇佣，并与外部 Agent 的身份/报价证据分开。
 
+新增的 `/hire-live` 会把实时报价继续到 ERC-8183 主网任务：创建订单、绑定官方策略、设置预算、精确授权 `0.10 U`、托管、等待交付、结算或过期退款。服务端只生成已校验的交易数据；每一笔写链仍必须由用户在钱包中单独确认。这个新流程尚未产生第一笔外部主网付费交付，因此卡片上的 SafeHire 付费履历仍如实显示为 `0`。
+
+首页还会分开显示 SafeHire 当前实测、8004scan 缓存健康状态、评分和反馈数，并明确标出四张卡实际只来自 `1` 个运营方。最小上架入口可输入新的 ERC-8004 token ID 生成只读校验档案，但不会自动通过审核。
+
 每次提交前要用只读链上检查刷新这份证据：
 
 ```bash
@@ -62,7 +66,7 @@ PYTHONPATH=src python scripts/refresh_live_agent_catalog.py
 
 Render 免费实例长时间无访问会休眠，首次唤醒可能需要等待约 50 秒。这不影响链上证据，但对评委首次打开体验有风险；如果要去掉休眠，需要用户另行确认付费方案。
 
-合约未经第三方审计，BSC mainnet 默认禁用。比赛写链只应使用一次性 BSC Testnet 钱包和小额资产。
+自有执行适配器的 BSC mainnet 仍默认禁用。`/hire-live` 是一条单独的外部 ERC-8183 人工确认路径，最多服务支付为 `0.10 U` 加 BNB Gas；钱包会在每笔交易前再次弹出。官方合约与本项目都未经本项目团队的第三方审计，不要放超过演示所需的资产。
 
 Agent Studio 的签名仍在官方固定入口中，AI 只能调用只读预演。报价固定为 0.1 U 且有同值上限，自动充值默认关闭。
 
@@ -123,7 +127,9 @@ Hardhat 只是开发工具，不进入 Python 运行容器。`npm audit --omit=d
 
 三题分别覆盖 PancakeSwap 网格路线、Venus 稳定币收益排序和 Venus 健康因子响应。Agent 侧全部通过公开 SafeHire A2A 的 `hire_analysis` 完成，并返回 hash-chain 雇佣回执；对照侧不调用任何市场 Agent，直接按公开公式计算。两边输入相同，原始输出和 SHA-256 文件指纹全部保留。
 
-结果是 Agent 质量总分 `73.5 / 75`，直接计算为 `66 / 75`；三次成本均为 `0 U`。在这组确定性任务里，直接计算耗时更短，所以 SafeHire **不声称节省时间**；可量化优势是 Agent 额外给出统一格式、风险检查、来源标签、可执行边界和可核验雇佣回执。评分来自公开的五项自动规则，仍需参赛者在最终提交前人工浏览一次，这不是独立人类研究。
+结果是 Agent 质量总分 `73.5 / 75`，直接计算为 `66 / 75`；三次成本均为 `0 U`。在这组确定性任务里，直接计算耗时更短，所以 SafeHire **不声称节省时间**。这份公开报告的评分来自自动规则，只是可复核基线，不是独立人类研究。
+
+新增的 `/benchmark` 证据实验室支持四题：原有三题加 PancakeSwap LP 调仓。它用不可暂停的浏览器计时器保存真实人工耗时，再把 Agent / No-Agent 完整输出随机隐藏为 A/B，分别下载盲评包和秘密映射。真人操作和独立评审未完成前，项目不会生成“已人工验证”的结论。详细流程见 [evidence/termix/v2/README.md](evidence/termix/v2/README.md)。
 
 重新采集命令：
 
@@ -136,13 +142,13 @@ live 模式会拒绝 fixture/demo 路径、缺文件、无时区时间、占位�
 
 ## PancakeSwap 真实路由收益证据
 
-`scripts/capture_pancakeswap_live_benefit.py` 会在同一个 BSC mainnet 区块，从 PancakeSwap 官方 V3 Factory 发现 WBNB/USDT 的直连手续费池，再用官方 QuoterV2 比较 `0.1 WBNB` 的输出。当前报告保存在 [evidence/pancakeswap/live-benefit-report.json](evidence/pancakeswap/live-benefit-report.json)，记录了区块、四个池、报价、选择结果和风险边界。
+`scripts/capture_pancakeswap_live_benefit.py` 会在同一个 BSC mainnet 区块，从 PancakeSwap 官方 V3 Factory 发现 WBNB/USDT 的直连手续费池，再用官方 QuoterV2 比较 `0.01 / 0.1 / 1 WBNB` 三档输出。报告记录同区块 RPC Gas 价格，以 QuoterV2 的 gasEstimate 计算估算净输出，再与 `0.05%` 池对比。当前报告保存在 [evidence/pancakeswap/live-benefit-report.json](evidence/pancakeswap/live-benefit-report.json)。
 
 ```bash
 PYTHONPATH=src python scripts/capture_pancakeswap_live_benefit.py
 ```
 
-这是真实主网只读报价，并已绑定一次公开 Agent 调用；它不是交易或利润承诺。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
+这是真实主网只读报价，并已绑定一次公开 Agent 调用；它不是交易或利润承诺。QuoterV2 的 gasEstimate 不等于最终 Router 交易 Gas，所以前端会明确写“估算”。实际交易前仍要刷新 quote，并经过 slippage、deadline、allowance 和钱包确认。
 
 ## 合约部署
 
@@ -180,9 +186,11 @@ PYTHONPATH=src python scripts/submission_gate.py
 
 ## 距离正式提交还差什么
 
-1. 用无登录窗口重走“发现四类 Agent → 获取实时报价 → 查看 SafeHire 交付/回执 → 打开证据页”，确认评委没有死路。
-2. 参赛者人工浏览一次三组 TermiX 原始输出和自动评分；不接受某项评分时先调整再提交。
-3. 最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款，并亲自点击官方表单的 `Submit`。演示视频可选，不是当前表单硬门槛。
+1. 本地 Python 检查、合约测试、Agent Studio 构建和 Docker 镜像构建已经通过；生产版本需以 GitHub Actions 和 Render 的最新部署结果为准。
+2. 由用户在 `/hire-live` 中用小额主网钱包亲自确认每笔交易，完成第一笔外部 Agent `0.10 U` 付费交付，下载回执。
+3. 在 `/benchmark` 完成至少三题的真人无 Agent 计时，由另一位真实评审人完成不看映射的 A/B 盲评；至少一题使用上一步的外部付费 Agent 输出。
+4. 找到第二个独立 ERC-8004 运营方，用首页上架校验入口产生档案，再人工审核是否纳入目录。
+5. 最后由用户核对姓名、邮箱、联系方式、领奖钱包和参赛条款，并亲自点击官方表单的 `Submit`。演示视频仍是强加分项。
 
 ## 仓库结构
 
@@ -211,3 +219,4 @@ templates                部署、TermiX 和提交模板
 4. [建设蓝图](docs/07_CONSTRUCTION_BLUEPRINT.md)
 5. [演示与提交](docs/08_DEMO_AND_SUBMISSION.md)
 6. [外部完成清单](docs/10_EXTERNAL_COMPLETION_CHECKLIST.md)
+7. [本轮必须由用户完成的门槛](docs/MANUAL_COMPLETION_GATES_2026-08-31.md)

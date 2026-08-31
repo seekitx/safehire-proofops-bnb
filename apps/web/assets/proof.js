@@ -114,6 +114,13 @@ async function loadProof() {
         <small>${selected ? "SELECTED" : `${escapeHtml(quote.initialized_ticks_crossed)} tick crossed`} ↗</small>
       </a>`;
   }).join("");
+  const scenarios = Array.isArray(pancake.scenarios) ? pancake.scenarios : [];
+  byId("routeScenarios").innerHTML = scenarios.length ? scenarios.map((scenario) => `
+    <article>
+      <small>${escapeHtml(scenario.input?.amount_in_display || "—")}</small>
+      <strong>${Number(scenario.decision?.selected_net_amount_out_usdt || 0).toFixed(6)} USDT net est.</strong>
+      <span>${Number(scenario.decision?.improvement_usdt || 0).toFixed(6)} USDT vs 0.05% · ${Number(scenario.decision?.selected_estimated_gas_usdt || 0).toFixed(6)} gas est.</span>
+    </article>`).join("") : "<p>Legacy evidence contains only the 0.1 WBNB scenario.</p>";
   byId("routeBenefit").textContent = pancake.measurable_benefit;
   byId("routeRisk").textContent = pancake.risk_boundary;
 

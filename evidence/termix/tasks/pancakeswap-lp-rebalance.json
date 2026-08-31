@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "task_id": "pancakeswap-lp-rebalance",
+  "task_description": "Review the supplied PancakeSwap V3 LP position snapshot and decide whether to keep the range or rebalance it. Calculate the position's range status, fee-versus-cost trade-off and a bounded recommendation. Name every assumption and permission still required. Do not execute a transaction or promise profit.",
+  "agent_request": {
+    "skill": "hire_analysis",
+    "task_id": "termix-pancakeswap-lp-rebalance",
+    "agent_id": "lp-guardian-demo",
+    "input": {
+      "current_price": 686.59,
+      "lower_price": 620,
+      "upper_price": 670,
+      "realized_volatility_30d": 0.42,
+      "fee_apr": 0.18,
+      "liquidity_usd": 2500000,
+      "estimated_rebalance_cost_usd": 0.35,
+      "uncollected_fees_usd": 1.2,
+      "notional_usd": 1000,
+      "source": "recorded_pancakeswap_scenario_not_fresh_execution_state"
+    }
+  },
+  "terms": {
+    "deliverables": "A keep-or-rebalance decision with range status, expected fee capture, estimated cost, risk boundary and explicit execution prerequisites.",
+    "quality_standards": "Use only the supplied snapshot, distinguish an analysis from a transaction, and disclose that fresh pool and wallet state are required before execution.",
+    "success_criteria": [
+      "The answer identifies that the supplied current price is above the position range.",
+      "The answer compares uncollected fees and estimated rebalance cost.",
+      "The answer requires a fresh pool read, slippage limit, allowance review, deadline and wallet confirmation before execution."
+    ]
+  },
+  "input_evidence": "evidence/pancakeswap/live-benefit-report.json",
+  "no_agent_method": "Inspect the exact supplied JSON, calculate range status and fee-versus-cost trade-off directly, then write the bounded decision without calling SafeHire or another Agent.",
+  "comparison_rule": "Agent and manual operator receive this exact JSON file; neither side receives extra hints."
+}

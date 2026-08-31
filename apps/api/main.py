@@ -37,6 +37,14 @@ from proofops.services.browser_erc8183 import (
     settle_job_plan,
 )
 from proofops.services.live_agent_market import live_agent_market, request_live_agent_quote
+from proofops.services.live_erc8183 import (
+    live_followup_plan,
+    live_job_status,
+    live_refund_plan,
+    live_settle_plan,
+    notify_live_agent,
+    prepare_live_hire,
+)
 from proofops.settings import Settings
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
@@ -154,6 +162,36 @@ class LiveMarketQuoteRequest(BaseModel):
         "yield_plan",
         "health_factor",
     ]
+
+
+LiveSkillId = Literal[
+    "rebalance_plan",
+    "grid_plan",
+    "yield_plan",
+    "health_factor",
+]
+
+
+class LiveHirePrepareRequest(BaseModel):
+    buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
+    skill_id: LiveSkillId
+    task_input: dict[str, Any]
+
+
+class LiveHireJobRequest(BaseModel):
+    buyer: str = Field(pattern=EVM_ADDRESS_PATTERN)
+    skill_id: LiveSkillId
+    job_id: int = Field(gt=0)
+
+
+class LiveHireNotifyRequest(BaseModel):
+    skill_id: LiveSkillId
+    job_id: int = Field(gt=0)
+
+
+class ProviderIntakeRequest(BaseModel):
+    chain_id: Literal[56, 97] = 56
+    token_id: int = Field(gt=0)
 
 
 class DebateRequest(BaseModel):
@@ -475,6 +513,93 @@ async def live_market_quote(body: LiveMarketQuoteRequest) -> dict[str, Any]:
             status_code=503,
             detail="live Agent quote service is temporarily unavailable",
         ) from exc
+
+
+@app.post("/api/live-hire/prepare")
+async def prepare_external_hire(body: LiveHirePrepareRequest) -> dict[str, Any]:
+    try:
+        return await prepare_live_hire(
+            PROJECT_ROOT,
+            buyer=body.buyer,
+            skill_id=body.skill_id,
+            task_input=body.task_input,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="live Agent hire service is unavailable") from exc
+
+
+@app.post("/api/live-hire/followup-plan")
+async def external_hire_followup(body: LiveHireJobRequest) -> dict[str, Any]:
+    try:
+        return await live_followup_plan(
+            buyer=body.buyer,
+            skill_id=body.skill_id,
+            job_id=body.job_id,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="BSC mainnet hire service is unavailable") from exc
+
+
+@app.get("/api/live-hire/status/{job_id}")
+async def external_hire_status(job_id: int) -> dict[str, Any]:
+    try:
+        return await live_job_status(job_id=job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="BSC mainnet job status is unavailable") from exc
+
+
+@app.post("/api/live-hire/notify")
+async def external_hire_notify(body: LiveHireNotifyRequest) -> dict[str, Any]:
+    try:
+        return await notify_live_agent(
+            job_id=body.job_id,
+            skill_id=body.skill_id,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="external Agent delivery service is unavailable") from exc
+
+
+@app.get("/api/live-hire/settle-plan/{job_id}")
+async def external_hire_settle(job_id: int) -> dict[str, Any]:
+    try:
+        return await live_settle_plan(job_id=job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="BSC mainnet settlement read is unavailable") from exc
+
+
+@app.get("/api/live-hire/refund-plan/{job_id}")
+async def external_hire_refund(job_id: int) -> dict[str, Any]:
+    try:
+        return await live_refund_plan(job_id=job_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="BSC mainnet refund read is unavailable") from exc
+
+
+@app.post("/api/providers/validate")
+async def validate_provider_intake(
+    body: ProviderIntakeRequest, application: ApplicationDep
+) -> dict[str, Any]:
+    try:
+        return await application.official_sources.validate_agent_intake(
+            chain_id=body.chain_id,
+            token_id=body.token_id,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except AdapterUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/sources/venus/pools")
@@ -1034,6 +1159,19 @@ async def public_termix_report() -> dict[str, Any]:
     return report
 
 
+@app.get("/api/evidence/termix/tasks/{task_id}")
+async def public_termix_task(task_id: str) -> dict[str, Any]:
+    allowed_tasks = {
+        "pancakeswap-grid-route",
+        "pancakeswap-lp-rebalance",
+        "venus-stablecoin-yield",
+        "venus-health-factor-response",
+    }
+    if task_id not in allowed_tasks:
+        raise HTTPException(status_code=404, detail="TermiX task was not found")
+    return _public_evidence_json(f"evidence/termix/tasks/{task_id}.json")
+
+
 @app.get("/api/evidence/termix/raw/{task_id}/{side}")
 async def public_termix_raw(task_id: str, side: str) -> dict[str, Any]:
     allowed_tasks = {
@@ -1129,6 +1267,8 @@ async def public_proof() -> dict[str, Any]:
             "observed_block": pancake.get("observed_block"),
             "observed_at": pancake.get("observed_at"),
             "source_url": pancake.get("source_url"),
+            "gas_context": pancake.get("gas_context"),
+            "scenarios": pancake.get("scenarios", []),
             "input": pancake.get("input"),
             "quotes": [
                 {
@@ -1197,6 +1337,16 @@ async def index() -> FileResponse:
 @app.get("/proof", include_in_schema=False)
 async def proof_page() -> FileResponse:
     return FileResponse(WEB_ROOT / "proof.html")
+
+
+@app.get("/hire-live", include_in_schema=False)
+async def live_hire_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "live-hire.html")
+
+
+@app.get("/benchmark", include_in_schema=False)
+async def benchmark_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "benchmark.html")
 
 
 @app.get("/dev/deploy-testnet", include_in_schema=False)

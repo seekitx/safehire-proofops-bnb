@@ -27,7 +27,7 @@ PUBLIC_BASE_URL = os.getenv(
 # Canonical BSC WBNB and Binance-Peg USDT. Both use 18 decimals.
 WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 USDT = "0x55d398326f99059fF775485246999027B3197955"
-AMOUNT_IN_RAW = 10**17  # 0.1 WBNB
+AMOUNT_SCENARIOS_RAW = (10**16, 10**17, 10**18)  # 0.01, 0.1 and 1 WBNB
 FEE_TIERS = (100, 500, 2500, 10000)
 
 
@@ -144,9 +144,10 @@ async def capture() -> dict[str, Any]:
         if chain_id != 56:
             raise ValueError("RPC is not BSC mainnet")
         block_number = int(await _rpc(client, "eth_blockNumber", []), 16)
+        gas_price_wei = int(await _rpc(client, "eth_gasPrice", []), 16)
         block_tag = hex(block_number)
 
-        quotes: list[dict[str, Any]] = []
+        pools: list[dict[str, Any]] = []
         for fee in FEE_TIERS:
             pool_call = (
                 "0x"
@@ -160,55 +161,139 @@ async def capture() -> dict[str, Any]:
                 "eth_call",
                 [{"to": FACTORY, "data": pool_call}, block_tag],
             )
-            pool = "0x" + str(pool_raw)[-40:]
-            if int(pool, 16) == 0:
+            pool_address = "0x" + str(pool_raw)[-40:]
+            if int(pool_address, 16) == 0:
                 continue
+            pools.append({"fee": fee, "address": pool_address})
 
-            quote_call = (
-                "0x"
-                + _selector(
-                    "quoteExactInputSingle((address,address,uint256,uint24,uint160))"
+        if len(pools) < 2:
+            raise ValueError("fewer than two viable direct PancakeSwap V3 pools were found")
+
+        scenarios: list[dict[str, Any]] = []
+        for amount_raw in AMOUNT_SCENARIOS_RAW:
+            amount_in = Decimal(amount_raw) / Decimal(10**18)
+            quotes: list[dict[str, Any]] = []
+            for pool_record in pools:
+                quote_call = (
+                    "0x"
+                    + _selector(
+                        "quoteExactInputSingle((address,address,uint256,uint24,uint160))"
+                    )
+                    + _word_address(WBNB)
+                    + _word_address(USDT)
+                    + _word_int(amount_raw)
+                    + _word_int(int(pool_record["fee"]))
+                    + _word_int(0)
                 )
-                + _word_address(WBNB)
-                + _word_address(USDT)
-                + _word_int(AMOUNT_IN_RAW)
-                + _word_int(fee)
-                + _word_int(0)
+                quote_raw = await _rpc(
+                    client,
+                    "eth_call",
+                    [{"to": QUOTER_V2, "data": quote_call}, block_tag],
+                )
+                words = _decode_words(quote_raw)
+                if len(words) < 4:
+                    raise ValueError("PancakeSwap QuoterV2 returned an incomplete response")
+                amount_out = Decimal(words[0]) / Decimal(10**18)
+                implied_price = amount_out / amount_in
+                gas_cost_bnb = (
+                    Decimal(words[3]) * Decimal(gas_price_wei) / Decimal(10**18)
+                )
+                gas_cost_usdt = gas_cost_bnb * implied_price
+                quotes.append(
+                    {
+                        "fee_hundredths_of_bip": pool_record["fee"],
+                        "fee_percent": str(
+                            Decimal(int(pool_record["fee"])) / Decimal(10_000)
+                        ),
+                        "pool_address": pool_record["address"],
+                        "pool_url": (
+                            f"https://bscscan.com/address/{pool_record['address']}"
+                        ),
+                        "amount_out_raw": str(words[0]),
+                        "amount_out_usdt": str(amount_out),
+                        "initialized_ticks_crossed": words[2],
+                        "quoter_gas_estimate": words[3],
+                        "estimated_gas_cost_bnb": str(gas_cost_bnb),
+                        "estimated_gas_cost_usdt": str(gas_cost_usdt),
+                        "net_amount_out_after_estimated_gas_usdt": str(
+                            amount_out - gas_cost_usdt
+                        ),
+                    }
+                )
+
+            best = max(
+                quotes,
+                key=lambda item: Decimal(
+                    str(item["net_amount_out_after_estimated_gas_usdt"])
+                ),
             )
-            quote_raw = await _rpc(
-                client,
-                "eth_call",
-                [{"to": QUOTER_V2, "data": quote_call}, block_tag],
+            baseline = next(
+                (item for item in quotes if item["fee_hundredths_of_bip"] == 500),
+                sorted(
+                    quotes,
+                    key=lambda item: Decimal(str(item["amount_out_usdt"])),
+                    reverse=True,
+                )[1],
             )
-            words = _decode_words(quote_raw)
-            if len(words) < 4:
-                raise ValueError("PancakeSwap QuoterV2 returned an incomplete response")
-            amount_out = Decimal(words[0]) / Decimal(10**18)
-            quotes.append(
+            improvement = Decimal(
+                str(best["net_amount_out_after_estimated_gas_usdt"])
+            ) - Decimal(str(baseline["net_amount_out_after_estimated_gas_usdt"]))
+            baseline_net = Decimal(
+                str(baseline["net_amount_out_after_estimated_gas_usdt"])
+            )
+            improvement_bps = improvement / baseline_net * 10_000
+            display_amount = format(amount_in, "f").rstrip("0").rstrip(".")
+            scenarios.append(
                 {
-                    "fee_hundredths_of_bip": fee,
-                    "fee_percent": str(Decimal(fee) / Decimal(10_000)),
-                    "pool_address": pool,
-                    "pool_url": f"https://bscscan.com/address/{pool}",
-                    "amount_out_raw": str(words[0]),
-                    "amount_out_usdt": str(amount_out),
-                    "initialized_ticks_crossed": words[2],
-                    "quoter_gas_estimate": words[3],
+                    "input": {
+                        "token_in": WBNB,
+                        "token_out": USDT,
+                        "amount_in_raw": str(amount_raw),
+                        "amount_in_display": f"{display_amount} WBNB",
+                    },
+                    "quotes": quotes,
+                    "decision": {
+                        "selection_basis": "maximum estimated output after quoted gas",
+                        "selected_fee_hundredths_of_bip": best[
+                            "fee_hundredths_of_bip"
+                        ],
+                        "selected_pool": best["pool_address"],
+                        "selected_amount_out_usdt": best["amount_out_usdt"],
+                        "selected_estimated_gas_usdt": best[
+                            "estimated_gas_cost_usdt"
+                        ],
+                        "selected_net_amount_out_usdt": best[
+                            "net_amount_out_after_estimated_gas_usdt"
+                        ],
+                        "baseline_fee_hundredths_of_bip": baseline[
+                            "fee_hundredths_of_bip"
+                        ],
+                        "baseline_amount_out_usdt": baseline["amount_out_usdt"],
+                        "baseline_estimated_gas_usdt": baseline[
+                            "estimated_gas_cost_usdt"
+                        ],
+                        "baseline_net_amount_out_usdt": baseline[
+                            "net_amount_out_after_estimated_gas_usdt"
+                        ],
+                        "improvement_usdt": str(improvement),
+                        "improvement_bps": str(
+                            improvement_bps.quantize(Decimal("0.0001"))
+                        ),
+                    },
                 }
             )
 
-    if len(quotes) < 2:
-        raise ValueError("fewer than two viable direct PancakeSwap V3 pools were quoted")
-    best = max(quotes, key=lambda item: Decimal(str(item["amount_out_usdt"])))
-    baseline = next(
-        (item for item in quotes if item["fee_hundredths_of_bip"] == 500),
-        sorted(quotes, key=lambda item: Decimal(str(item["amount_out_usdt"])), reverse=True)[1],
+    primary = next(
+        item for item in scenarios if item["input"]["amount_in_raw"] == str(10**17)
     )
-    improvement = Decimal(str(best["amount_out_usdt"])) - Decimal(
-        str(baseline["amount_out_usdt"])
+    primary_decision = primary["decision"]
+    primary_best = next(
+        item
+        for item in primary["quotes"]
+        if item["pool_address"].lower()
+        == str(primary_decision["selected_pool"]).lower()
     )
-    improvement_bps = improvement / Decimal(str(baseline["amount_out_usdt"])) * 10_000
-    implied_wbnb_price = Decimal(str(best["amount_out_usdt"])) / Decimal("0.1")
+    implied_wbnb_price = Decimal(str(primary_best["amount_out_usdt"])) / Decimal("0.1")
 
     async with httpx.AsyncClient(timeout=25) as client:
         agent_delivery = await _safehire_grid_delivery(
@@ -218,7 +303,7 @@ async def capture() -> dict[str, Any]:
         )
 
     report = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "evidence_mode": "live",
         "beneficiary": "trader",
         "network": "bsc-mainnet",
@@ -231,33 +316,31 @@ async def capture() -> dict[str, Any]:
             "factory": FACTORY,
             "quoter_v2": QUOTER_V2,
         },
-        "input": {
-            "token_in": WBNB,
-            "token_out": USDT,
-            "amount_in_raw": str(AMOUNT_IN_RAW),
-            "amount_in_display": "0.1 WBNB",
+        "gas_context": {
+            "gas_price_wei": str(gas_price_wei),
+            "gas_price_gwei": str(Decimal(gas_price_wei) / Decimal(10**9)),
+            "estimation_method": (
+                "QuoterV2 gasEstimate multiplied by same-block RPC gas price and "
+                "quote-implied WBNB/USDT price"
+            ),
         },
-        "quotes": quotes,
-        "decision": {
-            "selected_fee_hundredths_of_bip": best["fee_hundredths_of_bip"],
-            "selected_pool": best["pool_address"],
-            "selected_amount_out_usdt": best["amount_out_usdt"],
-            "baseline_fee_hundredths_of_bip": baseline["fee_hundredths_of_bip"],
-            "baseline_amount_out_usdt": baseline["amount_out_usdt"],
-            "improvement_usdt": str(improvement),
-            "improvement_bps": str(improvement_bps.quantize(Decimal("0.0001"))),
-        },
+        "scenarios": scenarios,
+        "input": primary["input"],
+        "quotes": primary["quotes"],
+        "decision": primary_decision,
         "measurable_benefit": (
-            f"At BSC block {block_number}, comparing direct PancakeSwap V3 fee tiers "
-            f"selected the {Decimal(int(best['fee_hundredths_of_bip'])) / Decimal(10_000)}% "
-            f"pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by "
-            f"{improvement} USDT ({improvement_bps.quantize(Decimal('0.0001'))} bps)."
+            f"At BSC block {block_number}, SafeHire compared 0.01, 0.1 and 1 WBNB "
+            "across every discovered direct V3 fee tier. For the 0.1 WBNB headline, "
+            f"the selected route changed estimated output after quoted gas by "
+            f"{primary_decision['improvement_usdt']} USDT versus the 0.05% baseline "
+            f"({primary_decision['improvement_bps']} bps)."
         ),
         "agent_delivery": agent_delivery,
         "risk_boundary": (
             "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. "
-            "It excludes transaction gas and later price movement; execution still needs a fresh "
-            "quote, user slippage limit, deadline, allowance review and wallet confirmation. "
+            "The gas-adjusted value is an estimate from QuoterV2 gasEstimate and RPC gas price; "
+            "a router transaction can consume different gas. Execution still needs a fresh quote, "
+            "user slippage limit, deadline, allowance review and wallet confirmation. "
             "The linked SafeHire result is a free deterministic A2A preview; no token was paid."
         ),
     }

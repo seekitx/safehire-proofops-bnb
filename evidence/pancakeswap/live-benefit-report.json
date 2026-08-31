@@ -1,17 +1,252 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "evidence_mode": "live",
   "beneficiary": "trader",
   "network": "bsc-mainnet",
   "chain_id": 56,
-  "observed_block": 119108691,
-  "observed_at": "2026-08-31T07:07:36.945685Z",
+  "observed_block": 119122589,
+  "observed_at": "2026-08-31T08:51:54.658554Z",
   "source_url": "https://developer.pancakeswap.finance/contracts/v3/addresses",
   "source": "pancakeswap_v3_factory_and_quoter_v2_same_block_rpc",
   "contracts": {
     "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
     "quoter_v2": "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997"
   },
+  "gas_context": {
+    "gas_price_wei": "50000000",
+    "gas_price_gwei": "0.05",
+    "estimation_method": "QuoterV2 gasEstimate multiplied by same-block RPC gas price and quote-implied WBNB/USDT price"
+  },
+  "scenarios": [
+    {
+      "input": {
+        "token_in": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+        "token_out": "0x55d398326f99059fF775485246999027B3197955",
+        "amount_in_raw": "10000000000000000",
+        "amount_in_display": "0.01 WBNB"
+      },
+      "quotes": [
+        {
+          "fee_hundredths_of_bip": 100,
+          "fee_percent": "0.01",
+          "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
+          "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
+          "amount_out_raw": "6870558904973585259",
+          "amount_out_usdt": "6.870558904973585259",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 92231,
+          "estimated_gas_cost_bnb": "0.00000461155",
+          "estimated_gas_cost_usdt": "0.003168392591823093710114145",
+          "net_amount_out_after_estimated_gas_usdt": "6.867390512381762165289885855"
+        },
+        {
+          "fee_hundredths_of_bip": 500,
+          "fee_percent": "0.05",
+          "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "amount_out_raw": "6867423829995829089",
+          "amount_out_usdt": "6.867423829995829089",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 115391,
+          "estimated_gas_cost_bnb": "0.00000576955",
+          "estimated_gas_cost_usdt": "0.003962194515835243572043995",
+          "net_amount_out_after_estimated_gas_usdt": "6.863461635479993845427956005"
+        },
+        {
+          "fee_hundredths_of_bip": 2500,
+          "fee_percent": "0.25",
+          "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "amount_out_raw": "6848799329046382469",
+          "amount_out_usdt": "6.848799329046382469",
+          "initialized_ticks_crossed": 0,
+          "quoter_gas_estimate": 114816,
+          "estimated_gas_cost_bnb": "0.0000057408",
+          "estimated_gas_cost_usdt": "0.00393175871881894724780352",
+          "net_amount_out_after_estimated_gas_usdt": "6.84486757032756352175219648"
+        },
+        {
+          "fee_hundredths_of_bip": 10000,
+          "fee_percent": "1",
+          "pool_address": "0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "pool_url": "https://bscscan.com/address/0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "amount_out_raw": "6821532254924883894",
+          "amount_out_usdt": "6.821532254924883894",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 94379,
+          "estimated_gas_cost_bnb": "0.00000471895",
+          "estimated_gas_cost_usdt": "0.003219046963437778085159130",
+          "net_amount_out_after_estimated_gas_usdt": "6.818313207961446115914840870"
+        }
+      ],
+      "decision": {
+        "selection_basis": "maximum estimated output after quoted gas",
+        "selected_fee_hundredths_of_bip": 100,
+        "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
+        "selected_amount_out_usdt": "6.870558904973585259",
+        "selected_estimated_gas_usdt": "0.003168392591823093710114145",
+        "selected_net_amount_out_usdt": "6.867390512381762165289885855",
+        "baseline_fee_hundredths_of_bip": 500,
+        "baseline_amount_out_usdt": "6.867423829995829089",
+        "baseline_estimated_gas_usdt": "0.003962194515835243572043995",
+        "baseline_net_amount_out_usdt": "6.863461635479993845427956005",
+        "improvement_usdt": "0.003928876901768319861929850",
+        "improvement_bps": "5.7243"
+      }
+    },
+    {
+      "input": {
+        "token_in": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+        "token_out": "0x55d398326f99059fF775485246999027B3197955",
+        "amount_in_raw": "100000000000000000",
+        "amount_in_display": "0.1 WBNB"
+      },
+      "quotes": [
+        {
+          "fee_hundredths_of_bip": 100,
+          "fee_percent": "0.01",
+          "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
+          "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
+          "amount_out_raw": "68705551174227993395",
+          "amount_out_usdt": "68.705551174227993395",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 92231,
+          "estimated_gas_cost_bnb": "0.00000461155",
+          "estimated_gas_cost_usdt": "0.0031683908451751110294071225",
+          "net_amount_out_after_estimated_gas_usdt": "68.70238278338281828397059288"
+        },
+        {
+          "fee_hundredths_of_bip": 500,
+          "fee_percent": "0.05",
+          "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "amount_out_raw": "68674187956436928519",
+          "amount_out_usdt": "68.674187956436928519",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 115391,
+          "estimated_gas_cost_bnb": "0.00000576955",
+          "estimated_gas_cost_usdt": "0.0039621916112406068093679645",
+          "net_amount_out_after_estimated_gas_usdt": "68.67022576482568791219063204"
+        },
+        {
+          "fee_hundredths_of_bip": 2500,
+          "fee_percent": "0.25",
+          "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "amount_out_raw": "68476512865682421695",
+          "amount_out_usdt": "68.476512865682421695",
+          "initialized_ticks_crossed": 0,
+          "quoter_gas_estimate": 124505,
+          "estimated_gas_cost_bnb": "0.00000622525",
+          "estimated_gas_cost_usdt": "0.0042628341171708949565679875",
+          "net_amount_out_after_estimated_gas_usdt": "68.47225003156525080004343201"
+        },
+        {
+          "fee_hundredths_of_bip": 10000,
+          "fee_percent": "1",
+          "pool_address": "0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "pool_url": "https://bscscan.com/address/0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "amount_out_raw": "68058340283542690143",
+          "amount_out_usdt": "68.058340283542690143",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 95387,
+          "estimated_gas_cost_bnb": "0.00000476935",
+          "estimated_gas_cost_usdt": "0.0032459404523131432923351705",
+          "net_amount_out_after_estimated_gas_usdt": "68.05509434309037699970766483"
+        }
+      ],
+      "decision": {
+        "selection_basis": "maximum estimated output after quoted gas",
+        "selected_fee_hundredths_of_bip": 100,
+        "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
+        "selected_amount_out_usdt": "68.705551174227993395",
+        "selected_estimated_gas_usdt": "0.0031683908451751110294071225",
+        "selected_net_amount_out_usdt": "68.70238278338281828397059288",
+        "baseline_fee_hundredths_of_bip": 500,
+        "baseline_amount_out_usdt": "68.674187956436928519",
+        "baseline_estimated_gas_usdt": "0.0039621916112406068093679645",
+        "baseline_net_amount_out_usdt": "68.67022576482568791219063204",
+        "improvement_usdt": "0.03215701855713037177996084",
+        "improvement_bps": "4.6828"
+      }
+    },
+    {
+      "input": {
+        "token_in": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+        "token_out": "0x55d398326f99059fF775485246999027B3197955",
+        "amount_in_raw": "1000000000000000000",
+        "amount_in_display": "1 WBNB"
+      },
+      "quotes": [
+        {
+          "fee_hundredths_of_bip": 100,
+          "fee_percent": "0.01",
+          "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
+          "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
+          "amount_out_raw": "687051724214461589930",
+          "amount_out_usdt": "687.05172421446158993",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 92231,
+          "estimated_gas_cost_bnb": "0.00000461155",
+          "estimated_gas_cost_usdt": "0.0031683733788012003450416915",
+          "net_amount_out_after_estimated_gas_usdt": "687.0485558410827887296549583"
+        },
+        {
+          "fee_hundredths_of_bip": 500,
+          "fee_percent": "0.05",
+          "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "amount_out_raw": "686736845252829009298",
+          "amount_out_usdt": "686.736845252829009298",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 115391,
+          "estimated_gas_cost_bnb": "0.00000576955",
+          "estimated_gas_cost_usdt": "0.00396216256552845961059527590",
+          "net_amount_out_after_estimated_gas_usdt": "686.7328830902634808383894047"
+        },
+        {
+          "fee_hundredths_of_bip": 2500,
+          "fee_percent": "0.25",
+          "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
+          "amount_out_raw": "683619199506036154172",
+          "amount_out_usdt": "683.619199506036154172",
+          "initialized_ticks_crossed": 1,
+          "quoter_gas_estimate": 124497,
+          "estimated_gas_cost_bnb": "0.00000622485",
+          "estimated_gas_cost_usdt": "0.00425542697404514915429757420",
+          "net_amount_out_after_estimated_gas_usdt": "683.6149440790621090228457024"
+        },
+        {
+          "fee_hundredths_of_bip": 10000,
+          "fee_percent": "1",
+          "pool_address": "0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "pool_url": "https://bscscan.com/address/0x6805e0e5333c5c3accf2930be4734e2b98f4ce06",
+          "amount_out_raw": "665288703235065648879",
+          "amount_out_usdt": "665.288703235065648879",
+          "initialized_ticks_crossed": 3,
+          "quoter_gas_estimate": 150044,
+          "estimated_gas_cost_bnb": "0.0000075022",
+          "estimated_gas_cost_usdt": "0.0049911289094101095110200338",
+          "net_amount_out_after_estimated_gas_usdt": "665.2837121061562387694889800"
+        }
+      ],
+      "decision": {
+        "selection_basis": "maximum estimated output after quoted gas",
+        "selected_fee_hundredths_of_bip": 100,
+        "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
+        "selected_amount_out_usdt": "687.05172421446158993",
+        "selected_estimated_gas_usdt": "0.0031683733788012003450416915",
+        "selected_net_amount_out_usdt": "687.0485558410827887296549583",
+        "baseline_fee_hundredths_of_bip": 500,
+        "baseline_amount_out_usdt": "686.736845252829009298",
+        "baseline_estimated_gas_usdt": "0.00396216256552845961059527590",
+        "baseline_net_amount_out_usdt": "686.7328830902634808383894047",
+        "improvement_usdt": "0.3156727508193078912655536",
+        "improvement_bps": "4.5967"
+      }
+    }
+  ],
   "input": {
     "token_in": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "token_out": "0x55d398326f99059fF775485246999027B3197955",
@@ -24,30 +259,39 @@
       "fee_percent": "0.01",
       "pool_address": "0x172fcd41e0913e95784454622d1c3724f546f849",
       "pool_url": "https://bscscan.com/address/0x172fcd41e0913e95784454622d1c3724f546f849",
-      "amount_out_raw": "68659207957773973223",
-      "amount_out_usdt": "68.659207957773973223",
+      "amount_out_raw": "68705551174227993395",
+      "amount_out_usdt": "68.705551174227993395",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 92187
+      "quoter_gas_estimate": 92231,
+      "estimated_gas_cost_bnb": "0.00000461155",
+      "estimated_gas_cost_usdt": "0.0031683908451751110294071225",
+      "net_amount_out_after_estimated_gas_usdt": "68.70238278338281828397059288"
     },
     {
       "fee_hundredths_of_bip": 500,
       "fee_percent": "0.05",
       "pool_address": "0x36696169c63e42cd08ce11f5deebbcebae652050",
       "pool_url": "https://bscscan.com/address/0x36696169c63e42cd08ce11f5deebbcebae652050",
-      "amount_out_raw": "68655327265055400157",
-      "amount_out_usdt": "68.655327265055400157",
+      "amount_out_raw": "68674187956436928519",
+      "amount_out_usdt": "68.674187956436928519",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 115399
+      "quoter_gas_estimate": 115391,
+      "estimated_gas_cost_bnb": "0.00000576955",
+      "estimated_gas_cost_usdt": "0.0039621916112406068093679645",
+      "net_amount_out_after_estimated_gas_usdt": "68.67022576482568791219063204"
     },
     {
       "fee_hundredths_of_bip": 2500,
       "fee_percent": "0.25",
       "pool_address": "0x1401ff943d08a7e098328c1d3a9d388923b115d2",
       "pool_url": "https://bscscan.com/address/0x1401ff943d08a7e098328c1d3a9d388923b115d2",
-      "amount_out_raw": "68485431562213872960",
-      "amount_out_usdt": "68.48543156221387296",
+      "amount_out_raw": "68476512865682421695",
+      "amount_out_usdt": "68.476512865682421695",
       "initialized_ticks_crossed": 0,
-      "quoter_gas_estimate": 124509
+      "quoter_gas_estimate": 124505,
+      "estimated_gas_cost_bnb": "0.00000622525",
+      "estimated_gas_cost_usdt": "0.0042628341171708949565679875",
+      "net_amount_out_after_estimated_gas_usdt": "68.47225003156525080004343201"
     },
     {
       "fee_hundredths_of_bip": 10000,
@@ -57,62 +301,70 @@
       "amount_out_raw": "68058340283542690143",
       "amount_out_usdt": "68.058340283542690143",
       "initialized_ticks_crossed": 1,
-      "quoter_gas_estimate": 95387
+      "quoter_gas_estimate": 95387,
+      "estimated_gas_cost_bnb": "0.00000476935",
+      "estimated_gas_cost_usdt": "0.0032459404523131432923351705",
+      "net_amount_out_after_estimated_gas_usdt": "68.05509434309037699970766483"
     }
   ],
   "decision": {
+    "selection_basis": "maximum estimated output after quoted gas",
     "selected_fee_hundredths_of_bip": 100,
     "selected_pool": "0x172fcd41e0913e95784454622d1c3724f546f849",
-    "selected_amount_out_usdt": "68.659207957773973223",
+    "selected_amount_out_usdt": "68.705551174227993395",
+    "selected_estimated_gas_usdt": "0.0031683908451751110294071225",
+    "selected_net_amount_out_usdt": "68.70238278338281828397059288",
     "baseline_fee_hundredths_of_bip": 500,
-    "baseline_amount_out_usdt": "68.655327265055400157",
-    "improvement_usdt": "0.003880692718573066",
-    "improvement_bps": "0.5652"
+    "baseline_amount_out_usdt": "68.674187956436928519",
+    "baseline_estimated_gas_usdt": "0.0039621916112406068093679645",
+    "baseline_net_amount_out_usdt": "68.67022576482568791219063204",
+    "improvement_usdt": "0.03215701855713037177996084",
+    "improvement_bps": "4.6828"
   },
-  "measurable_benefit": "At BSC block 119108691, comparing direct PancakeSwap V3 fee tiers selected the 0.01% pool over the 0.05% baseline and improved the read-only 0.1 WBNB quote by 0.003880692718573066 USDT (0.5652 bps).",
+  "measurable_benefit": "At BSC block 119122589, SafeHire compared 0.01, 0.1 and 1 WBNB across every discovered direct V3 fee tier. For the 0.1 WBNB headline, the selected route changed estimated output after quoted gas by 0.03215701855713037177996084 USDT versus the 0.05% baseline (4.6828 bps).",
   "agent_delivery": {
     "evidence_mode": "live",
     "transport": "A2A JSON-RPC message/send",
     "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
     "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
     "agent_id": "grid-sentinel-demo",
-    "started_at": "2026-08-31T07:07:35.210925Z",
-    "finished_at": "2026-08-31T07:07:36.945424Z",
-    "latency_ms": 1734.494,
+    "started_at": "2026-08-31T08:51:53.912342Z",
+    "finished_at": "2026-08-31T08:51:54.658268Z",
+    "latency_ms": 745.921,
     "cost": {
       "amount": 0,
       "currency": "U",
       "mode": "public_preview"
     },
     "input": {
-      "current_price": 686.5920795777397,
-      "lower_price": 652.2624755988528,
-      "upper_price": 720.9216835566267,
+      "current_price": 687.0555117422799,
+      "lower_price": 652.7027361551659,
+      "upper_price": 721.4082873293939,
       "levels": 9,
       "capital_usd": 1000,
       "max_drawdown_pct": 5,
-      "source": "pancakeswap_v3_block_119108691_same_block_quote"
+      "source": "pancakeswap_v3_block_119122589_same_block_quote"
     },
     "output": {
-      "invocation_id": "inv_20260831070737081187",
+      "invocation_id": "inv_20260831085154878514",
       "agent_id": "grid-sentinel-demo",
       "agent_version": "0.1.0",
-      "observed_at": "2026-08-31T07:07:37.081217+00:00",
+      "observed_at": "2026-08-31T08:51:54.878540+00:00",
       "category": "grid_trading",
       "action": "propose_grid",
       "executable": true,
       "confidence": 0.78,
       "result": {
         "grid_prices": [
-          652.2624756,
-          660.47381778,
-          668.78853267,
-          677.20792163,
-          685.73330241,
-          694.36600933,
-          703.10739353,
-          711.95882315,
-          720.92168356
+          652.70273616,
+          660.91962078,
+          669.23994789,
+          677.66501973,
+          686.19615492,
+          694.8346887,
+          703.58197311,
+          712.43937722,
+          721.40828733
         ],
         "capital_per_order_usd": 111.11,
         "configured_max_drawdown_pct": 5.0,
@@ -127,7 +379,7 @@
         "execution_requires_scoped_permission"
       ],
       "source_labels": [
-        "pancakeswap_v3_block_119108691_same_block_quote"
+        "pancakeswap_v3_block_119122589_same_block_quote"
       ],
       "evidence_boundary": "Deterministic preview from caller-supplied inputs; no wallet signature, payment, or fund execution occurred."
     },
@@ -137,5 +389,5 @@
       "boundary": "This PancakeSwap delivery is a free public A2A preview. Job #808 separately proves the 0.1 U ERC-8183 payment lifecycle; it did not fund this preview."
     }
   },
-  "risk_boundary": "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. It excludes transaction gas and later price movement; execution still needs a fresh quote, user slippage limit, deadline, allowance review and wallet confirmation. The linked SafeHire result is a free deterministic A2A preview; no token was paid."
+  "risk_boundary": "This is a same-block read-only QuoterV2 comparison, not a trade or profit promise. The gas-adjusted value is an estimate from QuoterV2 gasEstimate and RPC gas price; a router transaction can consume different gas. Execution still needs a fresh quote, user slippage limit, deadline, allowance review and wallet confirmation. The linked SafeHire result is a free deterministic A2A preview; no token was paid."
 }

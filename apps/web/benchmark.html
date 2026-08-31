@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="SafeHire evidence lab for real human timing and blind Agent quality review." />
+  <title>SafeHire · Evidence lab</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="/assets/benchmark.css" />
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>EVIDENCE LAB</small></a>
+    <a class="text-link" href="/proof">Published proof ↗</a>
+  </header>
+
+  <main class="benchmark-shell shell">
+    <section class="benchmark-hero">
+      <div class="eyebrow">TERMIX · HUMAN-VERIFIABLE COMPARISON</div>
+      <h1>Measure the work.<br/><span>Do not invent the proof.</span></h1>
+      <p>This lab records real manual time, keeps complete outputs, and separates blind review from the secret Agent/No-Agent mapping.</p>
+      <div class="truth-row"><strong>LOCAL ONLY</strong><span>Your text and uploaded files stay in this browser tab. The page only downloads JSON to your computer.</span></div>
+    </section>
+
+    <section class="lab-card" id="manualLab">
+      <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>Run the same task without an Agent.</h2></div><span id="timerState">NOT STARTED</span></div>
+      <div class="field-grid">
+        <label>Task<select id="taskSelect">
+          <option value="pancakeswap-grid-route">PancakeSwap grid route</option>
+          <option value="pancakeswap-lp-rebalance">PancakeSwap LP rebalance</option>
+          <option value="venus-stablecoin-yield">Venus stablecoin yield</option>
+          <option value="venus-health-factor-response">Venus health factor response</option>
+        </select></label>
+        <label>Manual operator<input id="operatorName" placeholder="Real person's name or public handle" /></label>
+      </div>
+      <div class="task-brief"><small>LOCKED TASK BRIEF</small><pre id="taskBrief">Loading…</pre></div>
+      <div class="timer-strip"><strong id="elapsedTime">00:00.0</strong><span>The timer includes research, calculations and writing. Pausing is intentionally unavailable.</span></div>
+      <label>Complete manual answer<textarea id="manualOutput" rows="13" disabled placeholder="Start the timer to unlock the task and answer field."></textarea></label>
+      <div class="cost-row">
+        <label>Direct cost<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
+        <label>Currency<input id="manualCurrency" value="USD" maxlength="12" /></label>
+      </div>
+      <div class="lab-actions"><button class="button" id="startTimer" type="button">Start real timer</button><button class="button secondary" id="finishManual" type="button" disabled>Finish &amp; download manual record</button></div>
+    </section>
+
+    <section class="lab-card">
+      <div class="lab-head"><div><small>02 · BLIND PACKET</small><h2>Hide which output used the Agent.</h2></div><span>PREPARER</span></div>
+      <p class="lab-copy">The preparer loads both raw JSON files. The page downloads a reviewer packet without the origin labels and a separate secret key. Do not send the key to the reviewer.</p>
+      <div class="upload-grid">
+        <label>Agent raw output<input id="agentFile" type="file" accept="application/json,.json" /></label>
+        <label>No-Agent raw output<input id="manualFile" type="file" accept="application/json,.json" /></label>
+      </div>
+      <button class="button" id="buildPacket" type="button" disabled>Download blind packet + secret key</button>
+    </section>
+
+    <section class="lab-card">
+      <div class="lab-head"><div><small>03 · INDEPENDENT REVIEW</small><h2>Score A and B before unblinding.</h2></div><span>REVIEWER</span></div>
+      <p class="lab-copy">Ideally, a person who did not prepare the files should review them. Load only the blind packet, never the secret key.</p>
+      <div class="field-grid">
+        <label>Blind packet<input id="packetFile" type="file" accept="application/json,.json" /></label>
+        <label>Reviewer name<input id="reviewerName" placeholder="Real reviewer name or public handle" /></label>
+      </div>
+      <div class="blind-output-grid" id="blindOutputs" hidden><article><small>OUTPUT A</small><pre id="outputA"></pre></article><article><small>OUTPUT B</small><pre id="outputB"></pre></article></div>
+      <div class="score-grid" id="scoreGrid" hidden></div>
+      <button class="button" id="downloadReview" type="button" disabled>Download blind review</button>
+    </section>
+
+    <section class="next-gates">
+      <strong>What still needs a person</strong>
+      <p>One operator must perform each manual run, a different reviewer should score the blind packet, and you must keep the secret mapping, outputs and review together for submission.</p>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/benchmark.js" defer></script>
+</body>
+</html>
