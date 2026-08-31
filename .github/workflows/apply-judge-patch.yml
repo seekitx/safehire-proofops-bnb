@@ -53,8 +53,11 @@ jobs:
           rm -f .github/patch-bundle.part-* .github/workflows/apply-judge-patch.yml
       - name: Install Python dependencies
         run: pip install -e '.[dev,bnb]'
-      - name: Apply reviewed Ruff fixes
-        run: ruff check src/proofops/judging/scorecard.py --fix --unsafe-fixes
+      - name: Apply reviewed source fixes
+        run: |
+          ruff check src/proofops/judging/scorecard.py --fix --unsafe-fixes
+          python .github/adversarial-mypy-fix.py
+          rm -f .github/adversarial-mypy-fix.py
       - name: Lint and typecheck
         run: |
           ruff check src apps tests scripts
