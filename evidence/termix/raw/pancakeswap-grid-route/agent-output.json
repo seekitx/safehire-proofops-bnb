@@ -5,9 +5,9 @@
   "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
   "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
   "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
-  "started_at": "2026-08-31T07:29:43.148473+00:00",
-  "finished_at": "2026-08-31T07:29:44.964141+00:00",
-  "duration_seconds": 1.814882,
+  "started_at": "2026-09-01T03:30:08.816028+00:00",
+  "finished_at": "2026-09-01T03:30:09.733562+00:00",
+  "duration_seconds": 0.91726,
   "cost": {
     "amount": 0,
     "currency": "U",
@@ -49,9 +49,9 @@
     "result": {
       "status": "completed",
       "hire_receipt": {
-        "record_id": "ev_ca13daa6c1c3c22c0f3d",
-        "record_hash": "ca13daa6c1c3c22c0f3d1ba5b7f69ecfd1fedd30e46703640b63ac25feef1736",
-        "occurred_at": "2026-08-31T07:29:44.988030+00:00",
+        "record_id": "ev_7ed422bb91d8cf05bcb0",
+        "record_hash": "7ed422bb91d8cf05bcb08e6afa66c23bf0396a6a2940e81c99a69f54236e082e",
+        "occurred_at": "2026-09-01T03:30:10.092472+00:00",
         "task_id": "termix-pancakeswap-grid-route",
         "agent_id": "grid-sentinel-demo",
         "price_amount": 0,
@@ -59,10 +59,10 @@
         "payment_mode": "sponsored"
       },
       "agent_result": {
-        "invocation_id": "inv_20260831072944984728",
+        "invocation_id": "inv_20260901033010090640",
         "agent_id": "grid-sentinel-demo",
         "agent_version": "0.1.0",
-        "observed_at": "2026-08-31T07:29:44.984756+00:00",
+        "observed_at": "2026-09-01T03:30:10.090663+00:00",
         "category": "grid_trading",
         "action": "propose_grid",
         "executable": true,

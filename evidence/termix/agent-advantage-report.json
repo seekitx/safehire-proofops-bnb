@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "evidence_mode": "live",
-  "generated_at": "2026-08-31T15:29:45.848921+08:00",
+  "generated_at": "2026-09-01T11:30:10.359082+08:00",
   "method": "same_prompt_agent_vs_manual_with_raw_outputs",
   "task_count": 3,
   "categories": [
@@ -17,10 +17,10 @@
       "prompt_sha256": "047637c1f7ccd2afb2d26376a6d0895355382b7bbaf21c2c190b7b9672357745",
       "agent": {
         "output_path": "evidence/termix/raw/pancakeswap-grid-route/agent-output.json",
-        "output_sha256": "300be7887e84bffb5e9c70da2ddc79aaabdfcc17811c8e137abf052ea33daa74",
-        "started_at": "2026-08-31T07:29:43.148473+00:00",
-        "finished_at": "2026-08-31T07:29:44.964141+00:00",
-        "duration_seconds": 1.816,
+        "output_sha256": "fb126042c9b5282dcba7fedc575fe0532a2fe3d62d3cedcd1769350e6c15a8f7",
+        "started_at": "2026-09-01T03:30:08.816028+00:00",
+        "finished_at": "2026-09-01T03:30:09.733562+00:00",
+        "duration_seconds": 0.918,
         "cost_usd": 0.0,
         "cost_currency": "U",
         "cost_amount": 0.0,
@@ -28,9 +28,9 @@
       },
       "manual": {
         "output_path": "evidence/termix/raw/pancakeswap-grid-route/manual-output.json",
-        "output_sha256": "4fe1025f5a042b89bd1cfeeda1bb9a6da33b8f06ca2ef36f0645c32b3e950de0",
-        "started_at": "2026-08-31T07:29:44.968169+00:00",
-        "finished_at": "2026-08-31T07:29:44.968206+00:00",
+        "output_sha256": "747b8c6532c9d7a8e518cfa7e020c2ff58a3c1c25455d30041a85280da61ef08",
+        "started_at": "2026-09-01T03:30:09.734125+00:00",
+        "finished_at": "2026-09-01T03:30:09.734141+00:00",
         "duration_seconds": 0.0,
         "cost_usd": 0.0,
         "cost_currency": "USD",
@@ -56,7 +56,7 @@
         }
       },
       "advantage": {
-        "time_saved_seconds": -1.816,
+        "time_saved_seconds": -0.918,
         "cost_delta_usd": 0.0,
         "quality_delta": 2.5
       },
@@ -69,10 +69,10 @@
       "prompt_sha256": "8d0fafbdac9d9820c526efc18d1abb59c76fe1c1c2da000444a3a322358a119f",
       "agent": {
         "output_path": "evidence/termix/raw/venus-stablecoin-yield/agent-output.json",
-        "output_sha256": "462669b0a8dacea6ad5c48380b0c3b4ff9bbaa3f21e9682203dbf9c8c8d76e1f",
-        "started_at": "2026-08-31T07:29:44.969546+00:00",
-        "finished_at": "2026-08-31T07:29:45.319352+00:00",
-        "duration_seconds": 0.35,
+        "output_sha256": "252dccb409e47ae614d17bdd6f0ea8d6109032e63e1ae0b13ced1a560cc70189",
+        "started_at": "2026-09-01T03:30:09.734673+00:00",
+        "finished_at": "2026-09-01T03:30:10.106589+00:00",
+        "duration_seconds": 0.372,
         "cost_usd": 0.0,
         "cost_currency": "U",
         "cost_amount": 0.0,
@@ -80,9 +80,9 @@
       },
       "manual": {
         "output_path": "evidence/termix/raw/venus-stablecoin-yield/manual-output.json",
-        "output_sha256": "fa3986f4b6c0668abb0c04846f0c4b53d9b82bf211c00559f64ed2a6e9b5dbdd",
-        "started_at": "2026-08-31T07:29:45.339770+00:00",
-        "finished_at": "2026-08-31T07:29:45.339804+00:00",
+        "output_sha256": "68a0cc96c467569a6854115414c2838cd1f58bdaf38e20efad28debcf2a01236",
+        "started_at": "2026-09-01T03:30:10.107186+00:00",
+        "finished_at": "2026-09-01T03:30:10.107207+00:00",
         "duration_seconds": 0.0,
         "cost_usd": 0.0,
         "cost_currency": "USD",
@@ -108,7 +108,7 @@
         }
       },
       "advantage": {
-        "time_saved_seconds": -0.35,
+        "time_saved_seconds": -0.372,
         "cost_delta_usd": 0.0,
         "quality_delta": 2.5
       },
@@ -121,10 +121,10 @@
       "prompt_sha256": "acd0f2b7c11ed7f81797373c5071d150a9c62a46e4e2bf6943d8c4f7f2d52f34",
       "agent": {
         "output_path": "evidence/termix/raw/venus-health-factor-response/agent-output.json",
-        "output_sha256": "5e1b4838266270a617ccaaf118a803f411ffe63a425e6d8e00ea8d0606d2c2b5",
-        "started_at": "2026-08-31T07:29:45.347039+00:00",
-        "finished_at": "2026-08-31T07:29:45.831366+00:00",
-        "duration_seconds": 0.484,
+        "output_sha256": "863d177f100dab89e7970ac7e68efd366062e26bc45b7a790bcfa459c4faa2df",
+        "started_at": "2026-09-01T03:30:10.107949+00:00",
+        "finished_at": "2026-09-01T03:30:10.354604+00:00",
+        "duration_seconds": 0.247,
         "cost_usd": 0.0,
         "cost_currency": "U",
         "cost_amount": 0.0,
@@ -132,9 +132,9 @@
       },
       "manual": {
         "output_path": "evidence/termix/raw/venus-health-factor-response/manual-output.json",
-        "output_sha256": "5dc97a0c8e7a81d84bcf2050e3bfebbd6a6a8a3eb42c73d620973dafe69a6a64",
-        "started_at": "2026-08-31T07:29:45.836105+00:00",
-        "finished_at": "2026-08-31T07:29:45.836141+00:00",
+        "output_sha256": "27711ef158016440aac2b170b8468e33bf61a98821ed6606bd97a73396699d6a",
+        "started_at": "2026-09-01T03:30:10.355200+00:00",
+        "finished_at": "2026-09-01T03:30:10.355214+00:00",
         "duration_seconds": 0.0,
         "cost_usd": 0.0,
         "cost_currency": "USD",
@@ -160,7 +160,7 @@
         }
       },
       "advantage": {
-        "time_saved_seconds": -0.484,
+        "time_saved_seconds": -0.247,
         "cost_delta_usd": 0.0,
         "quality_delta": 2.5
       },
@@ -168,9 +168,9 @@
     }
   ],
   "aggregate": {
-    "agent_duration_seconds": 2.65,
+    "agent_duration_seconds": 1.537,
     "manual_duration_seconds": 0.0,
-    "time_saved_seconds": -2.65,
+    "time_saved_seconds": -1.537,
     "agent_cost_usd": 0.0,
     "manual_cost_usd": 0.0,
     "agent_quality_total": 73.5,

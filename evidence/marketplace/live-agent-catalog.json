@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "evidence_mode": "live",
   "source": "8004scan_official_api_and_public_a2a",
-  "observed_at": "2026-08-30T16:36:18Z",
+  "observed_at": "2026-09-01T03:27:47.925352Z",
   "chain_id": 56,
   "network": "bsc-mainnet",
   "registry_address": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
@@ -85,5 +85,16 @@
       "registry_url": "https://8004scan.io/agents/bsc/302257"
     }
   ],
-  "trust_boundary": "These are externally operated agents discovered through the official ERC-8004 index. Registration and current A2A list access were checked, but SafeHire has not yet funded a paid mainnet job with them."
+  "trust_boundary": "These are externally operated agents discovered through the official ERC-8004 index. Registration and current A2A list access were checked, but SafeHire has not yet funded a paid mainnet job with them.",
+  "verification": {
+    "chain_id": 56,
+    "successful_registration_receipts": 4,
+    "a2a_can_sign": true,
+    "a2a_skill_ids": [
+      "grid_plan",
+      "health_factor",
+      "rebalance_plan",
+      "yield_plan"
+    ]
+  }
 }

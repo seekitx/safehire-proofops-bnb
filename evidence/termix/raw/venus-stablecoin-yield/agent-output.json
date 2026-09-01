@@ -5,9 +5,9 @@
   "prompt_path": "evidence/termix/tasks/venus-stablecoin-yield.json",
   "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
   "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
-  "started_at": "2026-08-31T07:29:44.969546+00:00",
-  "finished_at": "2026-08-31T07:29:45.319352+00:00",
-  "duration_seconds": 0.349966,
+  "started_at": "2026-09-01T03:30:09.734673+00:00",
+  "finished_at": "2026-09-01T03:30:10.106589+00:00",
+  "duration_seconds": 0.371976,
   "cost": {
     "amount": 0,
     "currency": "U",
@@ -68,9 +68,9 @@
     "result": {
       "status": "completed",
       "hire_receipt": {
-        "record_id": "ev_2d7e1ec21724d25514ea",
-        "record_hash": "2d7e1ec21724d25514ea43b2cc3151adcf818b26cd00e2ca099446d62481b879",
-        "occurred_at": "2026-08-31T07:29:45.457300+00:00",
+        "record_id": "ev_d396c027a4cdb620450d",
+        "record_hash": "d396c027a4cdb620450dc5f14800acf95a3b77fbef65a9e5bdad705ca1ef8702",
+        "occurred_at": "2026-09-01T03:30:10.411786+00:00",
         "task_id": "termix-venus-stablecoin-yield",
         "agent_id": "yield-scout-demo",
         "price_amount": 0,
@@ -78,10 +78,10 @@
         "payment_mode": "sponsored"
       },
       "agent_result": {
-        "invocation_id": "inv_20260831072945453982",
+        "invocation_id": "inv_20260901033010409559",
         "agent_id": "yield-scout-demo",
         "agent_version": "0.1.0",
-        "observed_at": "2026-08-31T07:29:45.454013+00:00",
+        "observed_at": "2026-09-01T03:30:10.409586+00:00",
         "category": "yield_optimisation",
         "action": "route_to_best_risk_adjusted_yield",
         "executable": true,

@@ -5,9 +5,9 @@
   "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
   "endpoint": "https://safehire-proofops-bnb.onrender.com/a2a",
   "agent_card_url": "https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json",
-  "started_at": "2026-08-31T07:29:45.347039+00:00",
-  "finished_at": "2026-08-31T07:29:45.831366+00:00",
-  "duration_seconds": 0.484391,
+  "started_at": "2026-09-01T03:30:10.107949+00:00",
+  "finished_at": "2026-09-01T03:30:10.354604+00:00",
+  "duration_seconds": 0.246699,
   "cost": {
     "amount": 0,
     "currency": "U",
@@ -48,9 +48,9 @@
     "result": {
       "status": "completed",
       "hire_receipt": {
-        "record_id": "ev_eb733197e28380e5a9a2",
-        "record_hash": "eb733197e28380e5a9a29b769db968c8819ae08e762adbc17ec6345629e890e4",
-        "occurred_at": "2026-08-31T07:29:45.777048+00:00",
+        "record_id": "ev_ec9501063211e37af8bb",
+        "record_hash": "ec9501063211e37af8bb19c9ff2c0e56c658a1f6427c9549c416d093691d603d",
+        "occurred_at": "2026-09-01T03:30:10.745332+00:00",
         "task_id": "termix-venus-health-factor-response",
         "agent_id": "hf-shield-demo",
         "price_amount": 0,
@@ -58,10 +58,10 @@
         "payment_mode": "sponsored"
       },
       "agent_result": {
-        "invocation_id": "inv_20260831072945773511",
+        "invocation_id": "inv_20260901033010743305",
         "agent_id": "hf-shield-demo",
         "agent_version": "0.1.0",
-        "observed_at": "2026-08-31T07:29:45.773534+00:00",
+        "observed_at": "2026-09-01T03:30:10.743336+00:00",
         "category": "health_factor_monitoring",
         "action": "repay_or_add_collateral",
         "executable": true,

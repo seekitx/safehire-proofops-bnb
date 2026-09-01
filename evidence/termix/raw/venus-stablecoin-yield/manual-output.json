@@ -3,9 +3,9 @@
   "evidence_mode": "live",
   "task_id": "venus-stablecoin-yield",
   "prompt_path": "evidence/termix/tasks/venus-stablecoin-yield.json",
-  "started_at": "2026-08-31T07:29:45.339770+00:00",
-  "finished_at": "2026-08-31T07:29:45.339804+00:00",
-  "duration_seconds": 0.000654,
+  "started_at": "2026-09-01T03:30:10.107186+00:00",
+  "finished_at": "2026-09-01T03:30:10.107207+00:00",
+  "duration_seconds": 3.4e-05,
   "cost": {
     "amount": 0,
     "currency": "USD"

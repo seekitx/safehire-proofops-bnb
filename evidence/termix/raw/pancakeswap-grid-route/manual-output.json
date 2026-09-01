@@ -3,9 +3,9 @@
   "evidence_mode": "live",
   "task_id": "pancakeswap-grid-route",
   "prompt_path": "evidence/termix/tasks/pancakeswap-grid-route.json",
-  "started_at": "2026-08-31T07:29:44.968169+00:00",
-  "finished_at": "2026-08-31T07:29:44.968206+00:00",
-  "duration_seconds": 0.0001,
+  "started_at": "2026-09-01T03:30:09.734125+00:00",
+  "finished_at": "2026-09-01T03:30:09.734141+00:00",
+  "duration_seconds": 3.1e-05,
   "cost": {
     "amount": 0,
     "currency": "USD"

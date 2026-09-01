@@ -3,9 +3,9 @@
   "evidence_mode": "live",
   "task_id": "venus-health-factor-response",
   "prompt_path": "evidence/termix/tasks/venus-health-factor-response.json",
-  "started_at": "2026-08-31T07:29:45.836105+00:00",
-  "finished_at": "2026-08-31T07:29:45.836141+00:00",
-  "duration_seconds": 0.000109,
+  "started_at": "2026-09-01T03:30:10.355200+00:00",
+  "finished_at": "2026-09-01T03:30:10.355214+00:00",
+  "duration_seconds": 3.6e-05,
   "cost": {
     "amount": 0,
     "currency": "USD"
