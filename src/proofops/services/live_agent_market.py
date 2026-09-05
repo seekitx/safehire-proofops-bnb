@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -28,7 +29,8 @@ def _safe_number(raw: Any) -> float | None:
     if isinstance(raw, bool):
         return None
     try:
-        return round(float(raw), 3)
+        value = float(raw)
+        return round(value, 3) if math.isfinite(value) else None
     except (TypeError, ValueError):
         return None
 

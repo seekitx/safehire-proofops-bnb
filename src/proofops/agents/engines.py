@@ -11,19 +11,26 @@ from proofops.plugins.lp_guardian import LpGuardianPolicy
 def _number(payload: dict[str, Any], key: str, *, minimum: float | None = None) -> float:
     if key not in payload:
         raise ValueError(f"{key} is required")
+    if isinstance(payload[key], bool):
+        raise ValueError(f"{key} must be a number, not a boolean")
     try:
         value = float(payload[key])
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{key} must be a number") from exc
     if not math.isfinite(value):
         raise ValueError(f"{key} must be finite")
+    if abs(value) > 1e15:
+        raise ValueError(f"{key} exceeds supported numeric range")
     if minimum is not None and value < minimum:
         raise ValueError(f"{key} must be at least {minimum}")
     return value
 
 
 def _integer(payload: dict[str, Any], key: str, *, minimum: int, maximum: int) -> int:
-    value = int(_number(payload, key, minimum=float(minimum)))
+    raw = _number(payload, key, minimum=float(minimum))
+    if not raw.is_integer():
+        raise ValueError(f"{key} must be a whole number")
+    value = int(raw)
     if value > maximum:
         raise ValueError(f"{key} must be at most {maximum}")
     return value
@@ -45,6 +52,8 @@ class EngineResult:
             "action": self.action,
             "executable": self.executable,
             "confidence": self.confidence,
+            "confidence_kind": "uncalibrated_policy_heuristic_not_probability",
+            "execution_authority": "none_preview_only",
             "result": self.result,
             "risk_checks": list(self.risk_checks),
             "source_labels": list(self.source_labels),
@@ -68,7 +77,10 @@ class RebalancingEngine:
             estimated_rebalance_cost_usd=_number(
                 payload, "estimated_rebalance_cost_usd", minimum=0
             ),
-            uncollected_fees_usd=float(payload.get("uncollected_fees_usd", 0)),
+            uncollected_fees_usd=_number(
+                {"uncollected_fees_usd": payload.get("uncollected_fees_usd", 0)},
+                "uncollected_fees_usd", minimum=0,
+            ),
         )
         simulation = self._policy.simulate(position, _number(payload, "notional_usd", minimum=0.01))
         return EngineResult(
@@ -104,10 +116,27 @@ class GridTradingEngine:
         prices = [round(lower * ratio**index, 8) for index in range(levels)]
         per_order = round(capital / levels, 2)
         distance_pct = round((upper - lower) / current * 100, 4)
+        # An executable grid preview requires all round-trip costs to be provided.
+        # Missing costs are unknown, never silently assumed to be zero.
+        cost_keys = ("fee_bps_per_side", "slippage_bps_per_side", "gas_usd_per_order")
+        costs_complete = all(key in payload for key in cost_keys)
+        round_trip_cost = None
+        gross_cycle = (capital / levels) * (ratio - 1)
+        net_cycle = None
+        if costs_complete:
+            fee = _number(payload, cost_keys[0], minimum=0)
+            slippage = _number(payload, cost_keys[1], minimum=0)
+            gas = _number(payload, cost_keys[2], minimum=0)
+            if fee + slippage >= 10_000:
+                raise ValueError("per-side costs must be less than 100 percent")
+            # Fees/impact apply on both the entry and the larger exit notional.
+            round_trip_cost = (capital / levels) * (1 + ratio) * (fee + slippage) / 10_000 + 2 * gas
+            net_cycle = gross_cycle - round_trip_cost
+        executable = costs_complete and net_cycle is not None and net_cycle > 0
         return EngineResult(
             category=self.category,
             action="propose_grid",
-            executable=True,
+            executable=executable,
             confidence=0.78 if levels <= 20 else 0.68,
             result={
                 "grid_prices": prices,
@@ -115,6 +144,15 @@ class GridTradingEngine:
                 "configured_max_drawdown_pct": max_drawdown,
                 "range_width_pct": distance_pct,
                 "orders": levels,
+                "costs_complete": costs_complete,
+                "gross_cycle_spread_usd": round(gross_cycle, 6),
+                "round_trip_cost_usd": round(round_trip_cost, 6) if round_trip_cost is not None else None,
+                "net_cycle_spread_usd": round(net_cycle, 6) if net_cycle is not None else None,
+                "decision_reason": "positive_spread_after_costs" if executable else (
+                    "round_trip_costs_missing" if not costs_complete else "costs_exceed_grid_spread"
+                ),
+                "cycle_model": "one_adjacent_buy_sell_fill_not_a_backtest",
+                "drawdown_limit_enforced_onchain": False,
                 "no_profit_guarantee": True,
             },
             risk_checks=(
@@ -132,8 +170,8 @@ class YieldOptimisationEngine:
 
     def invoke(self, payload: dict[str, Any]) -> EngineResult:
         raw_candidates = payload.get("candidates")
-        if not isinstance(raw_candidates, list) or len(raw_candidates) < 2:
-            raise ValueError("candidates must contain at least two protocols")
+        if not isinstance(raw_candidates, list) or not 2 <= len(raw_candidates) <= 100:
+            raise ValueError("candidates must contain between two and 100 protocols")
         capital = _number(payload, "capital_usd", minimum=1)
         horizon_days = _integer(payload, "horizon_days", minimum=1, maximum=365)
         ranked: list[dict[str, Any]] = []
@@ -150,9 +188,15 @@ class YieldOptimisationEngine:
                 raise ValueError("risk_score must be at most 100")
             tvl_usd = _number(raw, "tvl_usd", minimum=0)
             transaction_cost_usd = _number(raw, "transaction_cost_usd", minimum=0)
-            horizon_yield = capital * gross_apy / 100 * horizon_days / 365
+            # APY is an effective annual yield, unlike simple APR. log1p/expm1
+            # remains accurate for small yields and avoids rounding before ranking.
+            horizon_yield = capital * math.expm1(math.log1p(gross_apy / 100) * horizon_days / 365)
             net_yield = horizon_yield - transaction_cost_usd
-            risk_adjusted = net_yield * (1 - risk_score / 125)
+            # A penalty must NEVER improve a loss-making route's utility.
+            risk_penalty = abs(net_yield) * risk_score / 125
+            risk_adjusted = net_yield - risk_penalty
+            if not all(math.isfinite(v) for v in (horizon_yield, net_yield, risk_adjusted)):
+                raise ValueError("candidate estimates exceed supported numeric range")
             ranked.append(
                 {
                     "protocol": name,
@@ -161,18 +205,27 @@ class YieldOptimisationEngine:
                     "tvl_usd": tvl_usd,
                     "transaction_cost_usd": transaction_cost_usd,
                     "estimated_net_yield_usd": round(net_yield, 4),
-                    "risk_adjusted_yield_usd": round(risk_adjusted, 4),
+                    "risk_adjusted_yield_usd": risk_adjusted,
+                    "risk_penalty_usd": round(risk_penalty, 4),
+                    "estimated_horizon_gross_usd": round(horizon_yield, 4),
                 }
             )
-        ranked.sort(key=lambda item: float(item["risk_adjusted_yield_usd"]), reverse=True)
+        ranked.sort(key=lambda item: (-float(item["risk_adjusted_yield_usd"]), str(item["protocol"])))
+        positive_net_utility = float(ranked[0]["risk_adjusted_yield_usd"]) > 0
+        for item in ranked:
+            item["risk_adjusted_yield_usd"] = round(item["risk_adjusted_yield_usd"], 4)
         winner = ranked[0]
         return EngineResult(
             category=self.category,
-            action="route_to_best_risk_adjusted_yield",
-            executable=float(winner["estimated_net_yield_usd"]) > 0,
+            action="route_to_best_risk_adjusted_yield" if positive_net_utility else "hold_no_positive_net_yield",
+            executable=positive_net_utility,
             confidence=0.8 if float(winner["tvl_usd"]) >= 1_000_000 else 0.62,
             result={
-                "selected_protocol": winner["protocol"],
+                "selected_protocol": winner["protocol"] if positive_net_utility else None,
+                "best_candidate_protocol": winner["protocol"],
+                "yield_convention": "effective_annual_apy_percent",
+                "risk_penalty_model": "abs(net_yield) * risk_score / 125; heuristic, not expected loss",
+                "decision_scope": "candidate_comparison_not_incremental_migration_benefit",
                 "ranked_candidates": ranked,
                 "capital_usd": capital,
                 "horizon_days": horizon_days,

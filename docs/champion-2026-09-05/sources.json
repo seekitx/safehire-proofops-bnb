@@ -1,0 +1,91 @@
+{
+  "research_date": "2026-09-05",
+  "complete_official_entrant_list_obtained": false,
+  "competitor_live_transactions_replayed": false,
+  "sources": [
+    {
+      "id": "S1",
+      "evidence_grade": "A",
+      "title": "BNB 当前赛事页",
+      "url": "https://www.bnbchain.org/en/hackathons/smart-money-era",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S2",
+      "evidence_grade": "A",
+      "title": "官方主赛说明博客",
+      "url": "https://www.bnbchain.org/en/blog/build-the-era-build-the-official-bnb-agent-studio-marketplace",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S3",
+      "evidence_grade": "A",
+      "title": "Agent Family 活动页",
+      "url": "https://www.agent.family/campaigns/bnb-build-the-era",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S4",
+      "evidence_grade": "B",
+      "title": "HIREDESK README",
+      "url": "https://github.com/timmyspurs12/hiredesk/blob/main/README.md",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S5",
+      "evidence_grade": "B",
+      "title": "HIREDESK 执行路由",
+      "url": "https://github.com/timmyspurs12/hiredesk/blob/main/src/app/api/jobs/[id]/execute/route.ts",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S6",
+      "evidence_grade": "B",
+      "title": "minia2a pitch deck",
+      "url": "https://minia2a.uk/hackathon/bnb-pitch-deck.html",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S7",
+      "evidence_grade": "C",
+      "title": "SmartSentinels 作者公告",
+      "url": "https://www.linkedin.com/posts/andrei-galea_bnbchain-web3-aiagents-activity-7494835646889615362-hPjU",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S8",
+      "evidence_grade": "A",
+      "title": "历史 OpenClaw 获奖页",
+      "url": "https://www.bnbchain.org/en/hackathons/good-vibes-only-openclaw-edition",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S9",
+      "evidence_grade": "B",
+      "title": "SafeHire 锁定版本 catalog",
+      "url": "https://github.com/seekitx/safehire-proofops-bnb/blob/267e4978c56adc2c566ab82fc134b18b0a5a7708/evidence/marketplace/live-agent-catalog.json",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S10",
+      "evidence_grade": "A",
+      "title": "ERC-8004，尤其 getAgentWallet",
+      "url": "https://eips.ethereum.org/EIPS/eip-8004",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S11",
+      "evidence_grade": "A",
+      "title": "JSON-RPC",
+      "url": "https://ethereum.org/developers/docs/apis/json-rpc/",
+      "retrieved_on": "2026-09-05"
+    },
+    {
+      "id": "S12",
+      "evidence_grade": "A",
+      "title": "EIP-1898，精确区块绑定",
+      "url": "https://eips.ethereum.org/EIPS/eip-1898",
+      "retrieved_on": "2026-09-05"
+    }
+  ]
+}

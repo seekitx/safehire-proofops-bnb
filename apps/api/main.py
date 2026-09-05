@@ -46,6 +46,7 @@ from proofops.services.live_erc8183 import (
     prepare_live_hire,
 )
 from proofops.settings import Settings
+from proofops.decision.routes import make_router
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
 
@@ -260,6 +261,7 @@ app = FastAPI(
     description="Verifiable, permissioned DeFi agent marketplace for BNB Chain",
     lifespan=lifespan,
 )
+app.include_router(make_router(Path(__file__).resolve().parents[2]))
 settings = Settings()
 app.add_middleware(
     CORSMiddleware,
@@ -1359,3 +1361,8 @@ async def deploy_testnet_page(application: ApplicationDep) -> FileResponse:
 async def hire_agent_page(application: ApplicationDep) -> FileResponse:
     _require_development(application)
     return FileResponse(WEB_ROOT / "hire-agent.html")
+
+
+@app.get("/decision", include_in_schema=False)
+async def decision_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "decision.html")

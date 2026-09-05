@@ -7,6 +7,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from proofops.decision.market import freshness
+from proofops.decision.paid import VerifiedDelivery
+
 REQUIRED_CATEGORIES = (
     "rebalancing",
     "grid_trading",
@@ -67,29 +70,18 @@ def _completed_testnet_hire(record: Mapping[str, Any]) -> bool:
     )
 
 
-def _count_verified_records(directory: Path, *, evidence_type: str) -> int:
-    if not directory.is_dir():
-        return 0
-    count = 0
-    for path in directory.glob("*.json"):
-        record = _read_json(path)
-        if record.get("evidence_mode") != "live":
-            continue
-        if evidence_type == "external_paid_delivery":
-            if (
-                record.get("chain_id") == 56
-                and record.get("external_provider") is True
-                and record.get("paid") is True
-                and TX_HASH.fullmatch(str(record.get("settlement_tx_hash", "")))
-            ):
-                count += 1
-        elif evidence_type == "blind_review" and (
-            record.get("review_mode") == "blind"
-            and record.get("independent_reviewer") is True
-            and str(record.get("task_id", "")).strip()
-        ):
-            count += 1
-    return count
+def _count_evidence_candidates(directory: Path) -> int:
+    """Local JSON can claim anything; file presence is not verification."""
+    return sum(1 for path in directory.glob("*.json") if _read_json(path)) if directory.is_dir() else 0
+
+
+def _fresh_deliveries(records: tuple[VerifiedDelivery, ...], now: datetime) -> int:
+    # Only in-memory results from the read-only replay path are accepted. Never
+    # deserialize a stored {paid: true, verification_mode: ...} into this type.
+    return len({(row.chain_id, row.job_id) for row in records
+                if isinstance(row, VerifiedDelivery) and row.chain_id == 56
+                and row.provider_payment_raw > 0
+                and freshness(row.verified_at, now, 300)["status"] == "fresh"})
 
 
 def _category_parity(
@@ -126,6 +118,8 @@ def _category_parity(
                 "erc8004_token_id": token_id,
                 "status": "ready" if passed == len(dimensions) else "blocked",
                 "depth_coverage": f"{passed}/{len(dimensions)}",
+                "coverage_kind": "route_structure_only_not_execution_depth",
+                "actual_execution_depth_verified": False,
                 "dimensions": dimensions,
             }
         )
@@ -137,6 +131,7 @@ def build_judge_scorecard(
     submission_result: Mapping[str, Any] | None = None,
     *,
     generated_at: datetime | None = None,
+    verified_deliveries: tuple[VerifiedDelivery, ...] = (),
 ) -> dict[str, Any]:
     """Build a deterministic self-audit aligned to the published judge rubric.
 
@@ -163,14 +158,17 @@ def build_judge_scorecard(
     depth_values = {str(row["depth_coverage"]) for row in parity}
     equal_depth = categories_ready and len(depth_values) == 1
 
-    external_paid = _count_verified_records(
-        project_root / "evidence" / "marketplace" / "paid-deliveries",
-        evidence_type="external_paid_delivery",
+    now = generated_at or datetime.now(UTC)
+    external_paid = _fresh_deliveries(verified_deliveries, now)
+    paid_candidates = _count_evidence_candidates(
+        project_root / "evidence" / "marketplace" / "paid-deliveries"
     )
-    blind_reviews = _count_verified_records(
-        project_root / "evidence" / "termix" / "v2" / "reviews",
-        evidence_type="blind_review",
+    review_candidates = _count_evidence_candidates(
+        project_root / "evidence" / "termix" / "v2" / "reviews"
     )
+    # Authentication/conflict review is an explicit human signoff, not a boolean
+    # supplied by a contestant's JSON file. Blind-packet tooling does not certify it.
+    blind_reviews = 0
     operators = {
         str(item.get("operator") or catalog.get("operator") or "").strip()
         for item in _rows(catalog.get("agents"))
@@ -213,7 +211,7 @@ def build_judge_scorecard(
 
     data_checks = {
         "live_snapshot": catalog.get("evidence_mode") == "live",
-        "freshness_timestamp": bool(str(catalog.get("observed_at", "")).strip()),
+        "freshness_timestamp": freshness(catalog.get("observed_at"), now, 86400)["status"] == "fresh",
         "identity_and_registration_per_agent": all(
             bool(row["dimensions"]["erc8004_identity"])
             and bool(row["dimensions"]["registration_transaction"])
@@ -226,7 +224,7 @@ def build_judge_scorecard(
             submission, "termix_live_advantage_report"
         ),
         "independent_blind_reviews": blind_reviews >= 3,
-        "multiple_independent_operators": operator_count >= 2,
+        "multiple_independent_operators": False,
         "paid_external_track_record": external_paid > 0,
     }
     core_data_keys = (
@@ -247,7 +245,7 @@ def build_judge_scorecard(
     diversity_checks = {
         "all_four_official_categories": categories_ready,
         "equal_depth_envelope": equal_depth,
-        "second_independent_operator": operator_count >= 2,
+        "second_independent_operator": False,
     }
     diversity_status = (
         "ready"
@@ -296,7 +294,7 @@ def build_judge_scorecard(
         },
         {
             "id": "second_operator",
-            "status": "complete" if operator_count >= 2 else "manual_required",
+            "status": "manual_required",
             "action": "Onboard and verify a second independent ERC-8004 provider.",
             "completion_evidence": "Registration, callable endpoint, category fit and reviewed listing dossier.",
             "why_it_matters": "Proves marketplace choice rather than a four-skill catalog from one seller.",
@@ -311,7 +309,16 @@ def build_judge_scorecard(
     ]
 
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
+        "evidence_integrity": {
+            "paid_candidate_files": paid_candidates,
+            "blind_review_candidate_files": review_candidates,
+            "freshly_replayed_paid_deliveries": external_paid,
+            "declared_operator_labels": operator_count,
+            "independent_operators_verified": None,
+            "catalog_freshness": freshness(catalog.get("observed_at"), now, 86400),
+            "warning": "Candidate files, display labels and blind-packet presence are not independent proof.",
+        },
         "generated_at": (generated_at or datetime.now(UTC)).isoformat(),
         "project": "SafeHire / ProofOps",
         "positioning": (

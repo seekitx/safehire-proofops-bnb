@@ -164,3 +164,12 @@ This root file governs the repository. A deeper `AGENTS.md` may add stricter rul
 inside its subtree. In particular,
 `agent-studio/safehireagents/AGENTS.md` is authoritative for Agent Studio signing,
 wallet and deployment operations.
+
+
+## 2026-09-05 evidence-first championship overlay
+
+Read `docs/champion-2026-09-05/BLUEPRINT.zh-CN.md` and `docs/champion-2026-09-05/COMPETITOR_RESEARCH.zh-CN.md` before extending the marketplace.
+Implementation entry points: `src/proofops/decision/`, `/decision`, `tests/champion/`.
+Run `python -m pytest tests/champion` and the existing suite. Keep live source timestamps, treat category route parity as structure only, and never convert stored JSON booleans into verified paid outcomes.
+The read-only replay requires matching ERC-8004 agent wallet, exact job/settlement/block, payment and deliverable commitment. It does not prove useful work, independent businesses, or profit.
+Independent reviewer authentication, new provider adapters and live mainnet replay remain release gates listed in the blueprint. Do not mark them complete from synthetic tests.

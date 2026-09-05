@@ -118,13 +118,13 @@ class JudgeScorecardTests(unittest.TestCase):
         self.assertEqual(len({row["depth_coverage"] for row in parity}), 1)
 
     def test_scorecard_does_not_invent_an_official_numeric_score(self) -> None:
-        scorecard = build_judge_scorecard(self.root, self.submission)
+        scorecard = build_judge_scorecard(self.root, self.submission, generated_at=datetime(2026, 8, 31, tzinfo=UTC))
         self.assertFalse(scorecard["official_rubric"]["numeric_weights_published"])
         self.assertNotIn("official_score", scorecard)
         self.assertEqual(scorecard["readiness"]["winner_readiness"], "conditional")
 
     def test_real_world_gaps_remain_visible(self) -> None:
-        scorecard = build_judge_scorecard(self.root, self.submission)
+        scorecard = build_judge_scorecard(self.root, self.submission, generated_at=datetime(2026, 8, 31, tzinfo=UTC))
         self.assertEqual(scorecard["main_track"]["functionality"]["status"], "conditional")
         self.assertEqual(scorecard["main_track"]["data_quality"]["status"], "conditional")
         self.assertEqual(scorecard["main_track"]["agent_diversity"]["status"], "conditional")

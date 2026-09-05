@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Evidence-first discovery, comparison and bounded analysis hiring on BNB Chain.">
+  <title>SafeHire · Decision Desk</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/decision.css">
+  <script src="/assets/decision.js" defer></script>
+</head>
+<body>
+<header class="shell top"><a class="brand" href="/">S<span>SafeHire <small>Decision desk</small></span></a><nav aria-label="Main"><a href="/">Marketplace</a><a href="/proof">Chain evidence</a><a href="/benchmark">Benchmarks</a></nav></header>
+<main class="shell">
+  <section class="hero"><div><p class="eyebrow">BNB CHAIN / EVIDENCE BEFORE AUTHORITY</p><h1>Know what you’re hiring.</h1><p class="lead">Compare the proof. Inspect the missing pieces. Preview the risk.<br>Give an agent a job — not unrestricted access to your money.</p></div><aside class="boundary"><strong>Analysis ≠ execution</strong><p>A live endpoint proves availability. A registration proves identity. Neither proves returns or successful delivery.</p></aside></section>
+  <ol class="steps" aria-label="Journey"><li><b>01</b> Discover &amp; compare</li><li><b>02</b> Preview the downside</li><li><b>03</b> Review &amp; hire analysis</li><li><b>04</b> Verify the delivery</li></ol>
+  <section class="summary" aria-label="Source status"><div><span>Probe status</span><strong id="probeState">Checking…</strong><small id="probeTime">Original source timestamp retained</small></div><div><span>Registered listings</span><strong id="listingCount">—</strong><small id="supplierCount">Resolving owner addresses…</small></div><div><span>Independent businesses</span><strong>Not verified</strong><small>Distinct wallets are not independent suppliers</small></div><div><span>Proven execution</span><strong>Not established</strong><small>No simulated results counted as chain evidence</small></div></section>
+  <p id="marketStatus" class="status" role="status" aria-live="polite">Loading the reviewed BSC catalog. No demo fallback is used.</p>
+  <section aria-labelledby="discoverHeading"><div class="section-head"><div><p class="eyebrow">01 / FIND YOUR SERVICE</p><h2 id="discoverHeading">Four jobs. Four evidence standards.</h2></div><button id="refresh" class="secondary" type="button">Refresh sources</button></div>
+    <div id="categories" class="categories" role="group" aria-label="Agent category"></div>
+    <div class="toolbar"><label class="search-label" for="search">Search this category<input id="search" type="search" maxlength="100" placeholder="Agent, provider or capability"></label><button id="compare" type="button" disabled>Compare selected</button></div>
+    <div class="scope-note"><strong id="categoryQuestion"></strong><span id="categoryNeeds"></span></div>
+    <p id="choiceNote" class="muted"></p><div id="listings" class="cards"></div>
+    <section id="comparison" class="panel" hidden aria-labelledby="compareHeading"><h3 id="compareHeading">Evidence comparison</h3><div id="compareContent"></div></section>
+  </section>
+  <section class="preview panel" aria-labelledby="previewHeading"><div class="section-head"><div><p class="eyebrow">02 / DETERMINISTIC RISK PREVIEW</p><h2 id="previewHeading">Would the action survive its costs?</h2></div><span class="badge warning">SIMULATION · NO TRADE</span></div><p class="muted">Edit the inputs below. Examples are synthetic, not current prices or an agent’s actual delivery. Grid costs must be supplied before a positive action can be proposed.</p><form id="previewForm"><label for="previewInput">Inputs for the selected category</label><textarea id="previewInput" spellcheck="false" rows="13"></textarea><div class="form-actions"><button type="submit">Run risk preview</button><span>No wallet. No external order. No permissions granted.</span></div></form><pre id="previewResult" aria-live="polite">Choose a category and run a preview.</pre></section>
+  <section class="panel handoff" aria-labelledby="deliveryHeading"><div><p class="eyebrow">03 → 04 / COMPLETE THE EVIDENCE</p><h2 id="deliveryHeading">A hash is a starting point, not the result.</h2><p>Analysis hiring opens the existing manual-wallet review flow. A paid record still needs the correct chain, job, provider, settlement, payment and exact deliverable commitment.</p></div><div><strong>After your manually approved hire</strong><p>Use the read-only verifier included in this release. It never signs, approves or broadcasts a transaction.</p><code>python scripts/verify_paid_delivery.py claim.json deliverable.txt</code><p class="muted">Requires the provider’s exact commitment preimage. An unrelated successful transaction is rejected.</p></div></section>
+</main><footer class="shell"><span>SafeHire / ProofOps</span><span>Evidence readiness is not an investment recommendation or an official hackathon score.</span></footer>
+</body></html>
