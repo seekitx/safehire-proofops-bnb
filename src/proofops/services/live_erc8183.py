@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import ipaddress
 import json
+import re
 import socket
 import time
 from collections.abc import Awaitable, Callable, Mapping
@@ -52,6 +53,7 @@ LOG_SCAN_WINDOWS = 30
 JOB_INITIALISED_TOPIC = f"0x{keccak(text='JobInitialised(uint256,bytes32,uint64,bytes)').hex()}"
 JOB_COMPLETED_TOPIC = f"0x{keccak(text='JobCompleted(uint256,address,bytes32)').hex()}"
 TRANSFER_TOPIC = f"0x{keccak(text='Transfer(address,address,uint256)').hex()}"
+HASH_PATTERN = re.compile(r"^0x[0-9a-fA-F]{64}$")
 
 RpcCall: TypeAlias = Callable[[str, list[Any]], Awaitable[Any]]
 ManifestFetcher: TypeAlias = Callable[[str, int], Awaitable[tuple[dict[str, Any], str]]]
@@ -999,6 +1001,15 @@ async def build_verified_receipt(*, job_id: int) -> dict[str, Any]:
         raise ValueError("provider payment transfer could not be verified")
     task_spec = status["task_spec"]
     assert isinstance(task_spec, dict)
+    manifest = delivery.get("manifest")
+    verification = delivery.get("verification")
+    if not isinstance(manifest, Mapping) or not isinstance(verification, Mapping):
+        raise TypeError("verified delivery is missing its manifest or verification result")
+    deliverable_hash = status.get("deliverable_hash") or verification.get("computed_hash")
+    if deliverable_hash is None and verification.get("hash_matches") is True:
+        deliverable_hash = f"0x{keccak(text=canonical_json(dict(manifest))).hex()}"
+    if not isinstance(deliverable_hash, str) or not HASH_PATTERN.fullmatch(deliverable_hash):
+        raise ValueError("verified delivery is missing a valid deliverable hash")
     return {
         "schema_version": "1.0",
         "evidence_mode": "live",
@@ -1015,9 +1026,9 @@ async def build_verified_receipt(*, job_id: int) -> dict[str, Any]:
         "quote": status["description_verification"],
         "delivery": {
             "manifest_url": delivery["manifest_url"],
-            "deliverable_hash": status["deliverable_hash"],
-            "manifest": delivery["manifest"],
-            "verification": delivery["verification"],
+            "deliverable_hash": deliverable_hash,
+            "manifest": manifest,
+            "verification": verification,
         },
         "settlement_tx_hash": settlement_tx_hash,
         "settlement_block_number": int(str(completion.get("blockNumber", "0x0")), 16),
