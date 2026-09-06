@@ -44,7 +44,10 @@ async def refresh() -> dict[str, Any]:
             }
         },
     }
-    async with httpx.AsyncClient(timeout=15) as client:
+    # Public evidence refreshes should not inherit workstation proxy settings.
+    # In particular, an IPv6 localhost entry such as NO_PROXY=::1 can be
+    # interpreted as a malformed proxy port by some httpx versions.
+    async with httpx.AsyncClient(timeout=15, trust_env=False) as client:
         chain_id = await _rpc(client, "eth_chainId", [])
         if int(chain_id, 16) != 56:
             raise ValueError("RPC is not BSC mainnet")
