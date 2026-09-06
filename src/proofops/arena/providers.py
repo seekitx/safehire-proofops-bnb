@@ -176,7 +176,9 @@ class QuoteGateway:
         elif q.get('service') != provider.skill_id:
             raise ValueError('quote skill mismatch')
         price = q.get('price_raw', q.get('price'))
-        if type(price) not in (int, str) or not str(price).isascii() or not str(price).isdigit() or not 0 <= int(price) < 2**256:
+        if (isinstance(price, bool) or not isinstance(price, (int, str))
+                or not str(price).isascii() or not str(price).isdigit()
+                or not 0 <= int(price) < 2**256):
             raise ValueError('quote price must be an unsigned raw integer amount')
         payment_token = q.get('payment_token')
         if payment_token is not None and (not isinstance(payment_token, str) or not re.fullmatch(r'0x[0-9a-fA-F]{40}', payment_token)):

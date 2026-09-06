@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 from threading import Lock
-from typing import Any
+from typing import Any, ParamSpec, TypeVar
 
 import httpx
 from fastapi import APIRouter, Header, HTTPException
@@ -16,6 +16,12 @@ from proofops.arena.models import StrictModel, TaskSpec
 from proofops.arena.planners import compare, evaluate, reference_proposal
 from proofops.arena.providers import ProviderCatalog, QuoteGateway
 from proofops.arena.store import CapacityError, Conflict, MissingTask, TaskStore, parse_proposal
+
+P = ParamSpec('P')
+R = TypeVar('R')
+Message = dict[str, Any]
+Receive = Callable[[], Awaitable[Message]]
+Send = Callable[[Message], Awaitable[None]]
 
 
 class Submission(StrictModel):
@@ -54,7 +60,7 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
             raise HTTPException(401, 'Bearer task capability required; never send wallet keys')
         return authorization[7:]
 
-    def checked(fn: Callable, *args: Any, **kwargs: Any) -> Any:
+    def checked(fn: Callable[P, R], *args: P.args, **kwargs: P.kwargs) -> R:
         try:
             return fn(*args, **kwargs)
         except MissingTask as exc:
@@ -137,7 +143,7 @@ class ArenaBoundaryMiddleware:
     def __init__(self, app: Any, max_body_bytes: int = 64000) -> None:
         self.app, self.maximum = app, max_body_bytes
 
-    async def __call__(self, scope: dict[str, Any], receive: Callable, send: Callable) -> None:
+    async def __call__(self, scope: dict[str, Any], receive: Receive, send: Send) -> None:
         if scope['type'] != 'http' or not scope['path'].startswith('/api/arena'):
             await self.app(scope, receive, send)
             return

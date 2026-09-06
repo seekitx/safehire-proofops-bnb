@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 import httpx
+from eth_abi.abi import decode, encode
+from eth_utils.crypto import keccak
 
 COMMERCE = "0xea4daa3100a767e86fded867729ae7446476eba6"
 ROUTER = "0x51895229e12f9876011789b04f8698af06ccd6da"
@@ -62,14 +64,23 @@ async def verify_delivery(claim: dict[str, Any], output: bytes, reader: Reader,
     tx_hash, job_id = claim.get("settlement_tx_hash"), claim.get("job_id")
     _require(isinstance(tx_hash, str) and bool(HASH.fullmatch(tx_hash)), "Invalid settlement hash")
     _require(type(job_id) is int and 0 < job_id < 2**256, "Invalid job ID")
+    assert isinstance(tx_hash, str)
+    assert isinstance(job_id, int)
     _require(claim.get("chain_id") == 56 and type(claim.get("chain_id")) is int, "BSC mainnet only")
     _require(0 < len(output) <= 2 * 1024 * 1024, "Deliverable preimage must be 1 byte..2 MiB")
     _require(claim.get("commitment_scheme") == "keccak256_exact_utf8_bytes", "Explicit supported commitment scheme required")
     output.decode("utf-8")
     for key in ("buyer", "provider"):
         _require(isinstance(claim.get(key), str) and bool(ADDRESS.fullmatch(claim[key])), f"Invalid {key}")
-    _require(claim["buyer"].lower() != claim["provider"].lower(), "Same-wallet self-hire excluded")
-    _require(type(claim.get("token_id")) is int and claim["token_id"] > 0, "Invalid registry ID")
+    buyer, provider = claim["buyer"], claim["provider"]
+    assert isinstance(buyer, str)
+    assert isinstance(provider, str)
+    _require(buyer.lower() != provider.lower(), "Same-wallet self-hire excluded")
+    token_id, skill_id = claim.get("token_id"), claim.get("skill_id")
+    _require(type(token_id) is int and token_id > 0, "Invalid registry ID")
+    _require(isinstance(skill_id, str) and bool(skill_id), "Invalid skill ID")
+    assert isinstance(token_id, int)
+    assert isinstance(skill_id, str)
     _require(any(type(item.get("token_id")) is int and item.get("token_id") == claim.get("token_id")
                  and item.get("skill_id") == claim.get("skill_id") for item in reviewed_agents),
              "Identity and skill pair are outside reviewed catalog")
@@ -84,10 +95,10 @@ async def verify_delivery(claim: dict[str, Any], output: bytes, reader: Reader,
              "At least 12 observed confirmations required")
     block_hash = str(snapshot.get("block_hash", ""))
     _require(bool(HASH.fullmatch(block_hash)), "Missing settlement block hash")
-    identity = await reader.identity(claim["token_id"], block_hash)
-    _require(str(identity.get("wallet", "")).lower() == claim["provider"].lower(),
+    identity = await reader.identity(token_id, block_hash)
+    _require(str(identity.get("wallet", "")).lower() == provider.lower(),
              "Provider is not the registry agent wallet at the settlement block")
-    _require(str(identity.get("owner", "")).lower() != claim["buyer"].lower(),
+    _require(str(identity.get("owner", "")).lower() != buyer.lower(),
              "Buyer owns the agent; self-hire excluded")
     job = await reader.job(job_id, block_hash)
     _require(job.get("job_id") == job_id and job.get("status") == "COMPLETED", "Job is not completed at settlement block")
@@ -95,24 +106,26 @@ async def verify_delivery(claim: dict[str, Any], output: bytes, reader: Reader,
     _require(str(job.get("provider", "")).lower() == claim["provider"].lower(), "Provider mismatch")
     description = job.get("description")
     _require(isinstance(description, dict), "Missing bound task description")
+    assert isinstance(description, dict)
     _require(description.get("schema_version") == "safehire-live-hire-v1", "Unreviewed job schema")
     _require(description.get("service") == claim.get("skill_id") and description.get("erc8004_token_id") == claim.get("token_id"),
              "Job description does not bind registry identity and skill")
-    _require(str(description.get("provider", "")).lower() == claim["provider"].lower(), "Description provider mismatch")
+    _require(str(description.get("provider", "")).lower() == provider.lower(), "Description provider mismatch")
     budget = job.get("budget_raw")
     _require(type(budget) is int and budget > 0 and str(budget) == str(description.get("price_raw")), "Budget mismatch")
+    assert isinstance(budget, int)
     commitment = reader.commitment(output)
     _require(str(job.get("deliverable_hash", "")).lower() == commitment.lower(), "Deliverable bytes do not match onchain commitment")
     payment = sum(event["amount_raw"] for event in snapshot.get("transfers", [])
                   if isinstance(event, dict) and type(event.get("amount_raw")) is int and event["amount_raw"] > 0
                   and str(event.get("token", "")).lower() == TOKEN
                   and str(event.get("from", "")).lower() == COMMERCE
-                  and str(event.get("to", "")).lower() == claim["provider"].lower())
+                  and str(event.get("to", "")).lower() == provider.lower())
     _require(0 < payment <= budget, "No matching escrow-to-provider payment within budget")
     canonical_hash = await reader.canonical_block_hash(snapshot["block_number"])
     _require(canonical_hash.lower() == block_hash.lower(), "Settlement block was reorganized")
-    return VerifiedDelivery(56, job_id, tx_hash.lower(), claim["provider"].lower(), claim["buyer"].lower(),
-                            claim["token_id"], claim["skill_id"], payment, commitment, block_hash,
+    return VerifiedDelivery(56, job_id, tx_hash.lower(), provider.lower(), buyer.lower(),
+                            token_id, skill_id, payment, commitment, block_hash,
                             snapshot["confirmations"], datetime.now(UTC).isoformat())
 
 
@@ -120,11 +133,6 @@ class BscReader:
     """Pinned existing deployment ABI. Unsupported nodes/ABIs fail closed."""
 
     def __init__(self) -> None:
-        try:
-            from eth_abi import decode, encode
-            from eth_utils import keccak
-        except ImportError as exc:
-            raise RuntimeError("Install the project's declared dependencies: pip install -e '.[dev]'") from exc
         self.decode, self.encode, self.keccak = decode, encode, keccak
 
     async def rpc(self, method: str, params: list[Any]) -> Any:

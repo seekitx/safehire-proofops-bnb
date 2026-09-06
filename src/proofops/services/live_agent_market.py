@@ -431,7 +431,8 @@ async def request_live_agent_quote(
     if provider_raw is None:
         raise QuoteVerificationError("signed quote did not identify its provider account")
 
-    payment = catalog.get("payment") if isinstance(catalog.get("payment"), dict) else {}
+    payment_value = catalog.get("payment")
+    payment = payment_value if isinstance(payment_value, dict) else {}
     expected_price = int(
         _provider_field(selected, catalog, "price_raw")
         or payment.get("price_raw")

@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from proofops.arena.models import TaskSpec, utcnow
+from proofops.arena.models import Category, TaskSpec, utcnow
 
 
-def examples() -> dict:
-    base = {'snapshot': {'chain_id': 56, 'block_number': 1, 'block_hash': '0x' + '0' * 64,
-                         'observed_at': utcnow().isoformat(), 'source': 'SYNTHETIC_EXAMPLE_NOT_CHAIN_DATA'},
-            'limits': {'max_cost_usd': 10, 'max_slippage_bps': 100, 'max_snapshot_age_seconds': 300}}
-    inputs = {
+def examples() -> dict[str, Any]:
+    base: dict[str, Any] = {
+        'snapshot': {'chain_id': 56, 'block_number': 1, 'block_hash': '0x' + '0' * 64,
+                     'observed_at': utcnow().isoformat(), 'source': 'SYNTHETIC_EXAMPLE_NOT_CHAIN_DATA'},
+        'limits': {'max_cost_usd': 10, 'max_slippage_bps': 100, 'max_snapshot_age_seconds': 300},
+    }
+    inputs: dict[Category, dict[str, Any]] = {
         'rebalancing': {'current_tick': 300, 'old_lower_tick': -120, 'old_upper_tick': 120,
             'tick_spacing': 60, 'half_width_ticks': 180, 'liquidity_raw': 1000000000000000000,
             'token0_decimals': 18, 'token1_decimals': 18, 'estimated_cost_usd': 2, 'slippage_bps': 50},

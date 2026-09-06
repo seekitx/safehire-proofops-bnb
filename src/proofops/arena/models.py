@@ -8,6 +8,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator, model_validator
 
 Category = Literal['rebalancing', 'grid_trading', 'yield_optimisation', 'health_factor_monitoring']
+Action = Literal['hold', 'reset_lp_range', 'plan_grid', 'route_yield', 'repay']
 Nonnegative = Annotated[float, Field(ge=0, le=1e12, allow_inf_nan=False)]
 Positive = Annotated[float, Field(gt=0, le=1e12, allow_inf_nan=False)]
 Pct = Annotated[float, Field(ge=0, le=100, allow_inf_nan=False)]
@@ -158,8 +159,12 @@ class HealthInput(StrictModel):
         return self
 
 
-INPUT_MODELS = {'rebalancing': LPInput, 'grid_trading': GridInput,
-                'yield_optimisation': YieldInput, 'health_factor_monitoring': HealthInput}
+INPUT_MODELS: dict[Category, type[StrictModel]] = {
+    'rebalancing': LPInput,
+    'grid_trading': GridInput,
+    'yield_optimisation': YieldInput,
+    'health_factor_monitoring': HealthInput,
+}
 
 
 class TaskSpec(StrictModel):
@@ -197,7 +202,7 @@ class Proposal(StrictModel):
     agent_ref: str = Field(pattern=r'^(local:[a-zA-Z0-9_-]{1,64}|56:[1-9][0-9]{0,77}:[a-zA-Z0-9_-]{1,64})$')
     task_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
     snapshot_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
-    action: Literal['hold', 'reset_lp_range', 'plan_grid', 'route_yield', 'repay']
+    action: Action
     parameters: dict[str, Any]
 
     @model_validator(mode='after')

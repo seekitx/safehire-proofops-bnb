@@ -251,7 +251,7 @@ def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
 async def _verify_anchored_description(
     description: Mapping[str, Any], *, provider: str
 ) -> dict[str, Any]:
-    return await verify_job_description(
+    result = await verify_job_description(
         description=description,
         provider=provider,
         expected_chain_id=CHAIN_ID,
@@ -261,6 +261,9 @@ async def _verify_anchored_description(
         rpc_url=BSC_MAINNET_RPC,
         rpc_call=_rpc,
     )
+    if not isinstance(result, dict):
+        raise TypeError("job-description verifier returned an unexpected result")
+    return result
 
 
 async def prepare_live_hire(

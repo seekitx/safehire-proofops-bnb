@@ -11,9 +11,16 @@ import math
 import secrets
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 LIMIT = 2 * 1024 * 1024
+
+
+class MeasurementSide(TypedDict):
+    duration_seconds: float
+    cost_usd: float
+    cost_basis: str
+    output_sha256: str
 
 
 def canonical(value: Any) -> bytes:
@@ -65,7 +72,7 @@ def validate_experiment(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         prompt_hash = digest(prompt)
         if prompt_hash != task.get("prompt_sha256"):
             raise ValueError("Prompt hash mismatch")
-        sides = {}
+        sides: dict[str, MeasurementSide] = {}
         for side in ("agent", "manual"):
             run = task.get(side)
             if not isinstance(run, dict) or run.get("prompt_sha256") != prompt_hash:
@@ -83,12 +90,13 @@ def validate_experiment(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
             if duration <= 0 or duration > 7 * 86400:
                 raise ValueError("Measured duration must be positive and at most seven days")
             amount = run.get("cost_usd")
-            if type(amount) not in (int, float) or not math.isfinite(amount) or amount < 0:
+            if (isinstance(amount, bool) or not isinstance(amount, (int, float))
+                    or not math.isfinite(amount) or amount < 0):
                 raise ValueError("cost_usd must be a finite nonnegative measured number")
             basis = str(run.get("cost_basis", "")).strip()
             if not basis:
                 raise ValueError("Record the cost basis, including what was excluded")
-            sides[side] = {"duration_seconds": duration, "cost_usd": amount,
+            sides[side] = {"duration_seconds": duration, "cost_usd": float(amount),
                            "cost_basis": basis, "output_sha256": digest(output)}
         measurements.append({"task_id": task_id, "category": str(task.get("category", "unknown")),
                              "agent": sides["agent"], "manual": sides["manual"],

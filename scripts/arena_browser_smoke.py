@@ -14,12 +14,13 @@ import time
 import urllib.request
 from contextlib import ExitStack
 from pathlib import Path
+from typing import Any
 
 import httpx
 
 
 def main() -> int:
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import sync_playwright  # type: ignore[import-not-found]
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('.data/arena-browser'))
@@ -34,7 +35,11 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
         from arena_local_server import build_local_app
         asgi_app = build_local_app(root, Path(temporary)/'offline.sqlite3') if args.offline_asgi else None
-        async def binding(_source, path, options):
+        async def binding(
+            _source: Any, path: str, options: dict[str, Any]
+        ) -> dict[str, Any]:
+            if asgi_app is None:
+                raise RuntimeError('offline ASGI binding is unavailable')
             async with httpx.AsyncClient(transport=httpx.ASGITransport(asgi_app), base_url='http://test') as client:
                 response = await client.request(options.get('method', 'GET'), path,
                     headers=options.get('headers', {}), content=options.get('body'))

@@ -15,7 +15,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from proofops.arena.models import Proposal, TaskSpec, canonical, digest, utcnow
 from proofops.arena.planners import evaluate
@@ -120,7 +120,7 @@ class TaskStore:
         actual = hashlib.sha256(token.encode()).hexdigest()
         if row is None or not secrets.compare_digest(row['token_hash'], actual):
             raise MissingTask('task not found or capability token invalid')
-        return row
+        return cast(sqlite3.Row, row)
 
     def submit(self, task_id: str, token: str, proposal_text: str, *, request_key: str,
                expected_version: int, now: datetime | None = None) -> dict[str, Any]:

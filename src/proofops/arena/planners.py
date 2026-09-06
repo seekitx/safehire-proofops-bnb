@@ -12,7 +12,7 @@ from datetime import datetime
 from decimal import Decimal, localcontext
 from typing import Any
 
-from proofops.arena.models import Proposal, TaskSpec, utcnow
+from proofops.arena.models import Action, Proposal, TaskSpec, utcnow
 
 
 def D(value: Any) -> Decimal:
@@ -107,7 +107,8 @@ def health_metrics(i: dict[str, Any]) -> dict[str, Any]:
 
 def reference_proposal(task: TaskSpec) -> Proposal:
     i = task.inputs
-    action, params = 'hold', {}
+    action: Action = 'hold'
+    params: dict[str, Any] = {}
     if task.category == 'rebalancing':
         if not i['old_lower_tick'] <= i['current_tick'] < i['old_upper_tick']:
             lower, upper = lp_range(i)
@@ -158,9 +159,15 @@ def evaluate(task: TaskSpec, proposal: Proposal, *, now: datetime | None = None)
         check('category_action', proposal.action == 'reset_lp_range')
         check('parameter_schema', set(p) == {'lower_tick', 'upper_tick'})
         lower, upper = p.get('lower_tick'), p.get('upper_tick')
-        valid = type(lower) is int and type(upper) is int and -887272 <= lower < upper <= 887272
+        valid = (
+            isinstance(lower, int)
+            and not isinstance(lower, bool)
+            and isinstance(upper, int)
+            and not isinstance(upper, bool)
+            and -887272 <= lower < upper <= 887272
+        )
         check('protocol_tick_bounds', valid)
-        if valid:
+        if valid and isinstance(lower, int) and isinstance(upper, int):
             check('tick_spacing', lower % i['tick_spacing'] == 0 and upper % i['tick_spacing'] == 0)
             check('spot_inside_target', lower <= i['current_tick'] < upper)
             target = lp_range(i)
@@ -184,7 +191,7 @@ def evaluate(task: TaskSpec, proposal: Proposal, *, now: datetime | None = None)
         prices = p.get('prices')
         valid = isinstance(prices, list) and len(prices) == i['levels'] and all(type(v) in (int, float) and math.isfinite(v) for v in prices)
         check('order_count_and_numbers', valid)
-        if valid:
+        if valid and isinstance(prices, list):
             check('grid_geometry', all(math.isclose(a, b, rel_tol=1e-10, abs_tol=1e-14) for a, b in zip(prices, metrics['prices'], strict=True)))
         stop = p.get('stop_price')
         check('stop_price', type(stop) in (int, float) and stop == i['stop_price'])
@@ -210,9 +217,14 @@ def evaluate(task: TaskSpec, proposal: Proposal, *, now: datetime | None = None)
         check('category_action', proposal.action == 'repay')
         check('parameter_schema', set(p) == {'repay_usd'})
         repay = p.get('repay_usd')
-        valid = type(repay) in (int, float) and math.isfinite(repay) and 0 <= repay <= metrics['stressed_debt_usd']
+        valid = (
+            isinstance(repay, (int, float))
+            and not isinstance(repay, bool)
+            and math.isfinite(repay)
+            and 0 <= repay <= metrics['stressed_debt_usd']
+        )
         check('repay_value', valid)
-        if valid:
+        if valid and isinstance(repay, (int, float)):
             check('repay_budget', repay <= i['available_repay_usd'])
             check('target_reached', D(repay) >= D(metrics['required_repay_usd']))
             check('avoid_unnecessary_repay', metrics['required_repay_usd'] > 0)
