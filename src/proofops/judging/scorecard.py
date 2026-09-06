@@ -38,6 +38,14 @@ def _rows(value: Any) -> list[Mapping[str, Any]]:
     return [item for item in value if isinstance(item, Mapping)]
 
 
+def _source_contains(path: Path, *needles: str) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return all(needle in text for needle in needles)
+
+
 def _submission_check_passed(result: Mapping[str, Any], check_id: str) -> bool:
     for check in _rows(result.get("checks")):
         if check.get("check_id") == check_id:
@@ -89,9 +97,24 @@ def _category_parity(
 ) -> list[dict[str, Any]]:
     agents = _rows(catalog.get("agents"))
     by_category = {str(item.get("category")): item for item in agents}
+    quote_source = project_root / "src" / "proofops" / "services" / "live_agent_market.py"
+    hire_source = project_root / "src" / "proofops" / "services" / "live_erc8183.py"
+    signed_quote_route = _source_contains(
+        quote_source,
+        "verify_negotiation_envelope",
+        "quote_verification",
+        "agent_token_id",
+    )
     live_hire_route = (
         (project_root / "apps" / "web" / "live-hire.html").is_file()
-        and (project_root / "src" / "proofops" / "services" / "live_erc8183.py").is_file()
+        and _source_contains(
+            hire_source,
+            "safehire-external-hire-v2",
+            "verify_job_description",
+            "live_delivery",
+            "live_dispute_plan",
+            "build_verified_receipt",
+        )
     )
     rows: list[dict[str, Any]] = []
     for category in REQUIRED_CATEGORIES:
@@ -105,10 +128,11 @@ def _category_parity(
                 TX_HASH.fullmatch(str(agent.get("created_tx_hash", "")))
             ),
             "callable_skill": bool(str(agent.get("skill_id", "")).strip()),
-            "quote_route": (
-                project_root / "src" / "proofops" / "services" / "live_agent_market.py"
-            ).is_file(),
-            "hire_route": live_hire_route,
+            "independent_provider_route": bool(
+                str(agent.get("a2a_endpoint") or catalog.get("a2a_endpoint") or "").strip()
+            ),
+            "signed_quote_route": signed_quote_route,
+            "delivery_dispute_receipt_route": live_hire_route,
         }
         passed = sum(bool(value) for value in dimensions.values())
         rows.append(
@@ -140,6 +164,7 @@ def build_judge_scorecard(
     """
 
     submission = submission_result or {}
+    observed_now = generated_at or datetime.now(UTC)
     catalog = _read_json(
         project_root / "evidence" / "marketplace" / "live-agent-catalog.json"
     )
@@ -189,6 +214,11 @@ def build_judge_scorecard(
         ),
         "four_category_parity": equal_depth,
         "live_hire_route_present": live_hire_route,
+        "signed_quote_and_delivery_verification": all(
+            bool(row["dimensions"]["signed_quote_route"])
+            and bool(row["dimensions"]["delivery_dispute_receipt_route"])
+            for row in parity
+        ),
         "completed_erc8183_testnet_hire": completed_testnet_hire,
         "external_paid_delivery_captured": external_paid > 0,
     }
@@ -203,6 +233,7 @@ def build_judge_scorecard(
                 "live_bsc_catalog",
                 "four_category_parity",
                 "live_hire_route_present",
+                "signed_quote_and_delivery_verification",
                 "completed_erc8183_testnet_hire",
             )
         )
@@ -211,7 +242,9 @@ def build_judge_scorecard(
 
     data_checks = {
         "live_snapshot": catalog.get("evidence_mode") == "live",
-        "freshness_timestamp": freshness(catalog.get("observed_at"), now, 86400)["status"] == "fresh",
+        "freshness_timestamp": freshness(
+            catalog.get("observed_at"), now, 86400
+        )["status"] == "fresh",
         "identity_and_registration_per_agent": all(
             bool(row["dimensions"]["erc8004_identity"])
             and bool(row["dimensions"]["registration_transaction"])
@@ -319,7 +352,7 @@ def build_judge_scorecard(
             "catalog_freshness": freshness(catalog.get("observed_at"), now, 86400),
             "warning": "Candidate files, display labels and blind-packet presence are not independent proof.",
         },
-        "generated_at": (generated_at or datetime.now(UTC)).isoformat(),
+        "generated_at": observed_now.isoformat(),
         "project": "SafeHire / ProofOps",
         "positioning": (
             "A proof-carrying BNB Chain Agent marketplace: compare evidence, cap authority, "
@@ -352,8 +385,9 @@ def build_judge_scorecard(
                 "status": functionality_status,
                 "checks": functionality_checks,
                 "judge_message": (
-                    "The no-dead-end hire route exists and a full testnet settlement is proven; "
-                    "the first paid external mainnet delivery is still missing."
+                    "Signed quote verification, resumable funding, hash-matched delivery review, "
+                    "dispute and server receipt paths exist; the first paid external mainnet "
+                    "delivery is still missing."
                 ),
             },
             "data_quality": {

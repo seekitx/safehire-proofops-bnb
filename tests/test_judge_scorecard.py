@@ -33,6 +33,7 @@ class JudgeScorecardTests(unittest.TestCase):
                 "evidence_mode": "live",
                 "observed_at": "2026-08-31T00:00:00Z",
                 "operator": "one-provider",
+                "a2a_endpoint": "https://provider.example/a2a",
                 "agents": [
                     {
                         "category": category,
@@ -86,14 +87,20 @@ class JudgeScorecardTests(unittest.TestCase):
                 "measurable_benefit": "same-block route improvement",
             },
         )
-        for relative in (
-            "apps/web/live-hire.html",
-            "src/proofops/services/live_erc8183.py",
-            "src/proofops/services/live_agent_market.py",
-        ):
+        sources = {
+            "apps/web/live-hire.html": "live hire",
+            "src/proofops/services/live_erc8183.py": (
+                "safehire-external-hire-v2 verify_job_description live_delivery "
+                "live_dispute_plan build_verified_receipt"
+            ),
+            "src/proofops/services/live_agent_market.py": (
+                "verify_negotiation_envelope quote_verification agent_token_id"
+            ),
+        }
+        for relative, content in sources.items():
             path = self.root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text("", encoding="utf-8")
+            path.write_text(content, encoding="utf-8")
         self.submission = {
             "ready": True,
             "checks": [

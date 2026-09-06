@@ -21,7 +21,7 @@ trust-and-settlement envelope around financial Agents.
 - Four required BNB Chain categories are represented: rebalancing, grid trading,
   yield optimisation and health-factor monitoring.
 - External BSC mainnet ERC-8004 registrations can be discovered and quoted.
-- `/hire-live` prepares a wallet-confirmed ERC-8183 mainnet hire path.
+- `/hire-live` verifies a full provider-signed ERC-8183 quote, anchors the exact signed JobDescription, restores jobs from chain state, verifies delivery manifests and exposes dispute/settle/refund paths.
 - BSC Testnet Job #808 proves create → budget → approve → fund → deliver → settle.
 - SafeHire contracts, ERC-8004 identity, transaction evidence and delivery are
   exposed through `/proof`.
@@ -97,6 +97,7 @@ trust-and-settlement envelope around financial Agents.
 
 - `README.md` — 90-second project and evidence entry point.
 - `agent.md` — task-oriented repository index.
+- `docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md` — latest protocol/security/UX adversarial consensus and implementation map.
 - `docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md` — official-rubric strategy,
   winner patterns, innovation thesis and execution order.
 - `docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md` — ten-role debate, disagreements,
@@ -106,7 +107,7 @@ trust-and-settlement envelope around financial Agents.
 - `docs/MANUAL_COMPLETION_GATES_2026-08-31.md` — owner actions that code cannot do.
 - `docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md` — submission fields and
   operational checks; treat older status prose as a dated snapshot.
-- `apps/web/assets/judge-scorecard.html` — live judge-facing rubric map.
+- `/judge-scorecard` / `apps/web/assets/judge-scorecard.html` — live judge-facing rubric map backed only by `/api/judge-scorecard`.
 - `scripts/judge_scorecard.py` — deterministic machine-readable self-audit.
 
 ### Product and architecture

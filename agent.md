@@ -20,7 +20,7 @@
 
 | 顺序 | 入口 | 评委应看到什么 |
 |---:|---|---|
-| 1 | `/assets/judge-scorecard.html` | 官方三项主评分逐项状态、四类同深度、人工门槛 |
+| 1 | `/judge-scorecard` | 官方三项主评分逐项状态、四类同深度、人工门槛 |
 | 2 | `/` | 四类真实 ERC-8004 Agent、实时可调用性、索引信号与诚实边界 |
 | 3 | `/hire-live` | 报价 → ERC-8183 任务 → 精确授权 → 托管 → 交付 → 结算/退款 |
 | 4 | `/proof` | Job #808、ERC-8004、三份合约、PancakeSwap 和 TermiX 原始证据 |
@@ -44,15 +44,17 @@
 
 ### 第一优先级：当前冲奖决策
 
-1. [`docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md`](docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md)
+1. [`docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md`](docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md)  
+   本轮协议、安全、市场、体验与范围控制 Agent 的对抗结论，以及签名报价、交付验证、dispute、恢复和收据施工索引。
+2. [`docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md`](docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md)  
    官方规则、历届获奖模式、创新点、评委叙事、冲刺顺序。
-2. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)
+3. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)  
    十个评审角色的攻击、冲突与共识。
-3. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)
+4. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)  
    官方获奖作品中反复出现的评审偏好，并已同步当前代码状态。
-4. [`docs/MANUAL_COMPLETION_GATES_2026-08-31.md`](docs/MANUAL_COMPLETION_GATES_2026-08-31.md)
+5. [`docs/MANUAL_COMPLETION_GATES_2026-08-31.md`](docs/MANUAL_COMPLETION_GATES_2026-08-31.md)  
    不能由代码自动完成的链上付款、真人评审、供应方和提交动作。
-5. [`docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md`](docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md)
+6. [`docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md`](docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md)  
    表单和最终运营检查。涉及“当前是否已有某功能”时，以前四份文档为准。
 
 ### 第二优先级：实现设计
@@ -75,38 +77,40 @@
 
 ### 市场与实时数据
 
-- `src/proofops/services/live_agent_market.py`
+- `src/proofops/services/live_agent_market.py`  
   已审核目录 + 当前 A2A 探测 + 8004scan 信号；不把索引健康分冒充交付质量。
-- `src/proofops/integrations/`
+- `src/proofops/integrations/erc8183_quote.py`  
+  对齐官方 SDK 的 canonical hash、EIP-191/ERC-1271 签名验证与 JobDescription 构建。
+- `src/proofops/integrations/`  
   BSC RPC、8004scan、Venus、Lista、PancakeSwap 官方数据适配。
-- `evidence/marketplace/live-agent-catalog.json`
+- `evidence/marketplace/live-agent-catalog.json`  
   四类外部 Agent 的可复核快照。
 
 ### 雇佣与权限
 
-- `src/proofops/services/live_erc8183.py`
-  外部主网 ERC-8183 交易计划、状态、通知、结算与退款。
-- `src/proofops/execution/`
+- `src/proofops/services/live_erc8183.py`  
+  外部主网 ERC-8183 签名任务、可恢复资金步骤、交付 manifest 校验、dispute、结算、退款与 server-verified receipt。
+- `src/proofops/execution/`  
   policy、task、RiskGate、幂等、存储与执行适配。
-- `contracts/src/ScopedExecutionPolicy.sol`
+- `contracts/src/ScopedExecutionPolicy.sol`  
   链上范围、额度、方法、期限和授权边界。
-- `apps/web/live-hire.html` 与相关 assets
+- `apps/web/live-hire.html` 与相关 assets  
   每笔钱包动作显式确认的主网雇佣页。
 
 ### 证据与评分
 
-- `src/proofops/services/submission.py`
+- `src/proofops/services/submission.py`  
   是否具备提交级结构的 fail-closed 门禁。
-- `src/proofops/judging/scorecard.py`
+- `src/proofops/judging/scorecard.py`  
   按 Functionality / Data Quality / Agent Diversity 分开输出，不伪造官方权重。
-- `scripts/judge_scorecard.py`
+- `scripts/judge_scorecard.py`  
   生成机器可读的 `judge-scorecard.json`。
-- `src/proofops/plugins/adversarial.py`
+- `src/proofops/plugins/adversarial.py`  
   十角色对抗评审；安全和证据 veto 不能被语言模型覆盖。
-- `src/proofops/plugins/evidence.py`
+- `src/proofops/plugins/evidence.py`  
   append-only hash-chain 账本。
-- `apps/web/assets/judge-scorecard.html`
-  评委实时自检页，接口失败时 fail closed。
+- `/api/judge-scorecard` 与 `apps/web/assets/judge-scorecard.html`  
+  后端是唯一评分事实源；前端只渲染，接口失败时 fail closed。
 
 ### Agent 与协议
 

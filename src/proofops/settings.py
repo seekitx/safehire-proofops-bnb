@@ -32,6 +32,9 @@ class Settings:
         default_factory=lambda: _bool("ALLOW_ONCHAIN_EXECUTION", False)
     )
     allow_bsc_mainnet: bool = field(default_factory=lambda: _bool("ALLOW_BSC_MAINNET", False))
+    allow_external_mainnet_hire: bool = field(
+        default_factory=lambda: _bool("ALLOW_EXTERNAL_MAINNET_HIRE", False)
+    )
     admin_api_key: str = field(
         default_factory=lambda: os.getenv("ADMIN_API_KEY", "change-me-before-deploy")
     )
