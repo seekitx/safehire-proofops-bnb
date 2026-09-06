@@ -20,7 +20,7 @@ Working MVP
 
 ## 建议选择的 Sub-prize tracks
 
-- TermiX：建议勾选；三组 live Agent / without-Agent 对照、完整输出、时间、成本、质量和公开报告已完成。
+- TermiX：有三组赞助 Agent 与自动计算基线，不能当作真人对照已完成。完成三项真实任务的人工基线、实际成本与独立评审后再确认最终参赛主张；现有报告应明确标注研究缺口。
 - PancakeSwap：建议勾选；真实 BSC mainnet 同区块四池比较已刷新，并与公开 Agent 交付绑定。
 - AltLayer：表单有该选项，但官网未公布独立评分细则；未获主办方确认前不做资格声称。
 - Altana：当前不具备官方 session/Keystore/Explorer 证据，不声称参赛资格。
@@ -31,13 +31,13 @@ https://github.com/seekitx/safehire-proofops-bnb
 
 ## Additional Notes
 
-Public marketplace: https://safehire-proofops-bnb.onrender.com
+Public marketplace: https://safehire.eyesonchain.xyz
 
-On-chain proof dossier: https://safehire-proofops-bnb.onrender.com/proof
+On-chain proof dossier: https://safehire.eyesonchain.xyz/proof
 
-Public marketplace Agent Card: https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
+Public marketplace Agent Card: https://safehire.eyesonchain.xyz/.well-known/agent-card.json
 
-TermiX Agent Advantage Report: https://safehire-proofops-bnb.onrender.com/api/evidence/termix/report
+TermiX Agent Advantage Report: https://safehire.eyesonchain.xyz/api/evidence/termix/report
 
 PancakeSwap evidence: https://github.com/seekitx/safehire-proofops-bnb/blob/main/evidence/pancakeswap/live-benefit-report.json
 

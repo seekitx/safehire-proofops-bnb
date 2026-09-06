@@ -38,6 +38,11 @@ class QuoteRequest(StrictModel):
     consent_send_task: StrictBool
 
 
+class DeliveryRequest(StrictModel):
+    job_id: StrictInt = Field(gt=0, lt=2**256)
+    agent_ref: str = Field(min_length=1, max_length=180)
+
+
 def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGateway | None = None,
                 enabled: bool | None = None) -> APIRouter:
     router = APIRouter(prefix='/api/arena', tags=['Task-bound acceptance arena'])
@@ -134,6 +139,25 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
             raise HTTPException(502, 'Provider unavailable; no payment or fallback was attempted') from exc
         except httpx.HTTPError as exc:
             raise HTTPException(502, 'Provider rejected the read-only quote request') from exc
+
+    @router.post('/tasks/{task_id}/delivery-acceptance')
+    async def delivery_acceptance(
+        task_id: str, request: DeliveryRequest, authorization: str | None = Header(default=None),
+    ) -> dict[str, Any]:
+        # Lazy import keeps the offline Arena usable without the chain extras.
+        import asyncio
+
+        from proofops.arena.delivery import accept_delivery
+
+        data = await run_in_threadpool(checked, storage().bundle, task_id, token(authorization))
+        try:
+            return await asyncio.wait_for(accept_delivery(
+                TaskSpec.model_validate(data['task']), request.job_id, request.agent_ref, configured,
+            ), timeout=45)
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'Delivery could not be verified; no settlement was attempted') from exc
 
     return router
 

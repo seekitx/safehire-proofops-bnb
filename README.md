@@ -16,12 +16,16 @@ Discover → Compare proof → Quote → Limit authority → Hire
 
 ## Judge in 90 seconds
 
-1. [**Marketplace — discover four live ERC-8004 categories**](https://safehire-proofops-bnb.onrender.com)
-2. [**Decision desk — compare job-specific evidence**](https://safehire-proofops-bnb.onrender.com/decision)
-3. [**Live quote and external ERC-8183 hire path**](https://safehire-proofops-bnb.onrender.com/hire-live)
-4. [**Delivery and on-chain proof dossier**](https://safehire-proofops-bnb.onrender.com/proof)
-5. [**Live judge scorecard**](https://safehire-proofops-bnb.onrender.com/judge-scorecard)
-6. [**TermiX benchmark lab**](https://safehire-proofops-bnb.onrender.com/benchmark)
+Current delivery gaps, acceptance evidence and the final demo script are tracked in
+[the September 6 execution board](docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md).
+Hosting migration does not close paid-delivery or human-research gates.
+
+1. [**Marketplace — discover four live ERC-8004 categories**](https://safehire.eyesonchain.xyz)
+2. [**Decision desk — compare job-specific evidence**](https://safehire.eyesonchain.xyz/decision)
+3. [**Live quote and external ERC-8183 hire path**](https://safehire.eyesonchain.xyz/hire-live)
+4. [**Delivery and on-chain proof dossier**](https://safehire.eyesonchain.xyz/proof)
+5. [**Live judge scorecard**](https://safehire.eyesonchain.xyz/judge-scorecard)
+6. [**TermiX benchmark lab**](https://safehire.eyesonchain.xyz/benchmark)
 
 The scorecard is a deterministic evidence map, **not an official BNB Chain score**.
 The event publishes Functionality, Data Quality and Agent Diversity as main-track

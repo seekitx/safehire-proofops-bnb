@@ -321,6 +321,7 @@ def _reviewed_request(
     skill_id: str,
     task_input: dict[str, Any] | None,
     request_nonce: str,
+    arena_task: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     token_id = int(selected.get("token_id", 0))
     if token_id <= 0:
@@ -337,8 +338,10 @@ def _reviewed_request(
             "note": "A fresh signed quote will bind the final task before any transaction plan.",
         },
     }
+    if arena_task is not None:
+        task_spec["arena_task"] = arena_task
     description = str(selected.get("description", "")).strip()
-    request = {
+    request: dict[str, Any] = {
         "task_description": canonical_json(task_spec),
         "terms": {
             "deliverables": description,
@@ -357,6 +360,12 @@ def _reviewed_request(
         },
         "request_id": request_nonce,
     }
+    if arena_task is not None:
+        request["terms"]["success_criteria"].append(
+            "Deliver response.content as a safehire-proposal/2 JSON object for the exact arena_task: "
+            f"agent_ref=56:{token_id}:{skill_id}, task_hash and snapshot_hash computed from the "
+            "normalized frozen task, with action and parameters. Do not substitute narrative output."
+        )
     return request, task_spec
 
 
@@ -369,6 +378,7 @@ async def request_live_agent_quote(
     request_nonce: str | None = None,
     rpc_url: str = DEFAULT_BSC_MAINNET_RPC,
     rpc_call: RpcCall | None = None,
+    arena_task: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Verify a complete signed commercial quote without signing or moving funds."""
 
@@ -383,6 +393,7 @@ async def request_live_agent_quote(
         skill_id=skill_id,
         task_input=task_input,
         request_nonce=nonce,
+        arena_task=arena_task,
     )
     request = {
         "jsonrpc": "2.0",

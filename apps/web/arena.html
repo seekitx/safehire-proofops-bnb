@@ -33,5 +33,11 @@
 <div id="providers"></div><label for="provider-select">Quote route</label><select id="provider-select"></select>
 <label class="consent"><input id="consent" type="checkbox"> I approve sending this task to the selected configured provider for a quote only.</label>
 <button id="quote" disabled>Request read-only quote</button><pre id="quote-result"></pre></section>
+<section class="panel"><h2>Verify a real delivery against this task</h2>
+<p class="muted">Requires a job whose signed quote includes this frozen Arena task and a provider delivery in SafeHire proposal format. Legacy analysis text cannot be promoted to a verified proposal. Financial inputs still require independent review.</p>
+<label for="delivery-job">BSC job ID</label><input id="delivery-job" inputmode="numeric" pattern="[0-9]+">
+<button id="verify-delivery">Read chain delivery and check constraints</button>
+<button id="export-delivery" disabled>Export private acceptance result</button>
+<pre id="delivery-result" aria-live="polite"></pre></section>
 <footer class="status">SafeHire / ProofOps · Analysis acceptance v2 · No wallet signing, approvals or broadcasting in this arena.</footer>
 </main></body></html>

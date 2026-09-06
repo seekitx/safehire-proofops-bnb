@@ -9,6 +9,7 @@
   };
   let category = 'rebalancing', task = null, reference = null, capabilities = null;
   let saved = [], selected = new Set(), busy = false, pendingSubmission = null;
+  let acceptedDelivery = null;
   const requestKey = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   const json = value => JSON.stringify(value, null, 2);
   function status(text) { $('status').textContent = text; }
@@ -62,6 +63,7 @@
     $('category-detail').textContent = categories[category][1];
   }
   async function loadExample() {
+    acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     const data = await api('/examples');
     $('task-input').value = json(data.tasks[category]);
     $('reference').replaceChildren();
@@ -115,6 +117,7 @@
   $('create').addEventListener('click', () => act(async () => {
     if (task && !confirm('Replace this tab’s current task access token? Export first.')) return;
     task = await api('/tasks', {method: 'POST', body: $('task-input').value});
+    acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     saved = []; selected.clear(); renderSaved();
     status('Private task opened. Subsequent proposals are checked against its frozen inputs, not edited textarea values.');
   }));
@@ -155,6 +158,23 @@
     const data = await api(`/tasks/${task.task_id}/quote`, {method: 'POST', body: json({agent_ref: $('provider-select').value, consent_send_task: true})});
     $('quote-result').textContent = json(data); status('Read-only quote returned. No payment, delivery or signature was requested.');
   }));
+  $('verify-delivery').addEventListener('click', () => act(async () => {
+    acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
+    if (!task) throw new Error('Open the frozen private task first.');
+    const rawJob = $('delivery-job').value.trim();
+    const job = Number(rawJob);
+    if (!/^[1-9][0-9]*$/.test(rawJob) || !Number.isSafeInteger(job)) throw new Error('Enter a positive safe-integer job ID.');
+    const data = await api(`/tasks/${task.task_id}/delivery-acceptance`, {method: 'POST',
+      body: json({job_id: job, agent_ref: $('provider-select').value})});
+    acceptedDelivery = data; $('delivery-result').textContent = json(data); $('export-delivery').disabled = false;
+    status('Delivery checked against the frozen task. Review the acceptance and source limits; no payment was authorized.');
+  }));
+  $('export-delivery').addEventListener('click', () => {
+    if (!acceptedDelivery) return;
+    const url = URL.createObjectURL(new Blob([json(acceptedDelivery)], {type: 'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = `safehire-acceptance-${acceptedDelivery.job_id}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
   act(async () => {
     capabilities = await api('/capabilities'); categoryButtons(); await loadExample(); renderSaved();
     if (!capabilities.task_storage_enabled) status('Preview is available. Private task storage is disabled until the deployment enables SAFEHIRE_ARENA_ENABLED=true.');

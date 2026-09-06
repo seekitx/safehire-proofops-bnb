@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 import httpx
 
@@ -61,12 +61,16 @@ class RemoteAgentExecutionAdapter(ExecutionAdapter):
         endpoint_resolver: Callable[[str], str],
         auth_token: str = "",
         timeout_seconds: float = 30,
+        receipt_verifier: Callable[[ExecutionIntent, str], Awaitable[bool]] | None = None,
     ) -> None:
         self._endpoint_resolver = endpoint_resolver
         self._auth_token = auth_token
         self._timeout = timeout_seconds
+        self._receipt_verifier = receipt_verifier
 
     async def execute(self, intent: ExecutionIntent) -> ExecutionReceipt:
+        if self._receipt_verifier is None:
+            raise AdapterUnavailableError("No reviewed chain receipt verifier; remote execution was not sent")
         endpoint = self._endpoint_resolver(intent.agent_id)
         if not endpoint.startswith("https://"):
             raise AdapterUnavailableError("remote onchain agent endpoint must use HTTPS")
@@ -98,8 +102,16 @@ class RemoteAgentExecutionAdapter(ExecutionAdapter):
         if not isinstance(result, dict):
             raise AdapterUnavailableError("remote agent returned a non-object response")
         tx_hash = result.get("txHash") or result.get("tx_hash")
-        success = bool(result.get("success")) and isinstance(tx_hash, str)
-        source = DataSource.TESTNET_EVIDENCE if intent.chain_id == 97 else DataSource.LIVE_ONCHAIN
+        # Only the server-injected verifier can establish chain/receipt/intent
+        # binding. Provider booleans and hash-shaped strings are not evidence.
+        success = (
+            result.get("success") is True
+            and isinstance(tx_hash, str)
+            and await self._receipt_verifier(intent, tx_hash) is True
+        )
+        source = (
+            DataSource.TESTNET_EVIDENCE if intent.chain_id == 97 else DataSource.LIVE_ONCHAIN
+        ) if success else DataSource.SELF_REPORTED
         return ExecutionReceipt(
             task_id=intent.task_id,
             success=success,
@@ -114,6 +126,6 @@ class RemoteAgentExecutionAdapter(ExecutionAdapter):
             error_message=(
                 None
                 if success
-                else "Remote agent did not return success=true with a transaction hash"
+                else "Remote execution not verified; reconcile chain state before any retry"
             ),
         )

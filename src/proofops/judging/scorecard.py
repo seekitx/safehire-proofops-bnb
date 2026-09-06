@@ -387,7 +387,7 @@ def build_judge_scorecard(
                 "judge_message": (
                     "Signed quote verification, resumable funding, hash-matched delivery review, "
                     "dispute and server receipt paths exist; the first paid external mainnet "
-                    "delivery is still missing."
+                    "delivery requires an explicit fresh read-only replay before it is counted here."
                 ),
             },
             "data_quality": {
@@ -402,8 +402,8 @@ def build_judge_scorecard(
                 "status": diversity_status,
                 "checks": diversity_checks,
                 "judge_message": (
-                    "All four official categories use the same six-dimension depth envelope; "
-                    "all current live listings still share one operator."
+                    "Category cards report implementation coverage, not verified live execution. "
+                    "Declared operator labels do not establish independent businesses."
                 ),
             },
         },

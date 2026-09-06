@@ -139,6 +139,25 @@ class TaskServiceTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(TaskTransitionError):
             self.service.approve(task.task_id)
 
+    async def test_truthy_failed_or_missing_simulation_never_advances(self) -> None:
+        for index, result in enumerate(({"passed": False}, {"passed": "true"}, {"passed": 1}, {"answer": "ok"})):
+            task = self.create(f"bad-simulation-{index}")
+            with self.assertRaises(RiskRejectedError):
+                self.service.simulate(task.task_id, result)
+            self.assertEqual(self.service.get_task(task.task_id).state, TaskState.DRAFT)
+
+    async def test_owner_simulation_cannot_authorize_chain_execution(self) -> None:
+        task = self.create()
+        self.service.simulate(task.task_id, {"passed": True})
+        self.service.approve(task.task_id)
+        with self.assertRaisesRegex(RiskRejectedError, "trusted_chain_simulator"):
+            await self.service.execute(
+                task.task_id, idempotency_key="chain-attempt", chain_id=97,
+                target="0xtarget", method="collect", value_usd=1, slippage_bps=10,
+                mode=ExecutionMode.BSC_TESTNET, source=DataSource.TESTNET_EVIDENCE,
+            )
+        self.assertEqual(self.service.get_task(task.task_id).state, TaskState.APPROVED)
+
     async def test_revoke_policy_blocks_execution(self) -> None:
         task = self.create()
         self.service.simulate(task.task_id, {"passed": True})

@@ -185,6 +185,7 @@ class LiveHirePrepareRequest(BaseModel):
     skill_id: LiveSkillId
     agent_token_id: int | None = Field(default=None, gt=0)
     task_input: dict[str, Any]
+    arena_task: dict[str, Any] | None = None
 
 
 class LiveHireJobRequest(BaseModel):
@@ -557,6 +558,7 @@ async def prepare_external_hire(
             skill_id=body.skill_id,
             agent_token_id=body.agent_token_id,
             task_input=body.task_input,
+            **({"arena_task": body.arena_task} if body.arena_task is not None else {}),
         )
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -839,12 +841,16 @@ async def hire_agent(
         idempotency_key=body.idempotency_key,
     )
     agent_result = application.agents.invoke(agent_id, body.request)
-    task = application.tasks.simulate(task.task_id, agent_result)
+    # An Agent answer is advisory output, not a passed transaction simulation.
+    if application.settings.execution_mode == "demo":
+        task = application.tasks.simulate(
+            task.task_id, {"passed": True, "demo_only": True, "advisory_output": agent_result}
+        )
     return {
         "policy": policy.to_dict(),
         "task": task.to_dict(),
         "agent_result": agent_result,
-        "next_action": "approve",
+        "next_action": "approve" if application.settings.execution_mode == "demo" else "use_live_hire",
     }
 
 

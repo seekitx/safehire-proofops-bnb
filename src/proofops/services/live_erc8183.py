@@ -219,6 +219,19 @@ async def _policy_dispute_window() -> int:
     return window
 
 
+def _arena_binding(raw: Any, skill_id: str, *, require_fresh: bool = False) -> dict[str, Any]:
+    from proofops.arena.models import TaskSpec
+
+    task = TaskSpec.model_validate(raw)
+    categories = {"rebalance_plan": "rebalancing", "grid_plan": "grid_trading",
+                  "yield_plan": "yield_optimisation", "health_factor": "health_factor_monitoring"}
+    if task.category != categories.get(skill_id):
+        raise ValueError("Arena category does not match hired skill")
+    if require_fresh and not task.fresh():
+        raise ValueError("Arena task snapshot is stale")
+    return task.to_dict()
+
+
 def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
     if description.get("version") != 1:
         raise ValueError("job does not contain the supported signed description version")
@@ -241,7 +254,9 @@ def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
     if len(nonce) < 16 or len(nonce) > 128:
         raise ValueError("signed job request nonce is invalid")
     task_input = validate_task_input(skill_id, task.get("task_input"))
+    binding = {"arena_task": _arena_binding(task["arena_task"], skill_id)} if "arena_task" in task else {}
     return {
+        **binding,
         "schema_version": task["schema_version"],
         "service": skill_id,
         "erc8004_token_id": token_id,
@@ -275,11 +290,13 @@ async def prepare_live_hire(
     skill_id: str,
     task_input: dict[str, Any],
     agent_token_id: int | None = None,
+    arena_task: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Prepare one unsigned createJob call from a verified provider promise."""
 
     owner = _address(buyer, field="buyer")
     normalized_input = validate_task_input(skill_id, task_input)
+    binding: dict[str, Any] = {} if arena_task is None else {"arena_task": _arena_binding(arena_task, skill_id, require_fresh=True)}
     quote_payload = await request_live_agent_quote(
         project_root,
         skill_id=skill_id,
@@ -287,6 +304,7 @@ async def prepare_live_hire(
         task_input=normalized_input,
         rpc_url=BSC_MAINNET_RPC,
         rpc_call=_rpc,
+        **binding,
     )
     verification = quote_payload.get("quote_verification")
     quote = quote_payload.get("quote")

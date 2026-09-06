@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from proofops.domain.canonical import sha256_hex
 from proofops.domain.errors import RiskRejectedError
 from proofops.domain.models import (
     DataSource,
@@ -111,8 +112,18 @@ class TaskService:
     def simulate(self, task_id: str, result: Mapping[str, Any]) -> TaskRecord:
         task = self._store.get_task(task_id)
         require_transition(task.state, TaskState.SIMULATED)
+        if result.get("passed") is not True:
+            raise RiskRejectedError("simulation_requires_explicit_pass")
+        simulation = {
+            "passed": True,
+            "request_hash": sha256_hex(dict(task.request)),
+            "policy_id": task.policy_id,
+            "expires_at": (datetime.now(UTC) + timedelta(minutes=5)).isoformat(),
+            "authority": "caller_assertion_demo_only",
+            "result": dict(result),
+        }
         task = self._store.update_task(
-            task_id, expected_version=task.version, state=TaskState.SIMULATED, simulation=result
+            task_id, expected_version=task.version, state=TaskState.SIMULATED, simulation=simulation
         )
         require_transition(task.state, TaskState.APPROVAL_REQUIRED)
         task = self._store.update_task(
@@ -146,6 +157,23 @@ class TaskService:
     ) -> TaskRecord:
         task = self._store.get_task(task_id)
         policy = self.get_policy(task.policy_id)
+        # The generic simulation endpoint accepts owner-supplied JSON, not an
+        # authenticated chain simulation. It must never authorize real execution.
+        # The separately verified ERC-8183 wallet path remains available.
+        if mode != ExecutionMode.DEMO:
+            raise RiskRejectedError("trusted_chain_simulator_not_configured_use_live_hire")
+        simulation = task.simulation or {}
+        try:
+            expiry = datetime.fromisoformat(str(simulation.get("expires_at", "")))
+            simulation_valid = (
+                simulation.get("passed") is True
+                and simulation.get("request_hash") == sha256_hex(dict(task.request))
+                and simulation.get("policy_id") == task.policy_id
+                and expiry.tzinfo is not None
+                and datetime.now(UTC) < expiry
+            )
+        except ValueError:
+            simulation_valid = False
         intent = ExecutionIntent(
             task_id=task.task_id,
             idempotency_key=idempotency_key,
@@ -157,7 +185,7 @@ class TaskService:
             slippage_bps=slippage_bps,
             deadline=datetime.now(UTC) + timedelta(minutes=5),
             mode=mode,
-            simulation_passed=bool(task.simulation),
+            simulation_passed=simulation_valid,
             human_approved=task.state == TaskState.APPROVED,
             source=source,
             metadata={**(metadata or {}), "policy_id": task.policy_id},
