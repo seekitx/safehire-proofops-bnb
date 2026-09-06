@@ -50,7 +50,7 @@ def freshness(timestamp: Any, now: datetime, ttl_seconds: int = 60) -> dict[str,
     if now.tzinfo is None:
         raise ValueError("now must be timezone-aware")
     try:
-        stamp = datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
+        stamp = datetime.fromisoformat(str(timestamp))
         if stamp.tzinfo is None:
             raise ValueError("naive source timestamp")
         age = (now - stamp).total_seconds()
@@ -218,7 +218,7 @@ class SnapshotCache:
             try:
                 current = await asyncio.wait_for(self.loader(), timeout=self.timeout)
                 if not isinstance(current, dict) or not isinstance(current.get("agents"), list):
-                    raise ValueError("invalid upstream market shape")
+                    raise TypeError("invalid upstream market shape")
                 self.value = copy.deepcopy(current)
             except (TimeoutError, ValueError, TypeError, OSError, httpx.HTTPError) as exc:
                 previous = copy.deepcopy(self.value or {"agents": [], "observed_at": None})

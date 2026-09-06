@@ -5,12 +5,12 @@ import argparse
 import json
 import shutil
 from datetime import UTC, datetime
+from importlib import import_module
 from pathlib import Path
+from typing import Any
 
 import httpx
 from fastapi import FastAPI
-from importlib import import_module
-from typing import Any
 
 from proofops.decision.market import REVIEWED, SnapshotCache
 from proofops.decision.routes import make_router

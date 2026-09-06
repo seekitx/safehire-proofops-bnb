@@ -12,7 +12,8 @@ def _number(payload: dict[str, Any], key: str, *, minimum: float | None = None) 
     if key not in payload:
         raise ValueError(f"{key} is required")
     if isinstance(payload[key], bool):
-        raise ValueError(f"{key} must be a number, not a boolean")
+        # Keep all invalid user-supplied numeric fields on the same validation path.
+        raise ValueError(f"{key} must be a number, not a boolean")  # noqa: TRY004
     try:
         value = float(payload[key])
     except (TypeError, ValueError) as exc:

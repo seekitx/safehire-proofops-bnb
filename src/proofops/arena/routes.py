@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, Header, HTTPException

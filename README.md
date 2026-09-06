@@ -16,18 +16,12 @@ Discover → Compare proof → Quote → Limit authority → Hire
 
 ## Judge in 90 seconds
 
-1. **Live judge scorecard**  
-   https://safehire-proofops-bnb.onrender.com/judge-scorecard
-2. **Marketplace — four live ERC-8004 categories**  
-   https://safehire-proofops-bnb.onrender.com
-3. **External ERC-8183 hire path**  
-   https://safehire-proofops-bnb.onrender.com/hire-live
-4. **On-chain proof dossier**  
-   https://safehire-proofops-bnb.onrender.com/proof
-5. **TermiX benchmark lab**  
-   https://safehire-proofops-bnb.onrender.com/benchmark
-6. **Public A2A Agent Card**  
-   https://safehire-proofops-bnb.onrender.com/.well-known/agent-card.json
+1. [**Marketplace — discover four live ERC-8004 categories**](https://safehire-proofops-bnb.onrender.com)
+2. [**Decision desk — compare job-specific evidence**](https://safehire-proofops-bnb.onrender.com/decision)
+3. [**Live quote and external ERC-8183 hire path**](https://safehire-proofops-bnb.onrender.com/hire-live)
+4. [**Delivery and on-chain proof dossier**](https://safehire-proofops-bnb.onrender.com/proof)
+5. [**Live judge scorecard**](https://safehire-proofops-bnb.onrender.com/judge-scorecard)
+6. [**TermiX benchmark lab**](https://safehire-proofops-bnb.onrender.com/benchmark)
 
 The scorecard is a deterministic evidence map, **not an official BNB Chain score**.
 The event publishes Functionality, Data Quality and Agent Diversity as main-track

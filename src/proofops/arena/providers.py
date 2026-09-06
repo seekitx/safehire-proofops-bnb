@@ -147,21 +147,23 @@ class QuoteGateway:
             payload = {'schema_version': 'safehire-quote-request/2', 'task_hash': task.task_hash,
                        'agent_ref': provider.agent_ref, 'task': task.to_dict(), 'requested_action': 'quote_only'}
         started = self.clock()
-        async with httpx.AsyncClient(timeout=10, follow_redirects=False, trust_env=False, transport=self.transport) as client:
-            async with client.stream('POST', provider.endpoint, json=payload) as response:
-                response.raise_for_status()
-                if response.status_code != 200:
-                    raise ValueError('only a successful 200 quote response is supported')
-                chunks, size = [], 0
-                async for chunk in response.aiter_bytes():
-                    size += len(chunk)
-                    if size > 64000:
-                        raise ValueError('quote response exceeds 64 KiB')
-                    chunks.append(chunk)
+        async with (
+            httpx.AsyncClient(timeout=10, follow_redirects=False, trust_env=False, transport=self.transport) as client,
+            client.stream('POST', provider.endpoint, json=payload) as response,
+        ):
+            response.raise_for_status()
+            if response.status_code != 200:
+                raise ValueError('only a successful 200 quote response is supported')
+            chunks, size = [], 0
+            async for chunk in response.aiter_bytes():
+                size += len(chunk)
+                if size > 64000:
+                    raise ValueError('quote response exceeds 64 KiB')
+                chunks.append(chunk)
         raw = b''.join(chunks)
         body = json.loads(raw)
         if not isinstance(body, dict):
-            raise ValueError('quote must be a JSON object')
+            raise TypeError('quote must be a JSON object')
         task_bound = provider.protocol == 'safehire-quote-v2'
         q = body if task_bound else body.get('result')
         if not isinstance(q, dict) or q.get('accepted') is not True or body.get('error'):
@@ -186,7 +188,7 @@ class QuoteGateway:
             if type(deadline) is int:
                 expires = datetime.fromtimestamp(deadline, UTC)
             elif isinstance(deadline, str):
-                expires = datetime.fromisoformat(deadline.replace('Z', '+00:00'))
+                expires = datetime.fromisoformat(deadline)
             if expires is None or expires.tzinfo is None or expires <= utcnow():
                 raise ValueError('quote expired or expiry is invalid')
         return {'schema_version': 'safehire-observed-quote/2', 'agent_ref': provider.agent_ref,

@@ -11,10 +11,11 @@ import json
 import secrets
 import sqlite3
 import uuid
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from proofops.arena.models import Proposal, TaskSpec, canonical, digest, utcnow
 from proofops.arena.planners import evaluate

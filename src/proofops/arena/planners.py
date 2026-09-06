@@ -12,7 +12,7 @@ from datetime import datetime
 from decimal import Decimal, localcontext
 from typing import Any
 
-from proofops.arena.models import Proposal, TaskSpec, digest, utcnow
+from proofops.arena.models import Proposal, TaskSpec, utcnow
 
 
 def D(value: Any) -> Decimal:

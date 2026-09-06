@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from pathlib import Path
 
 import httpx
@@ -10,10 +9,10 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from proofops.arena.models import TaskSpec, canonical
 from proofops.arena.examples import examples
+from proofops.arena.models import TaskSpec, canonical
 from proofops.arena.planners import reference_proposal
-from proofops.arena.routes import make_router, ArenaBoundaryMiddleware
+from proofops.arena.routes import ArenaBoundaryMiddleware, make_router
 from proofops.arena.store import TaskStore
 
 ROOT = Path(__file__).resolve().parents[2]

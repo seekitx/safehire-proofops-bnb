@@ -1,13 +1,22 @@
 from __future__ import annotations
-import copy,json,sqlite3
+
+import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 
 import pytest
+
 from proofops.arena.examples import examples
-from proofops.arena.models import TaskSpec,canonical
+from proofops.arena.models import TaskSpec, canonical
 from proofops.arena.planners import reference_proposal
-from proofops.arena.store import TaskStore,Conflict,MissingTask,CapacityError,parse_proposal,verify_bundle
+from proofops.arena.store import (
+    CapacityError,
+    Conflict,
+    MissingTask,
+    TaskStore,
+    parse_proposal,
+    verify_bundle,
+)
 
 
 def sample(tmp_path,**kwargs):
@@ -19,8 +28,8 @@ def sample(tmp_path,**kwargs):
 
 
 def test_persistence_roundtrip_bytes_and_offline_verification(tmp_path):
-    s,t,c,raw=sample(tmp_path)
-    result=s.submit(c['task_id'],c['task_token'],raw,request_key='request-1',expected_version=1)
+    s,_,c,raw=sample(tmp_path)
+    s.submit(c['task_id'],c['task_token'],raw,request_key='request-1',expected_version=1)
     s=TaskStore(tmp_path/'tasks.sqlite3')
     bundle=s.bundle(c['task_id'],c['task_token'])
     assert bundle['proposals'][0]['raw_text']==raw
@@ -32,8 +41,8 @@ def test_persistence_roundtrip_bytes_and_offline_verification(tmp_path):
 
 
 def test_exact_idempotent_retry_and_byte_conflict(tmp_path):
-    s,t,c,raw=sample(tmp_path)
-    kw=dict(request_key='request-1',expected_version=1)
+    s,_,c,raw=sample(tmp_path)
+    kw={'request_key': 'request-1', 'expected_version': 1}
     a=s.submit(c['task_id'],c['task_token'],raw,**kw)
     b=s.submit(c['task_id'],c['task_token'],raw,**kw)
     assert b['replayed'] and a['proposal_id']==b['proposal_id']
@@ -50,7 +59,7 @@ def test_other_task_capability_cannot_access(tmp_path,operation):
 
 
 def test_atomic_concurrency_one_writer_one_conflict(tmp_path):
-    s,t,c,raw=sample(tmp_path)
+    s,_,c,raw=sample(tmp_path)
     def submit(n):
         try:return s.submit(c['task_id'],c['task_token'],raw,request_key=f'request-{n}',expected_version=1)
         except Conflict:return 'conflict'
@@ -69,7 +78,7 @@ def test_quotas_do_not_partially_write(tmp_path):
 
 @pytest.mark.parametrize('target',['raw','event','report','task','tail'])
 def test_tampering_detected(tmp_path,target):
-    s,t,c,raw=sample(tmp_path)
+    s,_,c,raw=sample(tmp_path)
     s.submit(c['task_id'],c['task_token'],raw,request_key='request-1',expected_version=1)
     b=s.bundle(c['task_id'],c['task_token']);b.pop('bundle_sha256')
     if target=='raw':b['proposals'][0]['raw_text']+=' '

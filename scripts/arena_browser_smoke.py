@@ -12,10 +12,10 @@ import sys
 import tempfile
 import time
 import urllib.request
-import asyncio
+from contextlib import ExitStack
+from pathlib import Path
 
 import httpx
-from pathlib import Path
 
 
 def main() -> int:
@@ -31,7 +31,7 @@ def main() -> int:
         sock.bind(('127.0.0.1', 0))
         port = sock.getsockname()[1]
     errors, checks = [], []
-    with tempfile.TemporaryDirectory() as temporary:
+    with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
         from arena_local_server import build_local_app
         asgi_app = build_local_app(root, Path(temporary)/'offline.sqlite3') if args.offline_asgi else None
         async def binding(_source, path, options):
@@ -40,7 +40,7 @@ def main() -> int:
                     headers=options.get('headers', {}), content=options.get('body'))
                 return {'status':response.status_code, 'body':response.json()}
         env = os.environ | {'PYTHONPATH':str(root/'src'), 'SAFEHIRE_PROVIDER_QUOTES_ENABLED':'false'}
-        log = open(args.output/'isolated-server.log', 'w')
+        log = stack.enter_context((args.output/'isolated-server.log').open('w'))
         process = subprocess.Popen([sys.executable, str(root/'scripts/arena_local_server.py'),
                                     '--port', str(port), '--db', str(Path(temporary)/'test.sqlite3')],
                                    env=env, cwd=root, stdout=log, stderr=subprocess.STDOUT)
@@ -138,7 +138,6 @@ def main() -> int:
                 process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 process.kill(); process.wait()
-            log.close()
     report = {'mode':'offline_browser_ASGI_synthetic_tasks' if args.offline_asgi else 'real_browser_HTTP_isolated_ASGI_synthetic_tasks', 'checks':checks,
               'javascript_errors':errors, 'full_marketplace_lifespan_tested':False,
               'mainnet_transactions_tested':False, 'external_providers_tested':False}

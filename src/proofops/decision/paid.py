@@ -164,10 +164,11 @@ class BscReader:
         transfers = []
         for log in receipt.get("logs", []):
             topics = log.get("topics", [])
-            if len(topics) == 3 and str(topics[0]).lower() == topic0 and not log.get("removed"):
-                if all(HASH.fullmatch(str(topic)) for topic in topics) and HASH.fullmatch(str(log.get("data"))):
-                    transfers.append({"token": log["address"], "from": "0x" + topics[1][-40:],
-                                      "to": "0x" + topics[2][-40:], "amount_raw": int(log["data"], 16)})
+            if (len(topics) == 3 and str(topics[0]).lower() == topic0 and not log.get("removed")
+                    and all(HASH.fullmatch(str(topic)) for topic in topics)
+                    and HASH.fullmatch(str(log.get("data")))):
+                transfers.append({"token": log["address"], "from": "0x" + topics[1][-40:],
+                                  "to": "0x" + topics[2][-40:], "amount_raw": int(log["data"], 16)})
         block = int(receipt["blockNumber"], 16)
         head = int(await self.rpc("eth_blockNumber", []), 16)
         return {"chain_id": chain, "status": int(receipt["status"], 16), "tx_hash": tx_hash,

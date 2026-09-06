@@ -16,6 +16,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from proofops.arena.routes import ArenaBoundaryMiddleware
+from proofops.arena.routes import make_router as make_arena_router
+from proofops.decision.routes import make_router
 from proofops.domain.errors import (
     AdapterUnavailableError,
     DuplicateRequestError,
@@ -50,8 +53,6 @@ from proofops.services.live_erc8183 import (
     prepare_live_hire,
 )
 from proofops.settings import Settings
-from proofops.decision.routes import make_router
-from proofops.arena.routes import make_router as make_arena_router, ArenaBoundaryMiddleware
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
 

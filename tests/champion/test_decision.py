@@ -8,7 +8,13 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
-from proofops.decision.market import REVIEWED, SnapshotCache, compare_market, freshness, project_market
+from proofops.decision.market import (
+    REVIEWED,
+    SnapshotCache,
+    compare_market,
+    freshness,
+    project_market,
+)
 from proofops.decision.routes import make_router
 
 NOW = datetime(2026, 9, 5, 12, tzinfo=UTC)

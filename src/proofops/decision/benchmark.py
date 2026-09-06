@@ -39,7 +39,7 @@ def bounded_file(root: Path, relative: str) -> bytes:
 
 def timestamp(value: Any) -> datetime:
     try:
-        result = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        result = datetime.fromisoformat(str(value))
     except (TypeError, ValueError) as exc:
         raise ValueError("Invalid measurement timestamp") from exc
     if result.tzinfo is None:

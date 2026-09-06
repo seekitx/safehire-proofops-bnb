@@ -18,7 +18,7 @@ def main() -> int:
         result = asyncio.run(replay_claim(args.root, args.claim, args.deliverable))
         print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
         return 0
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - verification must fail closed at the CLI boundary.
         # Network/ABI failures are failed verification, never a passing fallback.
         parser.exit(2, f"Verification not established: {type(exc).__name__}: {exc}\n")
 

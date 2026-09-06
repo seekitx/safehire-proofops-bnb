@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import asyncio
-import copy
 import json
 from datetime import timedelta
-from pathlib import Path
 
 import httpx
 import pytest
@@ -20,9 +18,9 @@ def task():
 
 
 def provider(**changes):
-    payload = dict(provider_id='synthetic-test-only', operator_label='TEST ONLY', token_id=123,
-                   skill_id='grid_test', category='grid_trading', endpoint='https://example.org/quote',
-                   protocol='safehire-quote-v2', reviewed_scope='synthetic grid proposal', quote_enabled=True)
+    payload = {'provider_id': 'synthetic-test-only', 'operator_label': 'TEST ONLY', 'token_id': 123,
+               'skill_id': 'grid_test', 'category': 'grid_trading', 'endpoint': 'https://example.org/quote',
+               'protocol': 'safehire-quote-v2', 'reviewed_scope': 'synthetic grid proposal', 'quote_enabled': True}
     return ProviderSpec(**(payload | changes))
 
 
@@ -33,9 +31,9 @@ test_dns.__test__ = False
 
 
 def response(t, p, **changes):
-    return dict(accepted=True, chain_id=56, task_hash=t.task_hash, agent_ref=p.agent_ref,
-                price_raw='100', payment_token='0x' + 'a'*40,
-                expires_at=(utcnow()+timedelta(minutes=2)).isoformat()) | changes
+    return {'accepted': True, 'chain_id': 56, 'task_hash': t.task_hash, 'agent_ref': p.agent_ref,
+            'price_raw': '100', 'payment_token': '0x' + 'a'*40,
+            'expires_at': (utcnow()+timedelta(minutes=2)).isoformat()} | changes
 
 
 def invoke(t, p, body=None, *, status=200, dns=test_dns):

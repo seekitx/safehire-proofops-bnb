@@ -8,8 +8,8 @@ from typing import Any, Self
 import pytest
 from eth_abi.abi import encode
 from eth_utils.crypto import keccak
-
 from proofops.integrations.erc8183_quote import canonical_json
+
 from proofops.services import live_erc8183
 
 BUYER = "0x1111111111111111111111111111111111111111"

@@ -5,8 +5,8 @@ import asyncio
 import json
 from pathlib import Path
 
-from proofops.judging.scorecard import build_judge_scorecard
 from proofops.decision.paid import VerifiedDelivery, replay_claim
+from proofops.judging.scorecard import build_judge_scorecard
 from proofops.services.bootstrap import build_application
 
 

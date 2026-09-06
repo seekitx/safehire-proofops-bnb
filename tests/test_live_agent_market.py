@@ -8,12 +8,12 @@ import httpx
 import pytest
 from eth_account import Account
 from eth_account.messages import encode_defunct
-
 from proofops.integrations.erc8183_quote import (
     build_description_content,
     canonical_keccak,
     response_hash_content,
 )
+
 from proofops.services import live_agent_market
 
 ACCOUNT = Account.create()

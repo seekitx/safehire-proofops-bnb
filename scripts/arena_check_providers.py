@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Validate reviewed provider manifest offline; never approves identity or calls provider."""
+import argparse
+import json
+import sys
 from pathlib import Path
-import argparse,json,sys
+
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from proofops.arena.providers import ProviderCatalog
 

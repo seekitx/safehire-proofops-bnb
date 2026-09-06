@@ -5,7 +5,13 @@ import json
 
 import pytest
 
-from proofops.decision.benchmark import bounded_file, canonical, create_blind_packet, digest, validate_experiment
+from proofops.decision.benchmark import (
+    bounded_file,
+    canonical,
+    create_blind_packet,
+    digest,
+    validate_experiment,
+)
 
 
 @pytest.fixture
@@ -71,7 +77,7 @@ def test_blind_packet_keeps_reveal_private_and_committed(experiment):
     reveal = json.loads((private / "reveal.json").read_text())
     assert digest(canonical(reveal)) == packet["reveal_commitment_sha256"]
     assert not (public / "reveal.json").exists()
-    assert set(reveal["mapping"]["case-001"][label] for label in ("A", "B")) == {"agent", "manual"}
+    assert {reveal["mapping"]["case-001"][label] for label in ("A", "B")} == {"agent", "manual"}
     assert (public / "case-001/A.txt").exists() and (public / "case-001/B.txt").exists()
     assert "task_id" not in json.dumps(packet)
     assert (private / "reveal.json").stat().st_mode & 0o077 == 0

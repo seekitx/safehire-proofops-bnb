@@ -8,8 +8,16 @@ import pytest
 from pydantic import ValidationError
 
 from proofops.arena.examples import examples
-from proofops.arena.models import Proposal, TaskSpec, utcnow
-from proofops.arena.planners import compare, evaluate, grid_metrics, health_metrics, lp_inventory, reference_proposal, yield_metrics
+from proofops.arena.models import TaskSpec
+from proofops.arena.planners import (
+    compare,
+    evaluate,
+    grid_metrics,
+    health_metrics,
+    lp_inventory,
+    reference_proposal,
+    yield_metrics,
+)
 
 CATEGORIES = list(examples()['tasks'])
 
