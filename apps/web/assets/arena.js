@@ -1,0 +1,162 @@
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const categories = {
+    rebalancing: ['LP ranges', 'Tick alignment, range inventory, churn and cost caps. Not portfolio weighting.'],
+    grid_trading: ['Grid trading', 'One adjacent cycle after both-side fees, tax, slippage and gas; not a backtest.'],
+    yield_optimisation: ['Yield routing', 'Compare net horizon income with staying in the current venue; check capacity and exit delay.'],
+    health_factor_monitoring: ['Lending protection', 'Asset-level collateral drops and debt-price increases; quantify repay and budget shortfall.']
+  };
+  let category = 'rebalancing', task = null, reference = null, capabilities = null;
+  let saved = [], selected = new Set(), busy = false, pendingSubmission = null;
+  const requestKey = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+  const json = value => JSON.stringify(value, null, 2);
+  function status(text) { $('status').textContent = text; }
+  function element(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+  async function api(path, options = {}) {
+    const headers = { ...(options.body ? {'Content-Type': 'application/json'} : {}), ...(options.headers || {}) };
+    if (task) headers.Authorization = `Bearer ${task.task_token}`;
+    const response = await fetch(`/api/arena${path}`, { ...options, headers, cache: 'no-store' });
+    const result = await response.json();
+    if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : json(result.detail || result));
+    return result;
+  }
+  async function act(fn) {
+    if (busy) return;
+    busy = true;
+    try { await fn(); } catch (error) { status(`Not completed: ${error.message}`); }
+    finally { busy = false; }
+  }
+  function renderReport(report, parent) {
+    const card = element('article', undefined, 'report-card');
+    card.append(element('h3', `${report.agent_ref} · ${report.policy_accepted ? 'CONSTRAINTS PASS' : 'BLOCKED'}`));
+    card.append(element('p', 'Caller-supplied model validation · no execution or verified authorship', 'muted'));
+    const list = element('ul');
+    for (const c of report.checks) {
+      list.append(element('li', `${c.passed ? 'PASS' : 'FAIL'}  ${c.name}${c.detail ? ` — ${c.detail}` : ''}`, c.passed ? 'pass' : 'fail'));
+    }
+    card.append(list);
+    const details = element('details');
+    details.append(element('summary', 'Recomputed metrics'), element('pre', json(report.metrics)));
+    card.append(details); parent.append(card);
+  }
+  function categoryButtons() {
+    $('categories').replaceChildren();
+    for (const [key, [label]] of Object.entries(categories)) {
+      const button = element('button', label);
+      button.setAttribute('aria-pressed', String(key === category));
+      button.addEventListener('click', () => act(async () => {
+        if (task && !confirm('Switching clears this tab’s task access token. Export your private bundle first. Continue?')) return;
+        category = key; task = null; saved = []; reference = null; selected.clear();
+        $('walkthrough-result').replaceChildren();
+        renderSaved(); await loadExample(); categoryButtons();
+      }));
+      $('categories').append(button);
+    }
+    $('task-title').textContent = categories[category][0];
+    $('category-detail').textContent = categories[category][1];
+  }
+  async function loadExample() {
+    const data = await api('/examples');
+    $('task-input').value = json(data.tasks[category]);
+    $('reference').replaceChildren();
+    status('SYNTHETIC EXAMPLE loaded. The block and asset values are not chain observations.');
+  }
+  function renderSaved() {
+    $('saved-proposals').replaceChildren();
+    for (const p of saved) {
+      const label = element('label', undefined, 'saved-row');
+      const box = document.createElement('input'); box.type = 'checkbox'; box.checked = selected.has(p.proposal_id);
+      box.addEventListener('change', () => {
+        if (box.checked) selected.add(p.proposal_id); else selected.delete(p.proposal_id);
+        $('compare').disabled = selected.size < 2 || selected.size > 3;
+      });
+      const report = JSON.parse(p.report_json);
+      const name = element('span', `${report.agent_ref} · ${report.policy_accepted ? 'passed at evaluation time' : 'blocked at evaluation time'}`);
+      name.append(element('small', `Exact output SHA-256 ${p.raw_sha256}`));
+      label.append(box, name); $('saved-proposals').append(label);
+    }
+    $('submit').disabled = !task; $('export').disabled = !task; $('refresh-task').disabled = !task;
+    $('create').disabled = Boolean(capabilities && !capabilities.task_storage_enabled);
+    $('compare').disabled = selected.size < 2 || selected.size > 3;
+    $('task-meta').textContent = task ? `Task ${task.task_id} · version ${task.version}` : 'No task opened.';
+    renderProviders();
+  }
+  function renderProviders() {
+    if (!capabilities) return;
+    $('providers').replaceChildren(); $('provider-select').replaceChildren();
+    const rows = capabilities.providers.providers.filter(p => p.category === category);
+    for (const p of rows) {
+      $('providers').append(element('div', `${p.operator_label} · ${p.agent_ref} · ${p.reviewed_scope} · ${p.quote_enabled ? 'quote configured' : 'quote disabled'}`, 'provider-row'));
+      const option = element('option', `${p.operator_label} — ${p.skill_id}`); option.value = p.agent_ref;
+      $('provider-select').append(option);
+    }
+    $('quote').disabled = !task || !capabilities.quotes_enabled || !rows.some(p => p.quote_enabled);
+  }
+  $('walkthrough').addEventListener('click', () => act(async () => {
+    const data = await api(`/synthetic-walkthrough/${category}`);
+    $('walkthrough-result').replaceChildren(); $('scenario-story').textContent = data.narrative;
+    for (const report of data.comparison.reports) renderReport(report, $('walkthrough-result'));
+    status('Synthetic local plans compared. Zero real providers, no payment and no reputation changes.');
+  }));
+  $('sample').addEventListener('click', () => act(loadExample));
+  $('preview').addEventListener('click', () => act(async () => {
+    const data = await api('/preview', {method: 'POST', body: $('task-input').value});
+    reference = data.reference_proposal; $('reference').replaceChildren();
+    renderReport(data.report, $('reference')); $('copy-reference').disabled = false;
+    $('proposal-input').value = json(reference);
+    status('Reference plan recomputed locally. This is not a hired provider’s delivery.');
+  }));
+  $('create').addEventListener('click', () => act(async () => {
+    if (task && !confirm('Replace this tab’s current task access token? Export first.')) return;
+    task = await api('/tasks', {method: 'POST', body: $('task-input').value});
+    saved = []; selected.clear(); renderSaved();
+    status('Private task opened. Subsequent proposals are checked against its frozen inputs, not edited textarea values.');
+  }));
+  $('copy-reference').addEventListener('click', () => { if (reference) $('proposal-input').value = json(reference); });
+  $('submit').addEventListener('click', () => act(async () => {
+    if (!task) throw new Error('Open a private task first.');
+    const body = json({proposal_text: $('proposal-input').value, expected_version: task.version});
+    if (!pendingSubmission || pendingSubmission.body !== body || pendingSubmission.task_id !== task.task_id) {
+      pendingSubmission = {body, task_id: task.task_id, key: requestKey()};
+    }
+    const result = await api(`/tasks/${task.task_id}/proposals`, {method: 'POST',
+      headers: {'Idempotency-Key': pendingSubmission.key}, body});
+    pendingSubmission = null;
+    task.version = result.version; $('proposal-result').replaceChildren(); renderReport(result.report, $('proposal-result'));
+    const bundle = await api(`/tasks/${task.task_id}`); task.version = bundle.version; saved = bundle.proposals; renderSaved();
+    status('Exact proposal bytes saved. No provider reputation or paid-delivery count was changed.');
+  }));
+  $('compare').addEventListener('click', () => act(async () => {
+    const data = await api(`/tasks/${task.task_id}/compare`, {method: 'POST', body: json({proposal_ids: [...selected]})});
+    $('comparison-result').replaceChildren();
+    for (const report of data.reports) renderReport(report, $('comparison-result'));
+    status(`Fresh checks completed. ${data.eligible_agent_refs.length} proposal(s) satisfy this task. No quality winner is inferred.`);
+  }));
+  $('refresh-task').addEventListener('click', () => act(async () => {
+    const bundle = await api(`/tasks/${task.task_id}`); task.version = bundle.version;
+    saved = bundle.proposals; pendingSubmission = null; selected.clear(); renderSaved();
+    status('Task version refreshed without discarding this tab’s access token.');
+  }));
+  $('export').addEventListener('click', () => act(async () => {
+    const bundle = await api(`/tasks/${task.task_id}`);
+    const url = URL.createObjectURL(new Blob([json(bundle)], {type: 'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = `safehire-private-${task.task_id}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status(`Exported. Preserve this head independently: ${bundle.integrity.head}. Bundle contains private inputs, not the task token.`);
+  }));
+  $('quote').addEventListener('click', () => act(async () => {
+    if (!$('consent').checked) throw new Error('Approve sending the task to this provider first.');
+    const data = await api(`/tasks/${task.task_id}/quote`, {method: 'POST', body: json({agent_ref: $('provider-select').value, consent_send_task: true})});
+    $('quote-result').textContent = json(data); status('Read-only quote returned. No payment, delivery or signature was requested.');
+  }));
+  act(async () => {
+    capabilities = await api('/capabilities'); categoryButtons(); await loadExample(); renderSaved();
+    if (!capabilities.task_storage_enabled) status('Preview is available. Private task storage is disabled until the deployment enables SAFEHIRE_ARENA_ENABLED=true.');
+  });
+})();

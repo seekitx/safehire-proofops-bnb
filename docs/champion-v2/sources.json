@@ -1,0 +1,60 @@
+{
+  "report_date": "2026-09-06",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "BNB official competition page",
+      "url": "https://www.bnbchain.org/en/hackathons/smart-money-era",
+      "scope": "official rules; phase 2 undisclosed; no numerical main-track weights"
+    },
+    {
+      "id": "S2",
+      "title": "BNB official announcement",
+      "url": "https://www.bnbchain.org/en/blog/build-the-era-build-the-official-bnb-agent-studio-marketplace",
+      "scope": "marketplace not collection of bots; categories wording differs from event page"
+    },
+    {
+      "id": "S3",
+      "title": "TermiX own campaign",
+      "url": "https://www.agent.family/campaigns/bnb-build-the-era",
+      "scope": "real paired tasks; independent sponsor judging"
+    },
+    {
+      "id": "S4",
+      "title": "HIREDESK owner README",
+      "url": "https://github.com/timmyspurs12/hiredesk/blob/main/README.md",
+      "scope": "first-party project description; not chain replay or full security audit"
+    },
+    {
+      "id": "S5",
+      "title": "minia2a owner pitch",
+      "url": "https://minia2a.uk/hackathon/bnb-pitch-deck.html",
+      "scope": "self-reported scale and roadmap, not independently verified"
+    },
+    {
+      "id": "S6",
+      "title": "SmartSentinels own Hub",
+      "url": "https://smartsentinels.net/hub",
+      "scope": "limited parsed content; not full code assessment"
+    },
+    {
+      "id": "S7",
+      "title": "SmartSentinels founder announcement",
+      "url": "https://www.linkedin.com/posts/andrei-galea_bnbchain-web3-aiagents-activity-7494835646889615362-hPjU",
+      "scope": "self-declared participation not official complete roster"
+    },
+    {
+      "id": "S8",
+      "title": "OWASP SSRF prevention",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html",
+      "scope": "network safety guidance; unresolved DNS connection pinning noted"
+    }
+  ],
+  "failed_fetches": [
+    {
+      "url": "https://smartsentinels.net/documents/hub/erc-8004-marketplace",
+      "result": "404 in direct open; not used to infer missing capability"
+    }
+  ],
+  "complete_official_competitor_roster_obtained": false
+}

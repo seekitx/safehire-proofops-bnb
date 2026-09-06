@@ -1,0 +1,75 @@
+{
+  "schema_version": "safehire-v2-workorders/1",
+  "items": [
+    {
+      "id": "V2-01",
+      "status": "implemented_tested_locally",
+      "task": "Task schema, category constraints, same-task comparison",
+      "files": "src/proofops/arena/models.py + planners.py",
+      "acceptance": "tests/arena/test_planners.py"
+    },
+    {
+      "id": "V2-02",
+      "status": "implemented_mock_transport_tested",
+      "task": "Reviewed provider quote routing and failure handling",
+      "files": "src/proofops/arena/providers.py",
+      "acceptance": "tests/arena/test_providers.py; no live payment"
+    },
+    {
+      "id": "V2-03",
+      "status": "implemented_tested_locally",
+      "task": "Private exact-byte journal, concurrency, export",
+      "files": "src/proofops/arena/store.py",
+      "acceptance": "tests/arena/test_store.py"
+    },
+    {
+      "id": "V2-04",
+      "status": "implemented_offline_browser_ASGI_tested",
+      "task": "Guided UI, private task, comparison, export",
+      "files": "apps/web/arena.html + assets/arena.js",
+      "acceptance": "scripts/arena_browser_smoke.py --offline-asgi"
+    },
+    {
+      "id": "P0-A",
+      "status": "not_implemented",
+      "task": "Pinned-block identity and snapshot verification",
+      "files": "src/proofops/arena/identity.py (planned)",
+      "acceptance": "wrong-chain/reorg/owner-change/timeout fail closed"
+    },
+    {
+      "id": "P0-B",
+      "status": "not_implemented",
+      "task": "Second real provider and exact-output normalization",
+      "files": "src/proofops/arena/delivery_adapter.py (planned)",
+      "acceptance": "original bytes + mapped envelope + versioned mapping; genuine provider consent"
+    },
+    {
+      "id": "P0-C",
+      "status": "not_implemented",
+      "task": "Authenticated paid-job to arena task binding",
+      "files": "src/proofops/arena/paid_binding.py (planned)",
+      "acceptance": "matching task/job/provider/chain/amount/block/output; no user boolean evidence"
+    },
+    {
+      "id": "P0-D",
+      "status": "not_implemented",
+      "task": "Authenticated independent paired review",
+      "files": "src/proofops/arena/reviewer.py (planned)",
+      "acceptance": "reviewer identity + conflicts + raw outputs + timing/cost"
+    },
+    {
+      "id": "P0-E",
+      "status": "not_implemented",
+      "task": "Verified real outcomes projected into decision desk",
+      "files": "src/proofops/arena/outcomes.py (planned)",
+      "acceptance": "defined denominator/time window; all failures; synthetic records excluded"
+    },
+    {
+      "id": "P1-B",
+      "status": "not_run",
+      "task": "Full app chain/TS/public deployment regression",
+      "files": "existing apps/contracts/agent-studio unchanged",
+      "acceptance": "complete dependencies; original wallet hire/revoke/refund; external browser"
+    }
+  ]
+}

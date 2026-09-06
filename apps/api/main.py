@@ -47,6 +47,7 @@ from proofops.services.live_erc8183 import (
 )
 from proofops.settings import Settings
 from proofops.decision.routes import make_router
+from proofops.arena.routes import make_router as make_arena_router, ArenaBoundaryMiddleware
 
 EVM_ADDRESS_PATTERN = r"^0x[a-fA-F0-9]{40}$"
 
@@ -262,6 +263,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(make_router(Path(__file__).resolve().parents[2]))
+app.include_router(make_arena_router(Path(__file__).resolve().parents[2]))
+app.add_middleware(ArenaBoundaryMiddleware)
 settings = Settings()
 app.add_middleware(
     CORSMiddleware,
@@ -1366,3 +1369,8 @@ async def hire_agent_page(application: ApplicationDep) -> FileResponse:
 @app.get("/decision", include_in_schema=False)
 async def decision_page() -> FileResponse:
     return FileResponse(WEB_ROOT / "decision.html")
+
+
+@app.get("/arena", include_in_schema=False)
+async def arena_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "arena.html", headers={"Cache-Control": "no-store"})

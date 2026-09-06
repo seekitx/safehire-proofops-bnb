@@ -1,0 +1,57 @@
+{
+  "schema_version": "safehire-providers/2",
+  "providers": [
+    {
+      "provider_id": "brain-on-bnb",
+      "operator_label": "Brain On BNB AI",
+      "token_id": 304494,
+      "chain_id": 56,
+      "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+      "skill_id": "rebalance_plan",
+      "category": "rebalancing",
+      "endpoint": "https://agent.brainonbnb.com/a2a",
+      "protocol": "brain-a2a-v1",
+      "reviewed_scope": "portfolio_rebalance_analysis_not_lp_execution",
+      "quote_enabled": false
+    },
+    {
+      "provider_id": "brain-on-bnb",
+      "operator_label": "Brain On BNB AI",
+      "token_id": 302258,
+      "chain_id": 56,
+      "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+      "skill_id": "grid_plan",
+      "category": "grid_trading",
+      "endpoint": "https://agent.brainonbnb.com/a2a",
+      "protocol": "brain-a2a-v1",
+      "reviewed_scope": "grid_cost_analysis",
+      "quote_enabled": false
+    },
+    {
+      "provider_id": "brain-on-bnb",
+      "operator_label": "Brain On BNB AI",
+      "token_id": 304493,
+      "chain_id": 56,
+      "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+      "skill_id": "yield_plan",
+      "category": "yield_optimisation",
+      "endpoint": "https://agent.brainonbnb.com/a2a",
+      "protocol": "brain-a2a-v1",
+      "reviewed_scope": "yield_comparison_analysis",
+      "quote_enabled": false
+    },
+    {
+      "provider_id": "brain-on-bnb",
+      "operator_label": "Brain On BNB AI",
+      "token_id": 302257,
+      "chain_id": 56,
+      "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+      "skill_id": "health_factor",
+      "category": "health_factor_monitoring",
+      "endpoint": "https://agent.brainonbnb.com/a2a",
+      "protocol": "brain-a2a-v1",
+      "reviewed_scope": "lending_position_analysis",
+      "quote_enabled": false
+    }
+  ]
+}

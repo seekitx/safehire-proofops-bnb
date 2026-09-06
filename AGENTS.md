@@ -173,3 +173,16 @@ Implementation entry points: `src/proofops/decision/`, `/decision`, `tests/champ
 Run `python -m pytest tests/champion` and the existing suite. Keep live source timestamps, treat category route parity as structure only, and never convert stored JSON booleans into verified paid outcomes.
 The read-only replay requires matching ERC-8004 agent wallet, exact job/settlement/block, payment and deliverable commitment. It does not prove useful work, independent businesses, or profit.
 Independent reviewer authentication, new provider adapters and live mainnet replay remain release gates listed in the blueprint. Do not mark them complete from synthetic tests.
+
+## 2026-09-06 task acceptance arena V2
+
+Read `docs/champion-v2/START_HERE.zh-CN.md`, `GAP_AND_COMPETITORS.zh-CN.md`,
+`CONSTRUCTION_BLUEPRINT.zh-CN.md`, and `RELEASE_AND_DEMO.zh-CN.md` before extending V2.
+Implementation: `src/proofops/arena/`, `config/arena-providers.json`, `/arena`, `tests/arena/`.
+Preserve existing marketplace, manual hire, contract and Agent Studio paths.
+A constraint pass, local journal, configured operator, or task echo does not prove chain
+truth, signed identity, paid delivery, independent quality, or live execution.
+External quotes default off; do not convert quote-only adapters into funding actions.
+Run `python -m pytest tests/arena -ra` and the full original suite in a complete environment.
+Keep synthetic guided plans separate from real supply and reputation. Bind paid output
+and authenticated identity only through the pending gates in the V2 construction document.
