@@ -19,6 +19,13 @@
 <div class="form-actions"><button id="preview">Check reference plan</button><button id="create" class="secondary">Create private task</button></div>
 <p class="muted">Creating a task stores these inputs on this server. Do not include keys, seeds, passwords or sensitive personal data. Access token stays in this tab's memory; export records before leaving.</p>
 <div id="reference" class="report-grid"></div></section>
+<section class="panel"><h2>Read Venus rates and optional public positions</h2>
+<button id="venus-template" class="secondary">Load Venus template (review assumed capital and costs)</button>
+<p class="muted">Create a yield task using live USDT / USDC core-market rates. In the task JSON above, use venue IDs venus-core-usdt and venus-core-usdc. Only rates and the block snapshot are replaced: capital, costs, withdrawal capacity and delays remain your assumptions. These are projected rates, not guaranteed returns. Optional account reads cover only these two markets, not your complete portfolio.</p>
+<label for="venus-current">Current market (your declaration)</label><select id="venus-current"><option value="venus-core-usdt">Venus core USDT</option><option value="venus-core-usdc">Venus core USDC</option></select>
+<label for="venus-account">Optional public BSC wallet address (never a key)</label><input id="venus-account" autocomplete="off" placeholder="0x…">
+<label class="consent"><input id="venus-consent" type="checkbox"> I approve sending this optional public address to the configured BSC RPC and storing the observation with this private task.</label>
+<button id="venus-create">Read sources and create private yield task</button><pre id="venus-result" aria-live="polite"></pre></section>
 <section class="panel"><p class="eyebrow">02 / EXACT DELIVERY</p><h2>Import a proposal</h2>
 <p class="muted">Use the normalized proposal envelope below. Imported agent references are claims, not authenticated identities. Provider-specific raw delivery mapping still requires an adapter review.</p>
 <label for="proposal-input">Exact proposal text (preserved byte for byte)</label><textarea id="proposal-input" rows="11" spellcheck="false"></textarea>

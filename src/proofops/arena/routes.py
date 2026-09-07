@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -43,6 +44,13 @@ class DeliveryRequest(StrictModel):
     agent_ref: str = Field(min_length=1, max_length=180)
 
 
+class VenusTaskRequest(StrictModel):
+    template: TaskSpec
+    current_venue: str = Field(pattern=r'^venus-core-(usdt|usdc)$')
+    account: str | None = Field(default=None, pattern=r'^0x[0-9a-fA-F]{40}$')
+    consent_read_public_account: StrictBool
+
+
 def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGateway | None = None,
                 enabled: bool | None = None) -> APIRouter:
     router = APIRouter(prefix='/api/arena', tags=['Task-bound acceptance arena'])
@@ -50,6 +58,7 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
     configured = ProviderCatalog.load(root / 'config/arena-providers.json')
     quote_gateway = gateway or QuoteGateway(configured)
     initialization = Lock()
+    source_slots = asyncio.Semaphore(2)
 
     def storage() -> TaskStore:
         nonlocal store
@@ -82,7 +91,7 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
         return {'task_storage_enabled': active, 'transaction_execution_enabled': False,
                 'quotes_enabled': os.getenv('SAFEHIRE_PROVIDER_QUOTES_ENABLED', 'false').lower() == 'true',
                 'default_task_quota': 2000, 'proposal_quota_per_task': 10,
-                'source_truth': 'caller supplied; no authenticated oracle in this module',
+                'source_truth': 'Default caller supplied. Venus source route records server-read rates; capital, costs and capacity remain assumptions.',
                 'providers': configured.public()}
 
     @router.get('/examples')
@@ -104,6 +113,35 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
     @router.post('/tasks', status_code=201)
     def create(task: TaskSpec) -> dict[str, Any]:
         return checked(storage().create, task)
+
+    @router.post('/source-tasks/venus-yield', status_code=201)
+    async def create_venus_task(request: VenusTaskRequest) -> dict[str, Any]:
+        from proofops.arena.financial_sources import observe_venus, source_yield_task
+
+        journal = storage()
+        if not request.consent_read_public_account:
+            raise HTTPException(422, 'Explicit consent to query public financial sources is required')
+        if (request.template.category != 'yield_optimisation'
+                or any(v['venue_id'] not in {'venus-core-usdt', 'venus-core-usdc'}
+                       for v in request.template.inputs.get('venues', []))):
+            raise HTTPException(422, 'Use a yield template with reviewed Venus venue IDs')
+        if source_slots.locked():
+            raise HTTPException(429, 'Financial source collector busy; retry later')
+        try:
+            async with source_slots:
+                observation = await asyncio.wait_for(observe_venus(request.account), timeout=45)
+            task = source_yield_task(request.template, observation, request.current_venue)
+            result = await run_in_threadpool(checked, journal.create, task,
+                                            source_observation=observation)
+            return {**result, 'task': task.to_dict(), 'source_observation': observation,
+                    'financial_inputs_authenticated': False,
+                    'remaining_assumptions': ['capital_usd', 'migration_cost_usd', 'capacity_usd',
+                                              'withdrawal_delay_days', 'horizon_days', 'limits'],
+                    'account_is_current_venue_owner_verified': False}
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            raise HTTPException(422, 'Financial source rejected; no synthetic fallback') from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'Financial source unavailable; no task or payment created') from exc
 
     @router.get('/tasks/{task_id}')
     def bundle(task_id: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:

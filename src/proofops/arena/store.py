@@ -95,7 +95,8 @@ class TaskStore:
                  'kind': kind, 'observed_at': now.isoformat(), 'data': data, 'previous_hash': head}
         db.execute('INSERT INTO arena_events VALUES(?,?,?,?,?)', (task_id, sequence, canonical(value), head, digest(value)))
 
-    def create(self, task: TaskSpec, *, now: datetime | None = None) -> dict[str, Any]:
+    def create(self, task: TaskSpec, *, now: datetime | None = None,
+               source_observation: dict[str, Any] | None = None) -> dict[str, Any]:
         now = now or utcnow()
         if not task.fresh(now):
             raise ValueError('cannot open task against stale/future snapshot')
@@ -107,7 +108,12 @@ class TaskStore:
                     raise CapacityError('task capacity reached; archive locally or increase configured quota')
                 db.execute('INSERT INTO arena_tasks VALUES(?,?,?,?,?,?)',
                            (task_id, hashlib.sha256(token.encode()).hexdigest(), canonical(task.to_dict()), task.task_hash, 1, now.isoformat()))
-                self._event(db, task_id, 'task_opened', {'task_hash': task.task_hash}, now)
+                opened: dict[str, Any] = {'task_hash': task.task_hash}
+                if source_observation is not None:
+                    # Internal server collector only. Public create accepts TaskSpec, not this field.
+                    opened['source_observation'] = source_observation
+                    opened['financial_inputs_authenticated'] = False
+                self._event(db, task_id, 'task_opened', opened, now)
                 db.execute('COMMIT')
             except Exception:
                 db.execute('ROLLBACK')
@@ -202,6 +208,13 @@ def verify_bundle(bundle: dict[str, Any], *, trusted_head: str | None = None) ->
                 failures.append('event_hash')
             if expected_sequence == 1 and (event['kind'] != 'task_opened' or event['data'].get('task_hash') != task.task_hash):
                 failures.append('task_binding')
+            if expected_sequence == 1 and 'source_observation' in event['data']:
+                source = event['data']['source_observation']
+                if (digest({k: v for k, v in source.items() if k != 'observation_hash'}) != source['observation_hash']
+                        or source['block_hash'] != task.snapshot.block_hash
+                        or source['block_number'] != task.snapshot.block_number
+                        or source['chain_id'] != task.snapshot.chain_id):
+                    failures.append('financial_source_binding')
             if event['kind'] == 'proposal_checked':
                 if expected_sequence == 1 or event['data']['proposal_id'] in referenced:
                     failures.append('duplicate_or_misordered_proposal')

@@ -361,10 +361,15 @@ def _reviewed_request(
         "request_id": request_nonce,
     }
     if arena_task is not None:
+        from proofops.arena.models import TaskSpec
+
+        frozen_task = TaskSpec.model_validate(arena_task)
         request["terms"]["success_criteria"].append(
             "Deliver response.content as a safehire-proposal/2 JSON object for the exact arena_task: "
-            f"agent_ref=56:{token_id}:{skill_id}, task_hash and snapshot_hash computed from the "
-            "normalized frozen task, with action and parameters. Do not substitute narrative output."
+            f"agent_ref=56:{token_id}:{skill_id}, task_hash={frozen_task.task_hash}, "
+            f"snapshot_hash={frozen_task.snapshot_hash}, with action and parameters. "
+            "Use schema_version=safehire-proposal/2. Do not substitute narrative output. "
+            "Do not accept these terms if this exact structured delivery is unsupported."
         )
     return request, task_spec
 

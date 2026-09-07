@@ -63,6 +63,7 @@
     $('category-detail').textContent = categories[category][1];
   }
   async function loadExample() {
+    $('venus-result').textContent = '';
     acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     const data = await api('/examples');
     $('task-input').value = json(data.tasks[category]);
@@ -117,9 +118,40 @@
   $('create').addEventListener('click', () => act(async () => {
     if (task && !confirm('Replace this tab’s current task access token? Export first.')) return;
     task = await api('/tasks', {method: 'POST', body: $('task-input').value});
+    $('venus-result').textContent = '';
     acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     saved = []; selected.clear(); renderSaved();
     status('Private task opened. Subsequent proposals are checked against its frozen inputs, not edited textarea values.');
+  }));
+  $('venus-create').addEventListener('click', () => act(async () => {
+    if (!$('venus-consent').checked) throw new Error('Approve the public source read first.');
+    if (category !== 'yield_optimisation') throw new Error('Select Yield routing and review its capital/cost/capacity assumptions first.');
+    if (task && !confirm('Replace this tab’s task access token? Export the existing private bundle first.')) return;
+    $('venus-result').textContent = '';
+    const data = await api('/source-tasks/venus-yield', {method: 'POST', body: json({
+      template: JSON.parse($('task-input').value), current_venue: $('venus-current').value,
+      account: $('venus-account').value.trim() || null, consent_read_public_account: true
+    })});
+    task = {task_id: data.task_id, task_token: data.task_token, version: data.version};
+    $('task-input').value = json(data.task);
+    $('venus-result').textContent = json({observation: data.source_observation, remaining_assumptions: data.remaining_assumptions});
+    acceptedDelivery = null; reference = null; pendingSubmission = null;
+    $('export-delivery').disabled = true; $('delivery-result').textContent = '';
+    $('copy-reference').disabled = true; $('reference').replaceChildren(); $('proposal-result').replaceChildren();
+    $('comparison-result').replaceChildren(); $('proposal-input').value = '';
+    saved = []; selected.clear(); renderSaved();
+    status('Server-read Venus rates frozen and recorded. Capital, costs and capacity are still assumptions. No wallet signature or payment.');
+  }));
+  $('venus-template').addEventListener('click', () => act(async () => {
+    if (task && !confirm('This clears this tab’s task access token. Export the current bundle first. Continue?')) return;
+    category = 'yield_optimisation'; task = null; reference = null; saved = []; selected.clear();
+    await loadExample();
+    const draft = JSON.parse($('task-input').value);
+    draft.inputs.venues[0].venue_id = 'venus-core-usdt';
+    draft.inputs.venues[1].venue_id = 'venus-core-usdc';
+    $('task-input').value = json(draft); $('venus-result').textContent = '';
+    categoryButtons(); renderSaved();
+    status('Venus template loaded. Capital, costs, capacity and delay are illustrative assumptions: edit before creating. Rates will be replaced by server reads.');
   }));
   $('copy-reference').addEventListener('click', () => { if (reference) $('proposal-input').value = json(reference); });
   $('submit').addEventListener('click', () => act(async () => {
