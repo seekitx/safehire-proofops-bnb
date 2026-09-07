@@ -302,8 +302,11 @@ async def prepare_live_hire(
     owner = _address(buyer, field="buyer")
     binding: dict[str, Any] = {} if arena_task is None else {"arena_task": _arena_binding(arena_task, skill_id, require_fresh=True)}
     if binding:
+        from proofops.arena.models import INPUT_MODELS
+
         normalized_input = binding["arena_task"]["inputs"]
-        if canonical_json(task_input) != canonical_json(normalized_input):
+        supplied = INPUT_MODELS[binding["arena_task"]["category"]].model_validate(task_input).model_dump(mode="json")
+        if canonical_json(supplied) != canonical_json(normalized_input):
             raise ValueError("Arena hire inputs must exactly match the frozen task inputs")
     else:
         normalized_input = validate_task_input(skill_id, task_input)

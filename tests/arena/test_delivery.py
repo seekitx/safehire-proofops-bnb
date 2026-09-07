@@ -134,3 +134,26 @@ def test_prepare_passes_frozen_inputs_to_quote_and_rejects_different_inputs(monk
     with pytest.raises(ValueError, match='exactly match'):
         asyncio.run(live_erc8183.prepare_live_hire(tmp_path, **kwargs))
     assert len(called) == 1
+
+
+@pytest.mark.parametrize('replacement', [2, 2.0])
+def test_lp_prepare_normalizes_browser_decimal_spelling_without_changing_task(monkeypatch, tmp_path, replacement):
+    import asyncio
+
+    from proofops.arena.examples import examples
+    from proofops.services import live_erc8183
+
+    task = examples()['tasks']['rebalancing']
+    async def reject_quote(*args, **kwargs):
+        assert kwargs['task_input'] == task['inputs']
+        assert kwargs['arena_task'] == task
+        raise ValueError('test provider reached with original task')
+    monkeypatch.setattr(live_erc8183, 'request_live_agent_quote', reject_quote)
+    inputs = {**task['inputs'], 'estimated_cost_usd': replacement}
+    with pytest.raises(ValueError, match='original task'):
+        asyncio.run(live_erc8183.prepare_live_hire(tmp_path, buyer='0x'+'1'*40,
+            skill_id='rebalance_plan', task_input=inputs, arena_task=task))
+    inputs['estimated_cost_usd'] = True
+    with pytest.raises(ValueError, match='boolean'):
+        asyncio.run(live_erc8183.prepare_live_hire(tmp_path, buyer='0x'+'1'*40,
+            skill_id='rebalance_plan', task_input=inputs, arena_task=task))
