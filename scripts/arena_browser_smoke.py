@@ -46,7 +46,7 @@ def main() -> int:
             async with httpx.AsyncClient(transport=httpx.ASGITransport(asgi_app), base_url='http://test') as client:
                 response = await client.request(options.get('method', 'GET'), path,
                     headers=options.get('headers', {}), content=options.get('body'))
-                return {'status':response.status_code, 'body':response.json()}
+                return {'status':response.status_code, 'body':response.json(), 'text':response.text}
         env = os.environ | {'PYTHONPATH':str(root/'src'), 'SAFEHIRE_PROVIDER_QUOTES_ENABLED':'false'}
         log = stack.enter_context((args.output/'isolated-server.log').open('w'))
         process = subprocess.Popen([sys.executable, str(root/'scripts/arena_local_server.py'),
@@ -81,7 +81,7 @@ def main() -> int:
                             page.add_style_tag(content=(root/f'apps/web/assets/{css}').read_text())
                         page.evaluate("""() => {window.fetch = async (path, options={}) => {
                             const r = await window.isolatedArenaASGI(path, options);
-                            return {ok:r.status >= 200 && r.status < 300, status:r.status, json:async()=>r.body};
+                            return {ok:r.status >= 200 && r.status < 300, status:r.status, json:async()=>r.body, text:async()=>r.text};
                         };}""")
                         page.add_script_tag(content=(root/'apps/web/assets/arena.js').read_text())
                     else:
@@ -97,6 +97,24 @@ def main() -> int:
                         titles = page.locator('#walkthrough-result h3').all_text_contents()
                         assert 'CONSTRAINTS PASS' in titles[0] and 'BLOCKED' in titles[1], titles
                         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), width
+                    # A uint128 LP value must survive forms, storage, reload and export unchanged.
+                    page.locator('#categories button').nth(0).click()
+                    page.wait_for_function("document.querySelector('#task-title').textContent === 'LP ranges'")
+                    exact_liquidity = '327142007496340585'
+                    page.get_by_label('Position liquidity (raw units)', exact=True).fill(exact_liquidity)
+                    page.locator('#create').click()
+                    page.wait_for_function("document.querySelector('#task-meta').textContent.includes('version 1')")
+                    if not args.offline_asgi:
+                        page.reload(wait_until='networkidle')
+                        page.wait_for_function("document.querySelector('#status').textContent.includes('Private task restored')")
+                    assert page.get_by_label('Position liquidity (raw units)', exact=True).input_value() == exact_liquidity
+                    with page.expect_download() as lp_download:
+                        page.locator('#export').click()
+                    lp_path = Path(temporary) / f'lp-exact-{width}.json'
+                    lp_download.value.save_as(str(lp_path))
+                    assert json.loads(lp_path.read_text())['task']['inputs']['liquidity_raw'] == int(exact_liquidity)
+                    page.once('dialog', lambda dialog: dialog.accept())
+                    page.locator('#forget-task').click()
                     # Persist exact valid and invalid plans against one frozen grid task.
                     page.locator('#categories button').nth(1).click()
                     page.wait_for_function("document.querySelector('#task-title').textContent === 'Grid trading'")
@@ -177,7 +195,7 @@ def main() -> int:
                     checks.append({'viewport':[width,height], 'four_guided_categories':True,
                                    'valid_and_invalid_plan_distinguished':True, 'native_http_calls':not args.offline_asgi,
                                    'capability_save_compare_export_refresh':True,
-                                   'quotes_disabled':True, 'horizontal_overflow':False})
+                                   'quotes_disabled':True, 'horizontal_overflow':False, 'exact_uint128_roundtrip':True})
                     page.close()
                 browser.close()
         finally:

@@ -1,5 +1,29 @@
 'use strict';
 (() => {
+// Preserve uint128 liquidity across JSON and form edits; never round a signed task.
+const taskJSON = {
+  parse(text) {
+    return JSON.parse(text, (key, value, context) => {
+      if (key !== 'liquidity_raw' || typeof value !== 'number') return value;
+      if (Number.isSafeInteger(value)) return String(value);
+      if (!context || !/^[1-9][0-9]*$/.test(context.source)) {
+        throw new Error('This browser cannot preserve large LP numbers. Use a current Chrome or Edge.');
+      }
+      return context.source;
+    });
+  },
+  stringify(value, _replacer = null, space) {
+    return JSON.stringify(value, (key, item) => {
+      if (key !== 'liquidity_raw' || typeof item !== 'string') return item;
+      if (!/^[1-9][0-9]*$/.test(item) || item.length > 39 || BigInt(item) > (2n ** 128n - 1n)) {
+        throw new Error('Liquidity must be an exact positive integer within the LP limit.');
+      }
+      if (!JSON.rawJSON) throw new Error('Use a current Chrome or Edge to preserve exact LP numbers.');
+      return JSON.rawJSON(item);
+    }, space);
+  }
+};
+
   const $ = id => document.getElementById(id);
   const categories = {
     rebalancing: ['LP ranges', 'Tick alignment, range inventory, churn and cost caps. Not portfolio weighting.'],
@@ -13,7 +37,7 @@
   let walletObservation = null;
   const sessionKey = 'safehire-arena-session-v1';
   const requestKey = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
-  const json = value => JSON.stringify(value, null, 2);
+  const json = value => taskJSON.stringify(value, null, 2);
   function status(text) { $('status').textContent = text; }
   function element(tag, text, className) {
     const item = document.createElement(tag);
@@ -28,7 +52,7 @@
     const timer = setTimeout(() => controller.abort(), 70000);
     try {
       const response = await fetch(`/api/arena${path}`, { ...options, headers, cache: 'no-store', signal: controller.signal });
-      const result = await response.json();
+      const result = taskJSON.parse(await response.text());
       if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : json(result.detail || result));
       return result;
     } catch (error) {
@@ -51,7 +75,7 @@
   function renderTaskForm() {
     const host = $('task-form'); host.replaceChildren();
     let draft;
-    try { draft = JSON.parse($('task-input').value); } catch (_) { return; }
+    try { draft = taskJSON.parse($('task-input').value); } catch (_) { return; }
     const labels = {
       capital_usd: 'Amount to analyse (USD)', max_cost_usd: 'Maximum total cost (USD)',
       max_slippage_bps: 'Maximum price slippage (basis points; 100 = 1%)',
@@ -90,7 +114,10 @@
           input.setCustomValidity('');
           if (input.value.trim() === '' || !input.checkValidity()) { input.setCustomValidity('Enter a valid value.'); return; }
           input.setCustomValidity('');
-          const current = JSON.parse($('task-input').value);
+          if (key === 'liquidity_raw' && (!/^[1-9][0-9]*$/.test(input.value) || input.value.length > 39 || BigInt(input.value) > (2n ** 128n - 1n))) {
+            input.setCustomValidity('Enter an exact positive liquidity integer.'); return;
+          }
+          const current = taskJSON.parse($('task-input').value);
           let target = current; for (const part of next.slice(0, -1)) target = target[part];
           target[next[next.length - 1]] = typeof val === 'number' ? Number(input.value) : input.value;
           $('task-input').value = json(current);
@@ -160,7 +187,7 @@
         if (box.checked) selected.add(p.proposal_id); else selected.delete(p.proposal_id);
         $('compare').disabled = selected.size < 2 || selected.size > 3;
       });
-      const report = JSON.parse(p.report_json);
+      const report = taskJSON.parse(p.report_json);
       const name = element('span', `${report.agent_ref} · ${report.policy_accepted ? 'passed at evaluation time' : 'blocked at evaluation time'}`);
       name.append(element('small', `Exact output SHA-256 ${p.raw_sha256}`));
       label.append(box, name); $('saved-proposals').append(label);
@@ -242,7 +269,7 @@
     if (task && !confirm('Replace this tab’s task access token? Export the existing private bundle first.')) return;
     $('lp-result').textContent = '';
     const data = await api('/source-tasks/pancakeswap-lp', {method: 'POST', body: json({
-      template: JSON.parse(taskDraft()), position_id: positionId, consent_read_public_position: true
+      template: taskJSON.parse(taskDraft()), position_id: positionId, consent_read_public_position: true
     })});
     task = {task_id: data.task_id, task_token: data.task_token, version: data.version};
     $('task-input').value = json(data.task); renderTaskForm();
@@ -260,7 +287,7 @@
     if (task && !confirm('Replace this tab’s task access token? Export the existing private bundle first.')) return;
     $('venus-result').textContent = '';
     const data = await api('/source-tasks/venus-yield', {method: 'POST', body: json({
-      template: JSON.parse(taskDraft()), current_venue: $('venus-current').value,
+      template: taskJSON.parse(taskDraft()), current_venue: $('venus-current').value,
       account: $('venus-account').value.trim() || null, consent_read_public_account: true
     })});
     task = {task_id: data.task_id, task_token: data.task_token, version: data.version};
@@ -277,7 +304,7 @@
     if (task && !confirm('This clears this tab’s task access token. Export the current bundle first. Continue?')) return;
     category = 'yield_optimisation'; task = null; reference = null; saved = []; selected.clear();
     await loadExample();
-    const draft = JSON.parse($('task-input').value);
+    const draft = taskJSON.parse($('task-input').value);
     draft.inputs.venues[0].venue_id = 'venus-core-usdt';
     draft.inputs.venues[1].venue_id = 'venus-core-usdc';
     $('task-input').value = json(draft); renderTaskForm(); $('venus-result').textContent = '';
@@ -351,7 +378,7 @@
   act(async () => {
     capabilities = await api('/capabilities');
     let recovery = null;
-    try { recovery = JSON.parse(sessionStorage.getItem(sessionKey)); } catch (_) { /* unavailable browser storage */ }
+    try { recovery = taskJSON.parse(sessionStorage.getItem(sessionKey)); } catch (_) { /* unavailable browser storage */ }
     categoryButtons(); await loadExample();
     if (recovery && recovery.task && categories[recovery.category]) {
       task = recovery.task; category = recovery.category;

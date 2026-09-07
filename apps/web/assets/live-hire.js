@@ -1,3 +1,27 @@
+// Preserve uint128 liquidity across JSON and form edits; never round a signed task.
+const taskJSON = {
+  parse(text) {
+    return JSON.parse(text, (key, value, context) => {
+      if (key !== 'liquidity_raw' || typeof value !== 'number') return value;
+      if (Number.isSafeInteger(value)) return String(value);
+      if (!context || !/^[1-9][0-9]*$/.test(context.source)) {
+        throw new Error('This browser cannot preserve large LP numbers. Use a current Chrome or Edge.');
+      }
+      return context.source;
+    });
+  },
+  stringify(value, _replacer = null, space) {
+    return JSON.stringify(value, (key, item) => {
+      if (key !== 'liquidity_raw' || typeof item !== 'string') return item;
+      if (!/^[1-9][0-9]*$/.test(item) || item.length > 39 || BigInt(item) > (2n ** 128n - 1n)) {
+        throw new Error('Liquidity must be an exact positive integer within the LP limit.');
+      }
+      if (!JSON.rawJSON) throw new Error('Use a current Chrome or Edge to preserve exact LP numbers.');
+      return JSON.rawJSON(item);
+    }, space);
+  }
+};
+
 "use strict";
 
 const CHAIN_ID_HEX = "0x38";
@@ -74,7 +98,7 @@ async function api(path, options = {}) {
     ...options,
     headers: { "Content-Type": "application/json", Accept: "application/json", ...(options.headers || {}) },
   });
-  const body = await response.json();
+  const body = taskJSON.parse(await response.text());
   if (!response.ok) throw new Error(body.detail || body.message || `HTTP ${response.status}`);
   return body;
 }
@@ -82,7 +106,7 @@ async function api(path, options = {}) {
 function selectedInput() {
   let value;
   try {
-    value = JSON.parse(byId("taskInput").value);
+    value = taskJSON.parse(byId("taskInput").value);
   } catch (error) {
     throw new Error(`Task JSON is invalid: ${error.message}`);
   }
@@ -100,13 +124,13 @@ function taskExample() {
 
 function resetTask() {
   if (state.arenaTask) {
-    byId("taskInput").value = JSON.stringify(state.arenaTask.inputs, null, 2);
+    byId("taskInput").value = taskJSON.stringify(state.arenaTask.inputs, null, 2);
     byId("taskInput").readOnly = true;
     byId("resetTask").disabled = true;
     byId("prepareNote").textContent = "Frozen Arena task attached. Inputs cannot be edited here; return to Arena to create a changed task. Fresh signed terms must include the full task before any wallet action.";
     return;
   }
-  byId("taskInput").value = JSON.stringify(taskExample(), null, 2);
+  byId("taskInput").value = taskJSON.stringify(taskExample(), null, 2);
 }
 
 function setStep(step, status, detail) {
@@ -157,7 +181,7 @@ function persistJob() {
     owner: state.owner,
     saved_at: new Date().toISOString(),
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+  localStorage.setItem(STORAGE_KEY, taskJSON.stringify(record));
   const url = new URL(location.href);
   url.searchParams.set("job_id", String(state.jobId));
   url.searchParams.set("skill_id", state.skillId);
@@ -170,7 +194,7 @@ function savedJob() {
   const queryJob = Number(params.get("job_id") || 0);
   if (Number.isSafeInteger(queryJob) && queryJob > 0) return queryJob;
   try {
-    const record = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    const record = taskJSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     return Number.isSafeInteger(record?.job_id) && record.job_id > 0 ? record.job_id : null;
   } catch (_error) {
     return null;
@@ -273,7 +297,7 @@ async function loadQuote() {
   state.agentTokenId = Number.isSafeInteger(token) && token > 0 ? token : null;
   if (params.get("arena") === "1") {
     try {
-      const handoff = JSON.parse(sessionStorage.getItem("safehire-arena-handoff-v1"));
+      const handoff = taskJSON.parse(sessionStorage.getItem("safehire-arena-handoff-v1"));
       const expectedRef = `56:${state.agentTokenId}:${state.skillId}`;
       const categories = {rebalance_plan: 'rebalancing', grid_plan: 'grid_trading', yield_plan: 'yield_optimisation', health_factor: 'health_factor_monitoring'};
       if (!handoff?.task || handoff.agent_ref !== expectedRef || handoff.task.category !== categories[state.skillId]) throw new Error('Saved task and selected provider do not match.');
@@ -287,7 +311,7 @@ async function loadQuote() {
   try {
     const payload = await api("/api/live-market/quote", {
       method: "POST",
-      body: JSON.stringify({ skill_id: state.skillId, agent_token_id: state.agentTokenId }),
+      body: taskJSON.stringify({ skill_id: state.skillId, agent_token_id: state.agentTokenId }),
     });
     showQuote(payload);
   } catch (error) {
@@ -347,7 +371,7 @@ function updateReceipt(title = "Job activity") {
   };
   byId("receiptPanel").hidden = false;
   byId("receiptTitle").textContent = title;
-  byId("receiptJson").textContent = JSON.stringify(state.receipt, null, 2);
+  byId("receiptJson").textContent = taskJSON.stringify(state.receipt, null, 2);
 }
 
 async function prepareHire() {
@@ -362,7 +386,7 @@ async function prepareHire() {
     const taskInput = selectedInput();
     state.plan = await api("/api/live-hire/prepare", {
       method: "POST",
-      body: JSON.stringify({
+      body: taskJSON.stringify({
         buyer: state.owner,
         skill_id: state.skillId,
         agent_token_id: state.agentTokenId,
@@ -432,7 +456,7 @@ async function sendNext() {
       byId("jobBadge").textContent = `JOB #${state.jobId}`;
       const followup = await api("/api/live-hire/followup-plan", {
         method: "POST",
-        body: JSON.stringify({ buyer: state.owner, job_id: state.jobId }),
+        body: taskJSON.stringify({ buyer: state.owner, job_id: state.jobId }),
       });
       state.transactions.push(...followup.transactions);
     }
@@ -475,7 +499,7 @@ async function resumeJob(jobId) {
     state.arenaTask = status.task_spec.arena_task || null;
     state.skillId = status.task_spec.service;
     state.agentTokenId = Number(status.task_spec.erc8004_token_id);
-    byId("taskInput").value = JSON.stringify(status.task_spec.task_input, null, 2);
+    byId("taskInput").value = taskJSON.stringify(status.task_spec.task_input, null, 2);
     byId("jobBadge").textContent = `JOB #${jobId} · ${status.status}`;
     byId("resumeState").hidden = false;
     byId("resumeState").textContent =
@@ -490,7 +514,7 @@ async function resumeJob(jobId) {
       if (status.open_progress?.exact_allowance) setStep("approve_u", "done", "Exact allowance confirmed");
       const followup = await api("/api/live-hire/followup-plan", {
         method: "POST",
-        body: JSON.stringify({ buyer: state.owner, job_id: jobId }),
+        body: taskJSON.stringify({ buyer: state.owner, job_id: jobId }),
       });
       state.transactions = followup.transactions;
       state.results = [];
@@ -541,7 +565,7 @@ async function notifyAgent() {
   try {
     state.notifyResult = await api("/api/live-hire/notify", {
       method: "POST",
-      body: JSON.stringify({ job_id: state.jobId }),
+      body: taskJSON.stringify({ job_id: state.jobId }),
     });
     setStep("agent_delivery", "active", "Provider acknowledged the funded job");
     button.textContent = state.notifyResult.status === "accepted" ? "Provider notified" : state.notifyResult.status;
@@ -631,7 +655,7 @@ async function prepareDispute() {
   try {
     const plan = await api("/api/live-hire/dispute-plan", {
       method: "POST",
-      body: JSON.stringify({ buyer: state.owner, job_id: state.jobId }),
+      body: taskJSON.stringify({ buyer: state.owner, job_id: state.jobId }),
     });
     state.disputeTransaction = plan.transaction;
     await sendFinal(plan.transaction, "dispute");
@@ -684,7 +708,7 @@ async function sendFinal(transaction, kind) {
 }
 
 function downloadJson(payload, filename) {
-  const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
+  const blob = new Blob([`${taskJSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = filename;
