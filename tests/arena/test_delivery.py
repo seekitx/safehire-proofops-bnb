@@ -93,3 +93,44 @@ def test_unverified_content_and_wrong_provider_are_rejected():
     delivery['provider'] = '0x' + '3' * 40
     with pytest.raises(ValueError, match='Registry wallet'):
         run()
+
+
+@pytest.mark.parametrize('category,skill', [
+    ('rebalancing', 'rebalance_plan'), ('grid_trading', 'grid_plan'),
+    ('yield_optimisation', 'yield_plan'), ('health_factor_monitoring', 'health_factor'),
+])
+def test_frozen_inputs_survive_signed_job_recovery(category, skill):
+    from proofops.arena.examples import examples
+    from proofops.integrations.erc8183_quote import canonical_json
+
+    task = examples()['tasks'][category]
+    spec = {'schema_version': 'safehire-external-hire-v2', 'service': skill,
+            'erc8004_token_id': 42, 'request_nonce': 'safehire-bound-input-roundtrip',
+            'task_input': task['inputs'], 'arena_task': task}
+    parsed = _parse_task_spec({'version': 1, 'task': canonical_json(spec)})
+    assert parsed['task_input'] == task['inputs']
+    assert parsed['arena_task'] == task
+
+
+def test_prepare_passes_frozen_inputs_to_quote_and_rejects_different_inputs(monkeypatch, tmp_path):
+    import asyncio
+
+    from proofops.arena.examples import examples
+    from proofops.services import live_erc8183
+
+    task = examples()['tasks']['yield_optimisation']
+    called = []
+    async def reject_quote(*args, **kwargs):
+        called.append(kwargs)
+        raise ValueError('test provider: no signature')
+    monkeypatch.setattr(live_erc8183, 'request_live_agent_quote', reject_quote)
+    kwargs = {'buyer': '0x' + '1' * 40, 'skill_id': 'yield_plan',
+              'task_input': task['inputs'], 'arena_task': task}
+    with pytest.raises(ValueError, match='test provider: no signature'):
+        asyncio.run(live_erc8183.prepare_live_hire(tmp_path, **kwargs))
+    assert called[0]['task_input'] == task['inputs']
+    assert called[0]['arena_task'] == task
+    kwargs['task_input'] = {**task['inputs'], 'capital_usd': 99999}
+    with pytest.raises(ValueError, match='exactly match'):
+        asyncio.run(live_erc8183.prepare_live_hire(tmp_path, **kwargs))
+    assert len(called) == 1

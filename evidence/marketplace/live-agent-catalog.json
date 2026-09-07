@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "evidence_mode": "live",
-  "source": "8004scan_official_api_and_public_a2a",
+  "source": "per_agent_receipts_or_current_registry_reads_and_public_a2a",
   "observed_at": "2026-09-07T16:12:26.811389Z",
   "chain_id": 56,
   "network": "bsc-mainnet",
@@ -83,6 +83,31 @@
       "registered_at": "2026-08-25T11:09:12Z",
       "registration_url": "https://bscscan.com/tx/0xe237457d3c1f3457bf1dba9f5e558d0c774f029da1c718e02aad0b9d1aaf0ba9",
       "registry_url": "https://8004scan.io/agents/bsc/302257"
+    },
+    {
+      "category": "rebalancing",
+      "skill_id": "rebalance_plan",
+      "token_id": 265375,
+      "name": "BNB LP Range Rebalancer",
+      "description": "Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.",
+      "provider": {
+        "operator": "BNB LP Range operator (identity 265375)",
+        "a2a_endpoint": "https://bnb-lp.172-104-171-139.nip.io/",
+        "agent_card_url": "https://bnb-lp.172-104-171-139.nip.io/.well-known/agent-card.json",
+        "provider_address": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b",
+        "quote_format": "bnbagent-sdk-v1",
+        "price_raw": "100000000000000000"
+      },
+      "requires_arena": true,
+      "required_inputs": {
+        "arena_task": "Frozen LP range task from Arena; costs and range width remain assumptions"
+      },
+      "registry_url": "https://8004scan.io/agents/bsc/265375",
+      "registration_evidence": "evidence/marketplace/lp-identity-2026-09-08.json",
+      "registration_receipt_verified": false,
+      "paid_delivery_verified": false,
+      "business_independence_verified": false,
+      "observed_at": "2026-09-07T16:54:00Z"
     }
   ],
   "trust_boundary": "These are externally operated agents discovered through the official ERC-8004 index. Registration and current A2A list access were checked, but SafeHire has not yet funded a paid mainnet job with them.",
@@ -96,5 +121,6 @@
       "rebalance_plan",
       "yield_plan"
     ]
-  }
+  },
+  "independence_note": "Two configured operator identities and endpoints; separate business ownership and successful paid deliveries are not verified."
 }

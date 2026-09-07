@@ -15,6 +15,7 @@ import httpx
 from eth_abi.abi import encode
 from eth_account import Account
 from eth_account.messages import encode_defunct
+from eth_utils.address import to_checksum_address
 from eth_utils.crypto import keccak
 
 RpcCall: TypeAlias = Callable[[str, list[Any]], Awaitable[Any]]
@@ -100,6 +101,33 @@ def build_description_content(envelope: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+
+def sdk_description_content(envelope: Mapping[str, Any]) -> dict[str, Any]:
+    """Pinned BNB SDK format, only when sanitization would preserve every byte.
+
+    Source: bnbagent-sdk bab27109237d509c780a36cf831dcfce70aabafe,
+    python/bnbagent/erc8183/negotiation.py::_build_description_content.
+    Evaluation flags are not signed by this format and are never trusted here.
+    """
+    content = build_description_content(envelope)
+    terms = content["terms"]
+    signed_keys = {"deliverables", "quality_standards", "success_criteria"}
+    content["terms"] = {key: value for key, value in terms.items() if key in signed_keys}
+    if not content["terms"].get("success_criteria"):
+        content["terms"].pop("success_criteria", None)
+    content["verifying_contract"] = to_checksum_address(content["verifying_contract"])
+    strings = [content["task"], content["terms"].get("deliverables"),
+               content["terms"].get("quality_standards")]
+    criteria = content["terms"].get("success_criteria", [])
+    if not isinstance(criteria, list):
+        raise QuoteVerificationError("SDK success criteria must be a list")
+    strings.extend(criteria)
+    for value in strings:
+        if (not isinstance(value, str) or not value.isascii() or "[" in value or "]" in value
+                or any(ord(char) < 32 and char not in "\t\n" for char in value)):
+            raise QuoteVerificationError("SDK sanitization would change the signed task or terms; refused")
+    return content
+
 def find_named_value(value: Any, name: str, *, _depth: int = 0) -> Any:
     """Find a named value in a bounded JSON tree without following object graphs."""
     if _depth > 12:
@@ -162,7 +190,7 @@ async def _default_rpc(rpc_url: str, method: str, params: list[Any]) -> Any:
 
 
 async def _read_chain_context(
-    *, rpc_url: str, rpc_call: RpcCall | None
+    *, rpc_url: str, rpc_call: RpcCall | None, expected_chain_id: int
 ) -> tuple[RpcCall, int]:
     async def call(method: str, params: list[Any]) -> Any:
         if rpc_call is not None:
@@ -181,7 +209,7 @@ async def _read_chain_context(
         timestamp = int(timestamp_raw, 16)
     except ValueError as exc:
         raise QuoteVerificationError("RPC returned malformed chain numbers") from exc
-    if chain_id <= 0 or timestamp <= 0:
+    if chain_id != expected_chain_id or timestamp <= 0:
         raise QuoteVerificationError("RPC returned invalid chain numbers")
     return call, timestamp
 
@@ -296,8 +324,11 @@ async def verify_negotiation_envelope(
     expected_price_raw: int,
     rpc_url: str,
     rpc_call: RpcCall | None = None,
+    quote_format: str = "safehire-v2",
 ) -> VerifiedQuote:
     """Verify request/response hashes, current validity and provider signature."""
+    if quote_format not in {"safehire-v2", "bnbagent-sdk-v1"}:
+        raise QuoteVerificationError("unreviewed provider quote format")
     request = envelope.get("request")
     response = envelope.get("response")
     if not isinstance(request, Mapping) or not isinstance(response, Mapping):
@@ -308,7 +339,12 @@ async def verify_negotiation_envelope(
     response_hash = envelope.get("response_hash")
     if request_hash != canonical_keccak(request):
         raise QuoteVerificationError("negotiation request hash mismatch")
-    if response_hash != canonical_keccak(response_hash_content(response)):
+    response_content = response_hash_content(response)
+    if quote_format == "bnbagent-sdk-v1":
+        # SDK assigns negotiated_at after computing response_hash. The timestamp
+        # is nevertheless bound by negotiation_hash + provider_sig below.
+        response_content.pop("negotiated_at", None)
+    if response_hash != canonical_keccak(response_content):
         raise QuoteVerificationError("negotiation response hash mismatch")
     if response.get("accepted") is not True:
         raise QuoteVerificationError("provider did not accept the requested job")
@@ -316,10 +352,14 @@ async def verify_negotiation_envelope(
     response_terms = response.get("terms")
     if not isinstance(requested_terms, Mapping) or not isinstance(response_terms, Mapping):
         raise QuoteVerificationError("negotiation terms are missing")
+    if quote_format == "bnbagent-sdk-v1" and (set(requested_terms) - {"deliverables", "quality_standards", "success_criteria", "evaluation_required", "evaluator_type"}
+            or requested_terms.get("evaluation_required", True) is not True
+            or requested_terms.get("evaluator_type", "uma_oov3") != "uma_oov3"):
+        raise QuoteVerificationError("SDK quote contains unreviewed unsigned metadata")
     for key, value in requested_terms.items():
         if response_terms.get(key) != value:
             raise QuoteVerificationError("provider changed a requested non-price term")
-    description_content = build_description_content(envelope)
+    description_content = sdk_description_content(envelope) if quote_format == "bnbagent-sdk-v1" else build_description_content(envelope)
     negotiation_hash = envelope.get("negotiation_hash")
     signature = envelope.get("provider_sig")
     if not isinstance(negotiation_hash, str) or negotiation_hash != canonical_keccak(description_content):
@@ -331,7 +371,7 @@ async def verify_negotiation_envelope(
         "negotiation_hash": negotiation_hash,
         "provider_sig": signature,
     }
-    call, chain_timestamp = await _read_chain_context(rpc_url=rpc_url, rpc_call=rpc_call)
+    call, chain_timestamp = await _read_chain_context(rpc_url=rpc_url, rpc_call=rpc_call, expected_chain_id=expected_chain_id)
     _validated_description(
         description,
         expected_chain_id=expected_chain_id,
@@ -381,7 +421,7 @@ async def verify_job_description(
     rpc_call: RpcCall | None = None,
 ) -> dict[str, Any]:
     """Re-verify the signed description read back from an on-chain job."""
-    call, chain_timestamp = await _read_chain_context(rpc_url=rpc_url, rpc_call=rpc_call)
+    call, chain_timestamp = await _read_chain_context(rpc_url=rpc_url, rpc_call=rpc_call, expected_chain_id=expected_chain_id)
     _, negotiation_hash, signature = _validated_description(
         description,
         expected_chain_id=expected_chain_id,

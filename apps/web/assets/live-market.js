@@ -54,7 +54,7 @@
         <p>${escapeHtml(agent.description)}</p>
         <dl>
           <div><dt>ERC-8004 ID</dt><dd>#${escapeHtml(agent.token_id)}</dd></div>
-          <div><dt>Quoted price</dt><dd>${escapeHtml(agent.current_capability?.price_display || "0.10 U")}</dd></div>
+          <div><dt>Quoted price</dt><dd>${escapeHtml(agent.current_capability?.price_display || "Unavailable (no current quote)")}</dd></div>
           <div><dt>Network</dt><dd>BSC mainnet</dd></div>
           <div><dt>SafeHire paid jobs</dt><dd>${escapeHtml(agent.safehire_paid_deliveries || 0)}</dd></div>
         </dl>
@@ -112,9 +112,9 @@
         <div><small>PROVIDER</small><strong title="${escapeHtml(quote.provider)}">${escapeHtml(shortAddress(quote.provider))}</strong></div>
         <div><small>EST. DELIVERY</small><strong>${escapeHtml(quote.estimated_completion_seconds || "—")} sec</strong></div>`;
       quoteBoundary.textContent = payload.evidence_boundary;
-      quoteIdentity.href = safeHttpsUrl(payload.agent?.registration_url);
+      quoteIdentity.href = safeHttpsUrl(payload.agent?.registration_url || payload.agent?.registry_url);
       if (continueLiveHire) {
-        continueLiveHire.href = `/hire-live?skill_id=${encodeURIComponent(skillId)}&agent_token_id=${encodeURIComponent(tokenId)}`;
+        continueLiveHire.href = payload.agent?.requires_arena ? "/arena" : `/hire-live?skill_id=${encodeURIComponent(skillId)}&agent_token_id=${encodeURIComponent(tokenId)}`;
         continueLiveHire.hidden = false;
       }
     } catch (error) {
@@ -143,7 +143,7 @@
       status.querySelector("strong").textContent = payload.endpoint_reachable
         ? `${callableCount}/${agents.length} skills callable now`
         : "Registration snapshot loaded; A2A is offline";
-      meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString()} · ${payload.operator_count || 0} independent operator(s) · read-only`;
+      meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString()} · ${payload.operator_count || 0} configured operator label(s); business independence unverified · read-only`;
       boundary.textContent = payload.trust_boundary;
       agentContainer.querySelectorAll("[data-live-quote]").forEach((button) => {
         button.addEventListener("click", () => prepareQuote(

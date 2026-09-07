@@ -35,7 +35,7 @@ class ProviderSpec(StrictModel):
     skill_id: str = Field(pattern=r'^[a-zA-Z0-9_-]{1,64}$')
     category: Category
     endpoint: str = Field(max_length=300)
-    protocol: Literal['brain-a2a-v1', 'safehire-quote-v2']
+    protocol: Literal['brain-a2a-v1', 'safehire-quote-v2', 'bnbagent-sdk-v1']
     reviewed_scope: str = Field(min_length=1, max_length=120)
     quote_enabled: bool = False
 
@@ -135,6 +135,8 @@ class QuoteGateway:
             raise
 
     async def _call(self, provider: ProviderSpec, task: TaskSpec) -> dict[str, Any]:
+        if provider.protocol == 'bnbagent-sdk-v1':
+            raise ValueError('Use the reviewed wallet-hire quote flow for SDK signed terms; this adapter never substitutes an unsigned Arena quote')
         await self.dns_check(urlsplit(provider.endpoint).hostname or '')
         if provider.protocol == 'brain-a2a-v1':
             payload = {'jsonrpc': '2.0', 'id': task.task_hash, 'method': 'message/send', 'params': {

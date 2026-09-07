@@ -234,6 +234,26 @@
     saved = []; selected.clear(); renderSaved();
     status('Private task opened. Subsequent proposals are checked against its frozen inputs, not edited textarea values.');
   }));
+  $('lp-create').addEventListener('click', () => act(async () => {
+    if (category !== 'rebalancing') throw new Error('Select LP range and review width, costs and slippage first.');
+    if (!$('lp-consent').checked) throw new Error('Approve the public position read first.');
+    const positionId = Number($('lp-position').value);
+    if (!Number.isSafeInteger(positionId) || positionId <= 0) throw new Error('Enter a positive position number.');
+    if (task && !confirm('Replace this tab’s task access token? Export the existing private bundle first.')) return;
+    $('lp-result').textContent = '';
+    const data = await api('/source-tasks/pancakeswap-lp', {method: 'POST', body: json({
+      template: JSON.parse(taskDraft()), position_id: positionId, consent_read_public_position: true
+    })});
+    task = {task_id: data.task_id, task_token: data.task_token, version: data.version};
+    $('task-input').value = json(data.task); renderTaskForm();
+    $('lp-result').textContent = json({observation: data.source_observation, remaining_assumptions: data.remaining_assumptions});
+    acceptedDelivery = null; reference = null; pendingSubmission = null;
+    $('export-delivery').disabled = true; $('delivery-result').textContent = '';
+    $('copy-reference').disabled = true; $('reference').replaceChildren(); $('proposal-result').replaceChildren();
+    $('comparison-result').replaceChildren(); $('proposal-input').value = '';
+    saved = []; selected.clear(); renderSaved();
+    status('Real LP range and liquidity frozen. Width, cost and slippage remain assumptions. No trade or payment.');
+  }));
   $('venus-create').addEventListener('click', () => act(async () => {
     if (!$('venus-consent').checked) throw new Error('Approve the public source read first.');
     if (category !== 'yield_optimisation') throw new Error('Select Yield routing and review its capital/cost/capacity assumptions first.');

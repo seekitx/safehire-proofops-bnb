@@ -44,7 +44,8 @@ ALLOWED_SKILLS = {
     "yield_plan",
     "health_factor",
 }
-MAX_JOB_LIFETIME_SECONDS = 7 * 24 * 60 * 60
+MAX_DELIVERY_SECONDS = 24 * 60 * 60
+MAX_JOB_LIFETIME_SECONDS = 8 * 24 * 60 * 60 + 30 * 60
 MIN_DELIVERY_SECONDS = 120
 EXPIRY_BUFFER_SECONDS = 30 * 60
 MANIFEST_MAX_BYTES = 1_000_000
@@ -253,8 +254,12 @@ def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("signed job has no valid ERC-8004 token id")
     if len(nonce) < 16 or len(nonce) > 128:
         raise ValueError("signed job request nonce is invalid")
-    task_input = validate_task_input(skill_id, task.get("task_input"))
     binding = {"arena_task": _arena_binding(task["arena_task"], skill_id)} if "arena_task" in task else {}
+    if binding and canonical_json(task.get("task_input")) == canonical_json(binding["arena_task"]["inputs"]):
+        task_input = binding["arena_task"]["inputs"]
+    else:
+        # Preserve recovery of older signed jobs with the legacy provider input format.
+        task_input = validate_task_input(skill_id, task.get("task_input"))
     return {
         **binding,
         "schema_version": task["schema_version"],
@@ -295,8 +300,13 @@ async def prepare_live_hire(
     """Prepare one unsigned createJob call from a verified provider promise."""
 
     owner = _address(buyer, field="buyer")
-    normalized_input = validate_task_input(skill_id, task_input)
     binding: dict[str, Any] = {} if arena_task is None else {"arena_task": _arena_binding(arena_task, skill_id, require_fresh=True)}
+    if binding:
+        normalized_input = binding["arena_task"]["inputs"]
+        if canonical_json(task_input) != canonical_json(normalized_input):
+            raise ValueError("Arena hire inputs must exactly match the frozen task inputs")
+    else:
+        normalized_input = validate_task_input(skill_id, task_input)
     quote_payload = await request_live_agent_quote(
         project_root,
         skill_id=skill_id,
@@ -306,6 +316,8 @@ async def prepare_live_hire(
         rpc_call=_rpc,
         **binding,
     )
+    if quote_payload.get("agent", {}).get("requires_arena") is True and not binding:
+        raise ValueError("This provider requires a frozen Arena LP task")
     verification = quote_payload.get("quote_verification")
     quote = quote_payload.get("quote")
     if not isinstance(verification, dict) or not isinstance(quote, dict):
@@ -317,6 +329,8 @@ async def prepare_live_hire(
 
     dispute_window = await _policy_dispute_window()
     eta = int(verification.get("estimated_completion_seconds") or 0)
+    if not 1 <= eta <= MAX_DELIVERY_SECONDS:
+        raise ValueError("provider ETA exceeds the reviewed one-day delivery limit")
     now = int(time.time())
     lifetime = max(eta, MIN_DELIVERY_SECONDS) + dispute_window + EXPIRY_BUFFER_SECONDS
     if lifetime > MAX_JOB_LIFETIME_SECONDS:

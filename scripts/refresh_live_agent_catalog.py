@@ -29,7 +29,12 @@ async def _rpc(client: httpx.AsyncClient, method: str, params: list[Any]) -> Any
 async def refresh() -> dict[str, Any]:
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     agents = catalog.get("agents")
-    if not isinstance(agents, list) or len(agents) != 4:
+    if not isinstance(agents, list):
+        raise TypeError("expected saved Agent registrations")
+    # Only this legacy operator uses the receipt/list refresh below. Other agents
+    # retain their separately dated current-registry evidence; never invent receipts.
+    agents = [agent for agent in agents if agent.get("token_id") in {304494, 302258, 304493, 302257}]
+    if len(agents) != 4:
         raise ValueError("expected exactly four saved Agent registrations")
 
     request = {
@@ -81,6 +86,7 @@ async def refresh() -> dict[str, Any]:
     catalog["a2a_list_verified"] = True
     verification: dict[str, Any] = {
         "chain_id": 56,
+        "scope": "four Brain On BNB registrations only; other observations retain their dates",
         "successful_registration_receipts": successful_receipts,
         "a2a_can_sign": True,
         "a2a_skill_ids": sorted(expected_skill_ids),

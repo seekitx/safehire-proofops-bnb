@@ -25,6 +25,11 @@
 <div class="form-actions"><button id="preview">Check reference plan</button><button id="create" class="secondary">Create private task</button></div>
 <p class="muted">Creating a task stores these inputs on this server. Do not include keys, seeds, passwords or sensitive personal data. Task access is stored in this browser tab so refreshing can recover it. Anyone using this tab can access the task. Export records before closing; use Forget task access on a shared computer.</p>
 <div id="reference" class="report-grid"></div></section>
+<section class="panel"><h2>Read a real PancakeSwap BNB / USDT position</h2>
+<p class="muted">Read the current price range, liquidity and owner from one confirmed BSC block. This does not prove the position belongs to you or authorize a trade. Range width, costs and slippage remain your assumptions. Public demonstration position 7319347 belongs to the supplier; its size is small and is not evidence of profit.</p>
+<label for="lp-position">Position NFT number (the position’s public ID)</label><input id="lp-position" type="number" min="1" step="1" placeholder="7319347">
+<label class="consent"><input id="lp-consent" type="checkbox"> I approve reading this public position and saving its source data with my private task.</label>
+<button id="lp-create">Read position and create private LP task</button><pre id="lp-result" aria-live="polite"></pre></section>
 <section class="panel"><h2>Read Venus rates and optional public positions</h2>
 <button id="venus-template" class="secondary">Load Venus template (review assumed capital and costs)</button>
 <p class="muted">Create a yield task using live USDT / USDC core-market rates. Load the Venus template, then review the amount, costs and market capacity in the form above. Only rates and the block snapshot are replaced: capital, costs, withdrawal capacity and delays remain your assumptions. These are projected rates, not guaranteed returns. Optional account reads cover only these two markets, not your complete portfolio.</p>

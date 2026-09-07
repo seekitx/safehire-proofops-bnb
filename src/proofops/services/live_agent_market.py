@@ -15,6 +15,7 @@ import httpx
 from proofops.integrations.erc8183_quote import (
     QuoteVerificationError,
     RpcCall,
+    _default_rpc,
     canonical_json,
     find_named_value,
     find_negotiation_envelope,
@@ -251,7 +252,19 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
         int(item.get("token_id", 0)): _agent_route(item, catalog) for item in catalog_agents
     }
     endpoints = sorted({route["endpoint"] for route in routes.values()})
-    probe_rows = await asyncio.gather(*(_probe_endpoint(endpoint) for endpoint in endpoints))
+    async def probe_route(endpoint: str) -> dict[str, Any]:
+        sdk_agent = next((item for item in catalog_agents if routes[int(item.get("token_id", 0))]["endpoint"] == endpoint
+                          and _provider_field(item, catalog, "quote_format") == "bnbagent-sdk-v1"), None)
+        if sdk_agent is None:
+            return await _probe_endpoint(endpoint)
+        try:
+            quote = await request_live_agent_quote(project_root, skill_id=sdk_agent["skill_id"],
+                                                  agent_token_id=int(sdk_agent["token_id"]))
+            return {"reachable": True, "services": {sdk_agent["skill_id"]: {
+                "id": sdk_agent["skill_id"], **quote["quote"], "signed_quote_verified": True}}, "error": None}
+        except (ValueError, TypeError, KeyError, httpx.HTTPError, OSError) as exc:
+            return {"reachable": False, "services": {}, "error": type(exc).__name__}
+    probe_rows = await asyncio.gather(*(probe_route(endpoint) for endpoint in endpoints))
     probes = dict(zip(endpoints, probe_rows, strict=True))
 
     async with httpx.AsyncClient(timeout=10) as client:
@@ -392,6 +405,7 @@ async def request_live_agent_quote(
         catalog, skill_id=skill_id, agent_token_id=agent_token_id
     )
     route = _agent_route(selected, catalog)
+    quote_format = str(_provider_field(selected, catalog, "quote_format") or "safehire-v2")
     nonce = request_nonce or f"safehire-{secrets.token_hex(16)}"
     expected_request, task_spec = _reviewed_request(
         selected=selected,
@@ -400,6 +414,16 @@ async def request_live_agent_quote(
         request_nonce=nonce,
         arena_task=arena_task,
     )
+    if quote_format == "bnbagent-sdk-v1":
+        # The reviewed chain transaction always uses SafeHire's fixed router and
+        # policy. Do not rely on unsigned SDK evaluator metadata.
+        expected_request["terms"]["evaluation_required"] = True
+        expected_request["terms"]["evaluator_type"] = "uma_oov3"
+        expected_request["terms"]["quality_standards"] += (
+            " Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy "
+            "0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router "
+            "0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized."
+        )
     request = {
         "jsonrpc": "2.0",
         "id": nonce,
@@ -444,6 +468,13 @@ async def request_live_agent_quote(
         find_named_value(payload.get("result"), "provider")
         or _provider_field(selected, catalog, "provider_address")
     )
+    configured_provider = _provider_field(selected, catalog, "provider_address")
+    if quote_format == "bnbagent-sdk-v1":
+        if not isinstance(configured_provider, str) or len(configured_provider) != 42:
+            raise QuoteVerificationError("SDK provider must have a reviewed registry wallet")
+        if provider_raw is not None and str(provider_raw).lower() != configured_provider.lower():
+            raise QuoteVerificationError("SDK quote provider differs from reviewed wallet")
+        provider_raw = configured_provider
     if provider_raw is None:
         raise QuoteVerificationError("signed quote did not identify its provider account")
 
@@ -472,7 +503,26 @@ async def request_live_agent_quote(
         expected_price_raw=expected_price,
         rpc_url=rpc_url,
         rpc_call=rpc_call,
+        quote_format=quote_format,
     )
+    identity_verification: dict[str, Any] | None = None
+    if quote_format == "bnbagent-sdk-v1":
+        async def identity_rpc(method: str, params: list[Any]) -> Any:
+            return await rpc_call(method, params) if rpc_call else await _default_rpc(rpc_url, method, params)
+        from eth_abi.abi import decode, encode
+        from eth_utils.crypto import keccak
+        registry = "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432"
+        block = await identity_rpc("eth_getBlockByNumber", ["latest", False])
+        if not isinstance(block, dict) or not _valid_tx_hash(block.get("hash")):
+            raise QuoteVerificationError("SDK identity block is unavailable")
+        calldata = "0x" + (keccak(text="getAgentWallet(uint256)")[:4] + encode(["uint256"], [int(selected["token_id"])])).hex()
+        raw = await identity_rpc("eth_call", [{"to": registry, "data": calldata},
+                                           {"blockHash": block["hash"], "requireCanonical": True}])
+        decoded = decode(["address"], bytes.fromhex(str(raw)[2:]))[0]
+        if encode(["address"], [decoded]).hex() != str(raw)[2:] or decoded.lower() != str(provider_raw).lower():
+            raise QuoteVerificationError("SDK signer no longer matches the registered agent wallet")
+        identity_verification = {"registry": registry, "block_hash": block["hash"],
+                                 "agent_wallet": decoded, "signer_matches": True}
     response_object = envelope["response"]
     assert isinstance(response_object, dict)
     terms = response_object.get("terms")
@@ -491,6 +541,7 @@ async def request_live_agent_quote(
             "registration_url": selected.get("registry_url"),
             "agent_card_url": route["agent_card_url"],
             "a2a_endpoint": route["endpoint"],
+            "requires_arena": selected.get("requires_arena") is True,
         },
         "task_spec": task_spec,
         "quote": {
@@ -508,6 +559,8 @@ async def request_live_agent_quote(
             "quality_standards": terms.get("quality_standards"),
             "success_criteria": terms.get("success_criteria") or [],
         },
+        "quote_format": quote_format,
+        "identity_verification": identity_verification,
         "quote_envelope": envelope,
         "quote_verification": verified.to_dict(),
         "next_action": "review_signed_quote_before_wallet_funding",

@@ -352,6 +352,9 @@ function updateReceipt(title = "Job activity") {
 
 async function prepareHire() {
   if (!state.owner || !state.quotePayload || !state.writeEnabled) return;
+  if (state.quotePayload.agent?.requires_arena && !state.arenaTask) {
+    return toast('This LP service requires a frozen LP range task. Open Arena, select LP ranges and carry the saved task here.', true);
+  }
   if (!byId("riskConfirm").checked) {
     return toast("Confirm the BSC Mainnet risk statement first.", true);
   }
@@ -368,6 +371,7 @@ async function prepareHire() {
       }),
     });
     showQuote(state.plan);
+    byId("escrowTiming").textContent = `Delivery estimate: ${Math.ceil(state.plan.timeline.estimated_completion_seconds / 60)} minutes. On-chain dispute window: ${(state.plan.timeline.dispute_window_seconds / 86400).toFixed(2)} days. Job expires ${unixTime(state.plan.expires_at)}. Delivery does not mean immediate payment release.`;
     state.transactions = [state.plan.transaction];
     state.results = [];
     state.jobId = null;

@@ -1,0 +1,107 @@
+{
+  "schema_version": "2.0",
+  "evidence_mode": "live",
+  "observed_at": "2026-09-07T16:44:34.887427+00:00",
+  "agent": {
+    "name": "BNB LP Range Rebalancer",
+    "operator": "BNB LP Range operator (identity 265375)",
+    "category": "rebalancing",
+    "skill_id": "rebalance_plan",
+    "erc8004_token_id": 265375,
+    "registration_url": null,
+    "agent_card_url": "https://bnb-lp.172-104-171-139.nip.io/.well-known/agent-card.json",
+    "a2a_endpoint": "https://bnb-lp.172-104-171-139.nip.io/"
+  },
+  "task_spec": {
+    "schema_version": "safehire-external-hire-v2",
+    "service": "rebalance_plan",
+    "erc8004_token_id": 265375,
+    "request_nonce": "safehire-ff15945ef267fd2e44867cd02dcd3273",
+    "task_input": {
+      "mode": "read_only_live_lp_report"
+    }
+  },
+  "quote": {
+    "accepted": true,
+    "service": "rebalance_plan",
+    "chain_id": 56,
+    "provider": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b",
+    "price": "100000000000000000",
+    "price_display": "0.10 U",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788800369,
+    "deliverables": "Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.",
+    "quality_standards": "Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds. Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+    "success_criteria": [
+      "Answer the selected SafeHire task and no unrelated task.",
+      "Name material data sources and observation times or blocks.",
+      "State risks, uncertainty and any condition that would change the recommendation.",
+      "Return a self-contained deliverable suitable for independent review."
+    ]
+  },
+  "quote_envelope": {
+    "request": {
+      "task_description": "{\"erc8004_token_id\":265375,\"request_nonce\":\"safehire-ff15945ef267fd2e44867cd02dcd3273\",\"schema_version\":\"safehire-external-hire-v2\",\"service\":\"rebalance_plan\",\"task_input\":{\"mode\":\"read_only_live_lp_report\"}}",
+      "terms": {
+        "deliverables": "Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.",
+        "quality_standards": "Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds. Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+        "evaluation_required": true,
+        "evaluator_type": "uma_oov3",
+        "success_criteria": [
+          "Answer the selected SafeHire task and no unrelated task.",
+          "Name material data sources and observation times or blocks.",
+          "State risks, uncertainty and any condition that would change the recommendation.",
+          "Return a self-contained deliverable suitable for independent review."
+        ]
+      },
+      "request_id": "safehire-ff15945ef267fd2e44867cd02dcd3273"
+    },
+    "request_hash": "0x4d61045e7a92a4b4e5af642432a5ee2f160db14cc2df829dac3c52cf5ebeea03",
+    "response": {
+      "accepted": true,
+      "terms": {
+        "deliverables": "Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.",
+        "quality_standards": "Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds. Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+        "evaluation_required": true,
+        "evaluator_type": "uma_oov3",
+        "success_criteria": [
+          "Answer the selected SafeHire task and no unrelated task.",
+          "Name material data sources and observation times or blocks.",
+          "State risks, uncertainty and any condition that would change the recommendation.",
+          "Return a self-contained deliverable suitable for independent review."
+        ],
+        "price": "100000000000000000",
+        "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666"
+      },
+      "estimated_completion_seconds": 600,
+      "quote_expires_at": 1788800369,
+      "negotiated_at": 1788799469
+    },
+    "response_hash": "0x2a2508969ff3eb859e6fb97bf86324ef4efd8fbf2582e6d4b19eef8d62fe3604",
+    "negotiation_hash": "0x96a147f48daa3882d448905f5323f3bcb08b5fc915cbbbd28d6e35e20b8745c0",
+    "provider_sig": "0x3e65f9b6255a5bb8424b1e507662378c80b0da6b25368a7c916c0d3cf760ca65093ade5fe6a13e203bd63bba16582a27c5b1718e55c8c918dcabe6bf746a1aa81b",
+    "chain_id": 56,
+    "verifying_contract": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6"
+  },
+  "quote_verification": {
+    "valid": true,
+    "chain_id": 56,
+    "provider": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b",
+    "price_raw": "100000000000000000",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788800369,
+    "signature_method": "eip191",
+    "request_hash": "0x4d61045e7a92a4b4e5af642432a5ee2f160db14cc2df829dac3c52cf5ebeea03",
+    "response_hash": "0x2a2508969ff3eb859e6fb97bf86324ef4efd8fbf2582e6d4b19eef8d62fe3604",
+    "negotiation_hash": "0x96a147f48daa3882d448905f5323f3bcb08b5fc915cbbbd28d6e35e20b8745c0",
+    "job_description": "{\"chain_id\":56,\"currency\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\",\"negotiated_at\":1788799469,\"negotiation_hash\":\"0x96a147f48daa3882d448905f5323f3bcb08b5fc915cbbbd28d6e35e20b8745c0\",\"price\":\"100000000000000000\",\"provider_sig\":\"0x3e65f9b6255a5bb8424b1e507662378c80b0da6b25368a7c916c0d3cf760ca65093ade5fe6a13e203bd63bba16582a27c5b1718e55c8c918dcabe6bf746a1aa81b\",\"quote_expires_at\":1788800369,\"task\":\"{\\\"erc8004_token_id\\\":265375,\\\"request_nonce\\\":\\\"safehire-ff15945ef267fd2e44867cd02dcd3273\\\",\\\"schema_version\\\":\\\"safehire-external-hire-v2\\\",\\\"service\\\":\\\"rebalance_plan\\\",\\\"task_input\\\":{\\\"mode\\\":\\\"read_only_live_lp_report\\\"}}\",\"terms\":{\"deliverables\":\"Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.\",\"quality_standards\":\"Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds. Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.\",\"success_criteria\":[\"Answer the selected SafeHire task and no unrelated task.\",\"Name material data sources and observation times or blocks.\",\"State risks, uncertainty and any condition that would change the recommendation.\",\"Return a self-contained deliverable suitable for independent review.\"]},\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"version\":1}"
+  },
+  "next_action": "review_signed_quote_before_wallet_funding",
+  "transaction_sent": false,
+  "wallet_connected": false,
+  "evidence_boundary": "SafeHire verified the provider signature, request/response hashes, chain, commerce contract, exact token price and quote expiry. No wallet was connected and no token approval, job creation or payment occurred."
+}

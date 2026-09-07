@@ -2,6 +2,19 @@
   "schema_version": "safehire-providers/2",
   "providers": [
     {
+      "provider_id": "bnb-lp-range",
+      "operator_label": "BNB LP Range operator (identity 265375)",
+      "token_id": 265375,
+      "chain_id": 56,
+      "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+      "skill_id": "rebalance_plan",
+      "category": "rebalancing",
+      "endpoint": "https://bnb-lp.172-104-171-139.nip.io/",
+      "protocol": "bnbagent-sdk-v1",
+      "reviewed_scope": "lp_range_analysis_signed_quote_only_no_execution",
+      "quote_enabled": false
+    },
+    {
       "provider_id": "brain-on-bnb",
       "operator_label": "Brain On BNB AI",
       "token_id": 304494,

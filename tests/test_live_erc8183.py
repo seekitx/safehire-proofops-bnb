@@ -134,8 +134,9 @@ def test_validate_live_task_inputs_fail_closed(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("dispute_seconds", [900, 7 * 24 * 60 * 60])
 async def test_prepare_live_hire_uses_signed_description_and_dynamic_timeline(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, dispute_seconds: int,
 ) -> None:
     async def fake_quote(
         _root: Path, **_kwargs: Any
@@ -153,7 +154,7 @@ async def test_prepare_live_hire_uses_signed_description_and_dynamic_timeline(
         }
 
     async def fake_window() -> int:
-        return 900
+        return dispute_seconds
 
     monkeypatch.setattr(live_erc8183, "request_live_agent_quote", fake_quote)
     monkeypatch.setattr(live_erc8183, "_policy_dispute_window", fake_window)
@@ -169,7 +170,7 @@ async def test_prepare_live_hire_uses_signed_description_and_dynamic_timeline(
     assert plan["chain_id"] == 56
     assert plan["transaction"]["to"] == live_erc8183.COMMERCE
     assert plan["transaction"]["data"].startswith("0x")
-    assert plan["timeline"]["dispute_window_seconds"] == 900
+    assert plan["timeline"]["dispute_window_seconds"] == dispute_seconds
     assert plan["timeline"]["job_expires_at"] > plan["timeline"]["quote_expires_at"]
     assert plan["safety"]["signed_task_bound"] is True
     assert plan["safety"]["unlimited_approval"] is False

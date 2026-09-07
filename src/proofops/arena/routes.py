@@ -51,6 +51,12 @@ class VenusTaskRequest(StrictModel):
     consent_read_public_account: StrictBool
 
 
+class LpTaskRequest(StrictModel):
+    template: TaskSpec
+    position_id: StrictInt = Field(gt=0, lt=2**53)
+    consent_read_public_position: StrictBool
+
+
 class WalletReadRequest(StrictModel):
     account: str = Field(pattern=r'^0x[0-9a-fA-F]{40}$')
     consent_read_public_account: StrictBool
@@ -165,6 +171,28 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
             raise HTTPException(422, 'Financial source rejected; no synthetic fallback') from exc
         except (httpx.HTTPError, OSError, TimeoutError) as exc:
             raise HTTPException(502, 'Financial source unavailable; no task or payment created') from exc
+
+    @router.post('/source-tasks/pancakeswap-lp', status_code=201)
+    async def create_lp_task(request: LpTaskRequest) -> dict[str, Any]:
+        from proofops.arena.lp_sources import observe_lp, source_lp_task
+
+        journal = storage()
+        if not request.consent_read_public_position or request.template.category != 'rebalancing':
+            raise HTTPException(422, 'Review an LP task and consent to the public position read first')
+        if source_slots.locked():
+            raise HTTPException(429, 'Financial source collector busy; retry later')
+        try:
+            async with source_slots:
+                observation = await asyncio.wait_for(observe_lp(request.position_id), timeout=45)
+            task = source_lp_task(request.template, observation)
+            result = await run_in_threadpool(checked, journal.create, task, source_observation=observation)
+            return {**result, 'task': task.to_dict(), 'source_observation': observation,
+                    'financial_inputs_authenticated': False,
+                    'remaining_assumptions': ['half_width_ticks', 'estimated_cost_usd', 'slippage_bps', 'limits']}
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            raise HTTPException(422, 'LP source rejected; no synthetic fallback') from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'LP source unavailable; no task or transaction created') from exc
 
     @router.get('/tasks/{task_id}')
     def bundle(task_id: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
