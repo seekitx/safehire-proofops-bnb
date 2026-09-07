@@ -20,7 +20,9 @@ import httpx
 
 
 def main() -> int:
-    from playwright.sync_api import sync_playwright  # type: ignore[import-not-found]
+    import importlib
+
+    sync_playwright = importlib.import_module('playwright.sync_api').sync_playwright
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('.data/arena-browser'))
@@ -62,7 +64,7 @@ def main() -> int:
             else:
                 raise RuntimeError('local analysis server did not start')
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(executable_path=shutil.which('chromium'), headless=True, args=['--no-sandbox'])
+                browser = playwright.chromium.launch(executable_path=os.getenv('SAFEHIRE_BROWSER_EXECUTABLE') or shutil.which('chromium'), headless=True, args=['--no-sandbox'])
                 for width, height in [(1440, 1000), (390, 844)]:
                     page = browser.new_page(viewport={'width':width,'height':height}, accept_downloads=True)
                     page.on('pageerror', lambda error: errors.append(str(error)))
@@ -100,6 +102,15 @@ def main() -> int:
                     page.locator('#preview').click()
                     page.wait_for_function("document.querySelector('#proposal-input').value.includes('local:reference-v2')")
                     original = page.locator('#proposal-input').input_value()
+                    # Empty edits must not silently submit the previous valid number.
+                    capital = page.get_by_label('Amount to analyse (USD)', exact=True)
+                    capital.fill('')
+                    page.locator('#create').click()
+                    page.wait_for_function("document.querySelector('#status').textContent.includes('Complete the task form')")
+                    assert 'No task opened' in page.locator('#task-meta').inner_text()
+                    capital.fill('1000')
+                    page.locator('#preview').click()
+                    page.wait_for_function("document.querySelector('#proposal-input').value.includes('local:reference-v2')")
                     page.locator('#create').click()
                     page.wait_for_function("document.querySelector('#task-meta').textContent.includes('version 1')")
                     page.locator('#submit').click()
@@ -128,6 +139,13 @@ def main() -> int:
                     page.wait_for_function("document.querySelector('#status').textContent.includes('version refreshed')")
                     assert not page.locator('#export').is_disabled()
                     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
+                    if not args.offline_asgi:
+                        task_meta = page.locator('#task-meta').inner_text()
+                        page.reload(wait_until='networkidle')
+                        page.wait_for_function("document.querySelector('#status').textContent.includes('Private task restored')")
+                        assert page.locator('#task-meta').inner_text() == task_meta
+                        assert page.locator('.saved-row').count() == 2
+                        assert page.locator('#task-title').inner_text() == 'Grid trading'
                     page.screenshot(path=str(args.output/f'arena-{width}.png'), full_page=True)
                     page.evaluate('window.scrollTo(0, 0)')
                     page.screenshot(path=str(args.output/f'arena-overview-{width}.png'))

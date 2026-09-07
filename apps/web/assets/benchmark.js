@@ -75,6 +75,9 @@ function startTimer() {
 function finishManual() {
   const answer = byId("manualOutput").value.trim();
   if (!answer) return toast("Paste the complete manual answer before finishing.", true);
+  if (!byId("manualAttestation").checked || !byId("manualTools").value.trim()) return toast("Confirm the real run and list the tools used.", true);
+  const cost = Number(byId("manualCost").value);
+  if (!Number.isFinite(cost) || cost < 0) return toast("Enter a valid non-negative cost.", true);
   const duration = elapsedSeconds();
   clearInterval(timerHandle);
   renderTimer();
@@ -88,7 +91,8 @@ function finishManual() {
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     duration_seconds: Number(duration.toFixed(3)),
-    cost: { amount: Number(byId("manualCost").value || 0), currency: byId("manualCurrency").value.trim() || "USD" },
+    tools_used: byId("manualTools").value.trim(),
+    cost: { amount: cost, currency: byId("manualCurrency").value.trim() || "USD" },
     output: answer,
     attestations: {
       no_safehire_agent_called: true,
@@ -119,16 +123,29 @@ async function maybeEnablePacket() {
   }
 }
 
+function answerContent(raw) {
+  const invocation = raw.response?.result?.agent_result;
+  if (invocation) return {result: invocation.result, risk_checks: invocation.risk_checks, source_labels: invocation.source_labels};
+  if (raw.output !== undefined) return raw.output;
+  if (raw.answer !== undefined) return raw.answer;
+  throw new Error("Unrecognised output format. Preserve raw files and supply an answer envelope with task_id and output.");
+}
+
 function buildPacket() {
+  if (!agentRaw?.task_id || agentRaw.task_id !== manualRaw?.task_id) return toast("Both outputs must have the same explicit task_id.", true);
+  let agentAnswer, manualAnswer;
+  try { agentAnswer = answerContent(agentRaw); manualAnswer = answerContent(manualRaw); }
+  catch (error) { return toast(error.message, true); }
   const taskId = String(agentRaw.task_id || manualRaw.task_id || task?.task_id || "comparison");
   const agentIsA = crypto.getRandomValues(new Uint8Array(1))[0] % 2 === 0;
   const packetId = crypto.randomUUID();
-  const outputs = agentIsA ? { A: agentRaw, B: manualRaw } : { A: manualRaw, B: agentRaw };
+  const outputs = agentIsA ? { A: agentAnswer, B: manualAnswer } : { A: manualAnswer, B: agentAnswer };
   const blindPacket = { schema_version: "safehire-termix-blind-packet-v2", packet_id: packetId, task_id: taskId, outputs };
   const secretKey = {
     schema_version: "safehire-termix-blind-key-v2",
     packet_id: packetId,
     task_id: taskId,
+    original_outputs: {agent: agentRaw, manual: manualRaw},
     mapping: agentIsA ? { A: "agent", B: "manual" } : { A: "manual", B: "agent" },
     warning: "Do not share this mapping with the reviewer until scoring is complete.",
   };
@@ -157,6 +174,7 @@ async function loadPacket() {
 function downloadReview() {
   const reviewer = byId("reviewerName").value.trim();
   if (!reviewer) return toast("Enter the real reviewer name first.", true);
+  if (!byId("reviewAttestation").checked || !byId("reviewRationale").value.trim()) return toast("Confirm the review and explain your scores.", true);
   const scores = { A: {}, B: {} };
   for (const input of document.querySelectorAll("[data-score]")) {
     const value = Number(input.value);
@@ -169,6 +187,7 @@ function downloadReview() {
     task_id: packet.task_id,
     reviewer,
     reviewed_at: new Date().toISOString(),
+    rationale: byId("reviewRationale").value.trim(),
     rubric: "1-5 each: correctness, completeness, risk awareness, actionability, evidence quality",
     scores,
     totals: {

@@ -40,12 +40,13 @@
         <label>Direct cost<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
         <label>Currency<input id="manualCurrency" value="USD" maxlength="12" /></label>
       </div>
+      <label>Tools actually used<input id="manualTools" placeholder="For example: calculator, Venus website; disclose every tool" /></label><label><input id="manualAttestation" type="checkbox" /> I performed this run myself without calling a marketplace Agent and preserved the full answer.</label>
       <div class="lab-actions"><button class="button" id="startTimer" type="button">Start real timer</button><button class="button secondary" id="finishManual" type="button" disabled>Finish &amp; download manual record</button></div>
     </section>
 
     <section class="lab-card">
       <div class="lab-head"><div><small>02 · BLIND PACKET</small><h2>Hide which output used the Agent.</h2></div><span>PREPARER</span></div>
-      <p class="lab-copy">The preparer loads both raw JSON files. The page downloads a reviewer packet without the origin labels and a separate secret key. Do not send the key to the reviewer.</p>
+      <p class="lab-copy">The preparer loads both raw JSON files. The page extracts answer content, removes transport metadata, and downloads a separate secret key. Answer wording can still reveal its origin: inspect the packet and disclose any remaining clues. Original files must be preserved. Do not send the key to the reviewer.</p>
       <div class="upload-grid">
         <label>Agent raw output<input id="agentFile" type="file" accept="application/json,.json" /></label>
         <label>No-Agent raw output<input id="manualFile" type="file" accept="application/json,.json" /></label>
@@ -62,6 +63,7 @@
       </div>
       <div class="blind-output-grid" id="blindOutputs" hidden><article><small>OUTPUT A</small><pre id="outputA"></pre></article><article><small>OUTPUT B</small><pre id="outputB"></pre></article></div>
       <div class="score-grid" id="scoreGrid" hidden></div>
+      <label>Reasons and limitations of these scores<textarea id="reviewRationale" rows="4" placeholder="Explain errors, missing evidence, usefulness, and whether wording revealed either source."></textarea></label><label><input id="reviewAttestation" type="checkbox" /> I reviewed both complete answers before seeing the separate mapping key.</label>
       <button class="button" id="downloadReview" type="button" disabled>Download blind review</button>
     </section>
 

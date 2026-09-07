@@ -6,6 +6,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from proofops.evidence.termix import RUBRIC_FIELDS, _scores
+
 
 def _load(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -44,6 +46,20 @@ def main() -> int:
     if set(origin_to_side) != {"agent", "manual"}:
         raise ValueError("secret key must map one Agent and one manual output")
 
+    task_ids = {value.get("task_id") for value in (packet, secret_key, review)}
+    if len(task_ids) != 1 or not packet.get("task_id"):
+        raise ValueError("packet, key and review must refer to the same task")
+    if not str(review.get("reviewer", "")).strip():
+        raise ValueError("reviewer identity is required")
+    if review.get("attestations", {}).get("mapping_not_seen_before_scoring") is not True:
+        raise ValueError("reviewer must attest that the mapping was not seen")
+    if review.get("attestations", {}).get("outputs_reviewed_in_full") is not True:
+        raise ValueError("reviewer must attest to reviewing both outputs")
+    validated = {side: _scores(scores[side], f"scores.{side}") for side in ("A", "B")}
+    # Recompute totals; a caller-supplied total is not a verified score.
+    totals = {side: validated[side].pop("total") for side in ("A", "B")}
+    scores = {side: {field: validated[side][field] for field in RUBRIC_FIELDS} for side in ("A", "B")}
+
     result = {
         "schema_version": "safehire-termix-unblinded-review-v2",
         "evidence_mode": "human_timed_and_blind_reviewed",
@@ -53,13 +69,14 @@ def main() -> int:
         "reviewed_at": review.get("reviewed_at"),
         "unblinded_at": datetime.now(UTC).isoformat(),
         "rubric": review.get("rubric"),
+        "rationale": review.get("rationale"),
         "scores": {
             "agent": scores[origin_to_side["agent"]],
             "manual": scores[origin_to_side["manual"]],
         },
         "totals": {
-            "agent": review.get("totals", {}).get(origin_to_side["agent"]),
-            "manual": review.get("totals", {}).get(origin_to_side["manual"]),
+            "agent": totals[origin_to_side["agent"]],
+            "manual": totals[origin_to_side["manual"]],
         },
         "artifacts": {
             "packet": str(args.packet),

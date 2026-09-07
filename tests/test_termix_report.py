@@ -76,3 +76,23 @@ def test_live_report_rejects_fixture_paths(tmp_path) -> None:
 
     with pytest.raises(ValueError, match="fixture/demo path|unique"):
         build_termix_report(manifest, project_root=tmp_path)
+
+
+@pytest.mark.parametrize("cost", [float("nan"), float("inf"), -1])
+def test_report_rejects_invalid_cost(tmp_path, cost) -> None:
+    task = _task(tmp_path, "cost-case", "grid_trading")
+    agent = task["agent"]
+    assert isinstance(agent, dict)
+    agent["cost_usd"] = cost
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({"evidence_mode": "fixture", "tasks": [task]}))
+    with pytest.raises(ValueError, match="cost_usd"):
+        build_termix_report(manifest, project_root=tmp_path)
+
+
+def test_live_report_requires_trading_or_security(tmp_path) -> None:
+    tasks = [_task(tmp_path, f"yield-{i}", "yield_optimisation") for i in range(3)]
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({"evidence_mode": "live", "tasks": tasks}))
+    with pytest.raises(ValueError, match="trading or security"):
+        build_termix_report(manifest, project_root=tmp_path)

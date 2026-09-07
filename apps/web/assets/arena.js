@@ -11,6 +11,7 @@
   let saved = [], selected = new Set(), busy = false, pendingSubmission = null;
   let acceptedDelivery = null;
   let walletObservation = null;
+  const sessionKey = 'safehire-arena-session-v1';
   const requestKey = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   const json = value => JSON.stringify(value, null, 2);
   function status(text) { $('status').textContent = text; }
@@ -23,11 +24,87 @@
   async function api(path, options = {}) {
     const headers = { ...(options.body ? {'Content-Type': 'application/json'} : {}), ...(options.headers || {}) };
     if (task) headers.Authorization = `Bearer ${task.task_token}`;
-    const response = await fetch(`/api/arena${path}`, { ...options, headers, cache: 'no-store' });
-    const result = await response.json();
-    if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : json(result.detail || result));
-    return result;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 70000);
+    try {
+      const response = await fetch(`/api/arena${path}`, { ...options, headers, cache: 'no-store', signal: controller.signal });
+      const result = await response.json();
+      if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : json(result.detail || result));
+      return result;
+    } catch (error) {
+      if (error.name === 'AbortError') throw new Error('The request timed out. Refresh task status before retrying a save. No payment was sent.');
+      throw error;
+    } finally { clearTimeout(timer); }
   }
+  function rememberTask() {
+    try {
+      if (task) sessionStorage.setItem(sessionKey, json({task, category}));
+      else sessionStorage.removeItem(sessionKey);
+    } catch (_) { $('task-meta').textContent += ' · Browser recovery unavailable; keep this tab open.'; }
+  }
+  function taskDraft() {
+    for (const input of $('task-form').querySelectorAll('input')) {
+      if (!input.reportValidity()) throw new Error('Complete the task form before continuing.');
+    }
+    return $('task-input').value;
+  }
+  function renderTaskForm() {
+    const host = $('task-form'); host.replaceChildren();
+    let draft;
+    try { draft = JSON.parse($('task-input').value); } catch (_) { return; }
+    const labels = {
+      capital_usd: 'Amount to analyse (USD)', max_cost_usd: 'Maximum total cost (USD)',
+      max_slippage_bps: 'Maximum price slippage (basis points; 100 = 1%)',
+      max_snapshot_age_seconds: 'Maximum data age (seconds)',
+      current_tick: 'Current pool price tick', old_lower_tick: 'Existing range: lower tick',
+      old_upper_tick: 'Existing range: upper tick', tick_spacing: 'Pool tick spacing',
+      half_width_ticks: 'New range: half width in ticks', liquidity_raw: 'Position liquidity (raw units)',
+      token0_decimals: 'First token decimal places', token1_decimals: 'Second token decimal places',
+      estimated_cost_usd: 'Estimated transaction cost (USD)', slippage_bps: 'Estimated slippage (100 = 1%)',
+      current_price: 'Current price', lower_price: 'Lowest grid price', upper_price: 'Highest grid price',
+      levels: 'Number of grid levels', fee_bps_per_side: 'Fee per side (100 = 1%)',
+      transfer_tax_bps_per_side: 'Token transfer tax per side (100 = 1%)',
+      slippage_bps_per_side: 'Slippage per side (100 = 1%)', gas_usd_per_order: 'Network cost per order (USD)',
+      stop_price: 'Stop price', current_apy_pct: 'Current annual compounded yield (%)',
+      horizon_days: 'Planned holding period (days)', min_improvement_usd: 'Minimum extra income required (USD)',
+      venue_id: 'Market identifier', apy_pct: 'Annual compounded yield (%)',
+      migration_cost_usd: 'Cost to move funds (USD)', capacity_usd: 'Available capacity (USD)',
+      withdrawal_delay_days: 'Withdrawal delay (days)', asset: 'Asset name', value_usd: 'Position value (USD)',
+      liquidation_threshold: 'Liquidation threshold (0 to 1)', price_drop_pct: 'Assumed price drop (%)',
+      price_rise_pct: 'Assumed debt price rise (%)', target_health_factor: 'Target lending safety ratio',
+      available_repay_usd: 'Available repayment budget (USD)'
+    };
+    function fields(value, parent, path) {
+      for (const [key, val] of Object.entries(value)) {
+        const next = [...path, key];
+        if (val !== null && typeof val === 'object') {
+          const group = element('fieldset'); group.append(element('legend', /^\d+$/.test(key) ? `Item ${Number(key) + 1}` : key.replaceAll('_', ' ')));
+          fields(val, group, next); parent.append(group); continue;
+        }
+        const label = element('label', labels[key] || key.replaceAll('_', ' '));
+        const input = document.createElement('input'); input.value = String(val);
+        input.type = typeof val === 'number' ? 'number' : 'text';
+        input.required = true;
+        if (input.type === 'number') input.step = 'any';
+        input.addEventListener('input', () => {
+          input.setCustomValidity('');
+          if (input.value.trim() === '' || !input.checkValidity()) { input.setCustomValidity('Enter a valid value.'); return; }
+          input.setCustomValidity('');
+          const current = JSON.parse($('task-input').value);
+          let target = current; for (const part of next.slice(0, -1)) target = target[part];
+          target[next[next.length - 1]] = typeof val === 'number' ? Number(input.value) : input.value;
+          $('task-input').value = json(current);
+          reference = null; $('copy-reference').disabled = true; $('reference').replaceChildren();
+          status(task ? 'Draft changed. The saved task remains frozen; create a new task to use these changes.' : 'Draft updated. Source data and assumptions still need review.');
+        });
+        label.append(input); parent.append(label);
+      }
+    }
+    fields(draft.inputs, host, ['inputs']);
+    const limits = element('fieldset'); limits.append(element('legend', 'Your limits'));
+    fields(draft.limits, limits, ['limits']); host.append(limits);
+  }
+
   async function act(fn) {
     if (busy) return;
     busy = true;
@@ -65,9 +142,12 @@
   }
   async function loadExample() {
     $('venus-result').textContent = '';
+    reference = null; pendingSubmission = null; $('copy-reference').disabled = true;
+    $('proposal-input').value = ''; $('proposal-result').replaceChildren(); $('comparison-result').replaceChildren();
     acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     const data = await api('/examples');
     $('task-input').value = json(data.tasks[category]);
+    renderTaskForm();
     $('reference').replaceChildren();
     status('SYNTHETIC EXAMPLE loaded. The block and asset values are not chain observations.');
   }
@@ -85,11 +165,12 @@
       name.append(element('small', `Exact output SHA-256 ${p.raw_sha256}`));
       label.append(box, name); $('saved-proposals').append(label);
     }
+    $('verify-delivery').disabled = !task;
     $('submit').disabled = !task; $('export').disabled = !task; $('refresh-task').disabled = !task;
     $('create').disabled = Boolean(capabilities && !capabilities.task_storage_enabled);
     $('compare').disabled = selected.size < 2 || selected.size > 3;
     $('task-meta').textContent = task ? `Task ${task.task_id} · version ${task.version}` : 'No task opened.';
-    renderProviders();
+    renderProviders(); rememberTask();
   }
   function renderProviders() {
     if (!capabilities) return;
@@ -102,6 +183,12 @@
     }
     $('quote').disabled = !task || !capabilities.quotes_enabled || !rows.some(p => p.quote_enabled);
   }
+  $('task-input').addEventListener('change', renderTaskForm);
+  $('forget-task').addEventListener('click', () => act(async () => {
+    if (!confirm('Remove this tab’s access to the private task? Export first. The server record is not deleted.')) return;
+    task = null; saved = []; selected.clear(); pendingSubmission = null; renderSaved();
+    status('Task access removed from this tab.');
+  }));
   $('walkthrough').addEventListener('click', () => act(async () => {
     const data = await api(`/synthetic-walkthrough/${category}`);
     $('walkthrough-result').replaceChildren(); $('scenario-story').textContent = data.narrative;
@@ -132,7 +219,7 @@
   });
   $('sample').addEventListener('click', () => act(loadExample));
   $('preview').addEventListener('click', () => act(async () => {
-    const data = await api('/preview', {method: 'POST', body: $('task-input').value});
+    const data = await api('/preview', {method: 'POST', body: taskDraft()});
     reference = data.reference_proposal; $('reference').replaceChildren();
     renderReport(data.report, $('reference')); $('copy-reference').disabled = false;
     $('proposal-input').value = json(reference);
@@ -140,7 +227,7 @@
   }));
   $('create').addEventListener('click', () => act(async () => {
     if (task && !confirm('Replace this tab’s current task access token? Export first.')) return;
-    task = await api('/tasks', {method: 'POST', body: $('task-input').value});
+    task = await api('/tasks', {method: 'POST', body: taskDraft()});
     $('venus-result').textContent = '';
     acceptedDelivery = null; $('export-delivery').disabled = true; $('delivery-result').textContent = '';
     saved = []; selected.clear(); renderSaved();
@@ -152,11 +239,11 @@
     if (task && !confirm('Replace this tab’s task access token? Export the existing private bundle first.')) return;
     $('venus-result').textContent = '';
     const data = await api('/source-tasks/venus-yield', {method: 'POST', body: json({
-      template: JSON.parse($('task-input').value), current_venue: $('venus-current').value,
+      template: JSON.parse(taskDraft()), current_venue: $('venus-current').value,
       account: $('venus-account').value.trim() || null, consent_read_public_account: true
     })});
     task = {task_id: data.task_id, task_token: data.task_token, version: data.version};
-    $('task-input').value = json(data.task);
+    $('task-input').value = json(data.task); renderTaskForm();
     $('venus-result').textContent = json({observation: data.source_observation, remaining_assumptions: data.remaining_assumptions});
     acceptedDelivery = null; reference = null; pendingSubmission = null;
     $('export-delivery').disabled = true; $('delivery-result').textContent = '';
@@ -172,7 +259,7 @@
     const draft = JSON.parse($('task-input').value);
     draft.inputs.venues[0].venue_id = 'venus-core-usdt';
     draft.inputs.venues[1].venue_id = 'venus-core-usdc';
-    $('task-input').value = json(draft); $('venus-result').textContent = '';
+    $('task-input').value = json(draft); renderTaskForm(); $('venus-result').textContent = '';
     categoryButtons(); renderSaved();
     status('Venus template loaded. Capital, costs, capacity and delay are illustrative assumptions: edit before creating. Rates will be replaced by server reads.');
   }));
@@ -231,7 +318,23 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   act(async () => {
-    capabilities = await api('/capabilities'); categoryButtons(); await loadExample(); renderSaved();
+    capabilities = await api('/capabilities');
+    let recovery = null;
+    try { recovery = JSON.parse(sessionStorage.getItem(sessionKey)); } catch (_) { /* unavailable browser storage */ }
+    categoryButtons(); await loadExample();
+    if (recovery && recovery.task && categories[recovery.category]) {
+      task = recovery.task; category = recovery.category;
+      try {
+        const bundle = await api(`/tasks/${task.task_id}`);
+        task.version = bundle.version; saved = bundle.proposals;
+        $('task-input').value = typeof bundle.task_json === 'string' ? bundle.task_json : json(bundle.task);
+        renderTaskForm(); categoryButtons();
+        status('Private task restored for this tab. Checks still use the original frozen snapshot; refresh does not make old data fresh.');
+      } catch (error) {
+        status(`Saved task could not be read: ${error.message}. Refresh task status to retry, or forget this task.`);
+      }
+    }
+    renderSaved();
     if (!capabilities.task_storage_enabled) status('Preview is available. Private task storage is disabled until the deployment enables SAFEHIRE_ARENA_ENABLED=true.');
   });
 })();

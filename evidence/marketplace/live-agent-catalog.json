@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "evidence_mode": "live",
   "source": "8004scan_official_api_and_public_a2a",
-  "observed_at": "2026-09-06T10:42:58.614182Z",
+  "observed_at": "2026-09-07T16:12:26.811389Z",
   "chain_id": 56,
   "network": "bsc-mainnet",
   "registry_address": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",

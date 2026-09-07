@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -69,13 +70,13 @@ def _run_record(root: Path, raw: Any, *, label: str, live: bool) -> dict[str, An
     if duration <= 0:
         raise ValueError(f"{label} finish time must be after start time")
     cost = float(raw.get("cost_usd", -1))
-    if cost < 0:
+    if not math.isfinite(cost) or cost < 0:
         raise ValueError(f"{label}.cost_usd must be non-negative")
     cost_currency = str(raw.get("cost_currency", "USD")).strip().upper()
     if not cost_currency or len(cost_currency) > 12:
         raise ValueError(f"{label}.cost_currency must be a short currency label")
     cost_amount = float(raw.get("cost_amount", cost))
-    if cost_amount < 0:
+    if not math.isfinite(cost_amount) or cost_amount < 0:
         raise ValueError(f"{label}.cost_amount must be non-negative")
     output_path = _resolve_file(root, str(raw.get("output_path", "")), live=live)
     return {
@@ -168,6 +169,8 @@ def build_termix_report(manifest_path: Path, *, project_root: Path) -> dict[str,
         )
 
     categories = sorted({item["category"] for item in built})
+    if live and not set(categories) & {'rebalancing', 'grid_trading', 'health_factor_monitoring'}:
+        raise ValueError('live TermiX report requires a trading or security task')
     agent_seconds = sum(item["agent"]["duration_seconds"] for item in built)
     manual_seconds = sum(item["manual"]["duration_seconds"] for item in built)
     return {
