@@ -72,9 +72,9 @@
         <div class="live-card-actions">
           <button class="quote-button" type="button" data-live-quote="${escapeHtml(agent.skill_id)}" data-agent-token-id="${escapeHtml(agent.token_id)}">Prepare signed quote</button>
           <a href="${safeHttpsUrl(agent.registry_url)}" target="_blank" rel="noreferrer">8004 identity <span>↗</span></a>
-          <a href="${safeHttpsUrl(agent.registration_url)}" target="_blank" rel="noreferrer">Registration tx <span>↗</span></a>
+          ${agent.registration_url ? `<a href="${safeHttpsUrl(agent.registration_url)}" target="_blank" rel="noreferrer">Registration tx <span>↗</span></a>` : `<span>Current registry identity checked; creation receipt unavailable</span>`}
         </div>
-        <p class="no-auto-hire">Quote is live. Mainnet funding remains a separate wallet action and is never automatic.</p>
+        <p class="no-auto-hire">A fresh signed quote is required. Mainnet funding remains a separate wallet action and is never automatic.</p>
       </article>`;
   };
 
