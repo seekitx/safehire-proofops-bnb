@@ -97,6 +97,13 @@ def main() -> int:
                         titles = page.locator('#walkthrough-result h3').all_text_contents()
                         assert 'CONSTRAINTS PASS' in titles[0] and 'BLOCKED' in titles[1], titles
                         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), width
+                    # JSON must distinguish an exact number from the observation's decimal string.
+                    helper_source = (root/'apps/web/assets/live-hire.js').read_text().split('\n};', 1)[0] + '\n};'
+                    typed_sample = {'task': {'liquidity_raw': 327142007496340585},
+                                    'source_observation': {'liquidity_raw': '327142007496340585'}}
+                    typed_result = page.evaluate('(text) => {' + helper_source +
+                        ' return taskJSON.stringify(taskJSON.parse(text));}', json.dumps(typed_sample))
+                    assert json.loads(typed_result) == typed_sample
                     # A uint128 LP value must survive forms, storage, reload and export unchanged.
                     page.locator('#categories button').nth(0).click()
                     page.wait_for_function("document.querySelector('#task-title').textContent === 'LP ranges'")

@@ -1,25 +1,16 @@
-// Preserve uint128 liquidity across JSON and form edits; never round a signed task.
+// Keep large JSON integers as exact numeric tokens, distinct from decimal strings.
 const taskJSON = {
   parse(text) {
     return JSON.parse(text, (key, value, context) => {
       if (key !== 'liquidity_raw' || typeof value !== 'number') return value;
-      if (Number.isSafeInteger(value)) return String(value);
-      if (!context || !/^[1-9][0-9]*$/.test(context.source)) {
+      const source = context?.source || (Number.isSafeInteger(value) ? String(value) : '');
+      if (!JSON.rawJSON || !/^[1-9][0-9]*$/.test(source)) {
         throw new Error('This browser cannot preserve large LP numbers. Use a current Chrome or Edge.');
       }
-      return context.source;
+      return JSON.rawJSON(source);
     });
   },
-  stringify(value, _replacer = null, space) {
-    return JSON.stringify(value, (key, item) => {
-      if (key !== 'liquidity_raw' || typeof item !== 'string') return item;
-      if (!/^[1-9][0-9]*$/.test(item) || item.length > 39 || BigInt(item) > (2n ** 128n - 1n)) {
-        throw new Error('Liquidity must be an exact positive integer within the LP limit.');
-      }
-      if (!JSON.rawJSON) throw new Error('Use a current Chrome or Edge to preserve exact LP numbers.');
-      return JSON.rawJSON(item);
-    }, space);
-  }
+  stringify: (value, replacer = null, space) => JSON.stringify(value, replacer, space)
 };
 
 "use strict";

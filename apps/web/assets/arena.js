@@ -1,27 +1,18 @@
 'use strict';
 (() => {
-// Preserve uint128 liquidity across JSON and form edits; never round a signed task.
+// Keep large JSON integers as exact numeric tokens, distinct from decimal strings.
 const taskJSON = {
   parse(text) {
     return JSON.parse(text, (key, value, context) => {
       if (key !== 'liquidity_raw' || typeof value !== 'number') return value;
-      if (Number.isSafeInteger(value)) return String(value);
-      if (!context || !/^[1-9][0-9]*$/.test(context.source)) {
+      const source = context?.source || (Number.isSafeInteger(value) ? String(value) : '');
+      if (!JSON.rawJSON || !/^[1-9][0-9]*$/.test(source)) {
         throw new Error('This browser cannot preserve large LP numbers. Use a current Chrome or Edge.');
       }
-      return context.source;
+      return JSON.rawJSON(source);
     });
   },
-  stringify(value, _replacer = null, space) {
-    return JSON.stringify(value, (key, item) => {
-      if (key !== 'liquidity_raw' || typeof item !== 'string') return item;
-      if (!/^[1-9][0-9]*$/.test(item) || item.length > 39 || BigInt(item) > (2n ** 128n - 1n)) {
-        throw new Error('Liquidity must be an exact positive integer within the LP limit.');
-      }
-      if (!JSON.rawJSON) throw new Error('Use a current Chrome or Edge to preserve exact LP numbers.');
-      return JSON.rawJSON(item);
-    }, space);
-  }
+  stringify: (value, replacer = null, space) => JSON.stringify(value, replacer, space)
 };
 
   const $ = id => document.getElementById(id);
@@ -101,12 +92,12 @@ const taskJSON = {
     function fields(value, parent, path) {
       for (const [key, val] of Object.entries(value)) {
         const next = [...path, key];
-        if (val !== null && typeof val === 'object') {
+        if (val !== null && typeof val === 'object' && !JSON.isRawJSON?.(val)) {
           const group = element('fieldset'); group.append(element('legend', /^\d+$/.test(key) ? `Item ${Number(key) + 1}` : key.replaceAll('_', ' ')));
           fields(val, group, next); parent.append(group); continue;
         }
         const label = element('label', labels[key] || key.replaceAll('_', ' '));
-        const input = document.createElement('input'); input.value = String(val);
+        const input = document.createElement('input'); input.value = JSON.isRawJSON?.(val) ? val.rawJSON : String(val);
         input.type = typeof val === 'number' ? 'number' : 'text';
         input.required = true;
         if (input.type === 'number') input.step = 'any';
@@ -119,7 +110,7 @@ const taskJSON = {
           }
           const current = taskJSON.parse($('task-input').value);
           let target = current; for (const part of next.slice(0, -1)) target = target[part];
-          target[next[next.length - 1]] = typeof val === 'number' ? Number(input.value) : input.value;
+          target[next[next.length - 1]] = JSON.isRawJSON?.(val) ? JSON.rawJSON(input.value) : (typeof val === 'number' ? Number(input.value) : input.value);
           $('task-input').value = json(current);
           reference = null; $('copy-reference').disabled = true; $('reference').replaceChildren();
           status(task ? 'Draft changed. The saved task remains frozen; create a new task to use these changes.' : 'Draft updated. Source data and assumptions still need review.');
