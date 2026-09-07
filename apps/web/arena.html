@@ -12,6 +12,12 @@
 <aside class="boundary"><strong>No funds move here.</strong><p>Samples are synthetic. A passing constraint check is not a live trade, paid delivery, verified authorship or proof of profit. Mainnet hiring stays in the existing wallet flow.</p></aside></section>
 <p id="status" class="status" role="status" aria-live="polite">Loading capabilities…</p>
 <div class="categories" id="categories" aria-label="Financial task category"></div>
+<section class="panel"><h2>Wallet holdings — no protocol deposit required</h2>
+<p class="muted">Read BNB, USDT and USDC held directly on BSC. This is a three-asset watchlist, not your entire wallet. Reference prices are timestamped oracle readings, not executable sale quotes. Missing prices stay unknown; holding coins does not establish a yield or profit.</p>
+<label for="wallet-account">Public BSC address</label><input id="wallet-account" autocomplete="off" placeholder="0x…">
+<label class="consent"><input id="wallet-consent" type="checkbox"> I approve sending this public address to the configured chain reader. No wallet connection or signing.</label>
+<button id="wallet-read">Read wallet holdings</button><button id="wallet-export" disabled>Export private observation</button>
+<div id="wallet-summary" aria-live="polite"></div><pre id="wallet-result"></pre></section>
 <section class="panel scenario-panel"><div class="section-head"><div><p class="eyebrow">GUIDED EXAMPLE · NOT A LIVE PROVIDER BENCHMARK</p><h2>See why one answer fails.</h2></div><button id="walkthrough">Run synthetic walkthrough</button></div><p id="scenario-story" class="muted">Choose a category above, then compare a valid local plan against a deliberately flawed local test plan. No JSON editing or wallet needed.</p><div id="walkthrough-result" class="report-grid" aria-live="polite"></div></section>
 <section class="panel"><div class="section-head"><div><p class="eyebrow">01 / TASK CONTRACT</p><h2 id="task-title">Define the task</h2></div><button id="sample" class="secondary">Load synthetic example</button></div>
 <p id="category-detail" class="muted"></p>

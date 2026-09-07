@@ -10,6 +10,7 @@
   let category = 'rebalancing', task = null, reference = null, capabilities = null;
   let saved = [], selected = new Set(), busy = false, pendingSubmission = null;
   let acceptedDelivery = null;
+  let walletObservation = null;
   const requestKey = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
   const json = value => JSON.stringify(value, null, 2);
   function status(text) { $('status').textContent = text; }
@@ -107,6 +108,28 @@
     for (const report of data.comparison.reports) renderReport(report, $('walkthrough-result'));
     status('Synthetic local plans compared. Zero real providers, no payment and no reputation changes.');
   }));
+  $('wallet-read').addEventListener('click', () => act(async () => {
+    walletObservation = null; $('wallet-export').disabled = true;
+    $('wallet-summary').replaceChildren(); $('wallet-result').textContent = '';
+    if (!$('wallet-consent').checked) throw new Error('Approve the public account read first.');
+    const data = await api('/sources/wallet', {method: 'POST', body: json({
+      account: $('wallet-account').value.trim(), consent_read_public_account: true
+    })});
+    walletObservation = data;
+    const display = (value, digits = 2) => value === null ? 'unknown' : Number(value).toLocaleString('en-US', {maximumFractionDigits: digits});
+    for (const row of data.assets) {
+      $('wallet-summary').append(element('p', `${row.symbol}: ${row.balance ?? 'unavailable'} · reference USD ${display(row.reference_value_usd)} · priced-subset share ${display(row.share_of_priced_subset_pct)}%`));
+    }
+    $('wallet-summary').append(element('p', `Priced subset only: USD ${display(data.summary.priced_subset_value_usd)}. Other tokens and chains are not covered. ${data.summary.concentration_warning ? 'One asset is at least 80% of this priced subset; this is not a sell recommendation.' : ''}`));
+    $('wallet-result').textContent = json(data); $('wallet-export').disabled = false;
+    status('Wallet observation complete. Review missing values and coverage; no trade or yield inferred.');
+  }));
+  $('wallet-export').addEventListener('click', () => {
+    if (!walletObservation) return;
+    const url = URL.createObjectURL(new Blob([json(walletObservation)], {type: 'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = `safehire-wallet-${walletObservation.block_number}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
   $('sample').addEventListener('click', () => act(loadExample));
   $('preview').addEventListener('click', () => act(async () => {
     const data = await api('/preview', {method: 'POST', body: $('task-input').value});

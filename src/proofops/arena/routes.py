@@ -51,6 +51,11 @@ class VenusTaskRequest(StrictModel):
     consent_read_public_account: StrictBool
 
 
+class WalletReadRequest(StrictModel):
+    account: str = Field(pattern=r'^0x[0-9a-fA-F]{40}$')
+    consent_read_public_account: StrictBool
+
+
 def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGateway | None = None,
                 enabled: bool | None = None) -> APIRouter:
     router = APIRouter(prefix='/api/arena', tags=['Task-bound acceptance arena'])
@@ -97,6 +102,24 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
     @router.get('/examples')
     def sample_tasks() -> dict[str, Any]:
         return examples()
+
+    @router.post('/sources/wallet')
+    async def wallet_observation(request: WalletReadRequest) -> dict[str, Any]:
+        from proofops.arena.wallet_sources import observe_wallet
+
+        if not active:
+            raise HTTPException(503, 'Arena sources disabled by deployment')
+        if not request.consent_read_public_account:
+            raise HTTPException(422, 'Explicit public account read consent required')
+        if source_slots.locked():
+            raise HTTPException(429, 'Source collector busy; retry later')
+        try:
+            async with source_slots:
+                return await asyncio.wait_for(observe_wallet(request.account), timeout=60)
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            raise HTTPException(422, 'Wallet snapshot rejected; no synthetic fallback') from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'Wallet source unavailable; no transaction attempted') from exc
 
     @router.get('/synthetic-walkthrough/{category}')
     def synthetic_walkthrough(category: str) -> dict[str, Any]:

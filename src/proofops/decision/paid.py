@@ -136,7 +136,7 @@ class BscReader:
         self.decode, self.encode, self.keccak = decode, encode, keccak
 
     async def rpc(self, method: str, params: list[Any]) -> Any:
-        allowed = {"eth_chainId", "eth_blockNumber", "eth_getTransactionReceipt",
+        allowed = {"eth_chainId", "eth_blockNumber", "eth_getBalance", "eth_getTransactionReceipt",
                    "eth_getTransactionByHash", "eth_call", "eth_getBlockByNumber"}
         if method not in allowed:
             raise ValueError("RPC method is not read-only allowlisted")
