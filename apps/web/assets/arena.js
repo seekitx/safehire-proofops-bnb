@@ -15,6 +15,7 @@ const taskJSON = {
   stringify: (value, replacer = null, space) => JSON.stringify(value, replacer, space)
 };
 
+  const responseBytes = new WeakMap();
   const $ = id => document.getElementById(id);
   const categories = {
     rebalancing: ['LP ranges', 'Tick alignment, range inventory, churn and cost caps. Not portfolio weighting.'],
@@ -43,7 +44,9 @@ const taskJSON = {
     const timer = setTimeout(() => controller.abort(), 70000);
     try {
       const response = await fetch(`/api/arena${path}`, { ...options, headers, cache: 'no-store', signal: controller.signal });
-      const result = taskJSON.parse(await response.text());
+      const raw = await response.text();
+      const result = taskJSON.parse(raw);
+      if (result && typeof result === 'object') responseBytes.set(result, raw);
       if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : json(result.detail || result));
       return result;
     } catch (error) {
@@ -232,7 +235,7 @@ const taskJSON = {
   }));
   $('wallet-export').addEventListener('click', () => {
     if (!walletObservation) return;
-    const url = URL.createObjectURL(new Blob([json(walletObservation)], {type: 'application/json'}));
+    const url = URL.createObjectURL(new Blob([responseBytes.get(walletObservation)], {type: 'application/json'}));
     const a = document.createElement('a'); a.href = url; a.download = `safehire-wallet-${walletObservation.block_number}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
@@ -329,7 +332,7 @@ const taskJSON = {
   }));
   $('export').addEventListener('click', () => act(async () => {
     const bundle = await api(`/tasks/${task.task_id}`);
-    const url = URL.createObjectURL(new Blob([json(bundle)], {type: 'application/json'}));
+    const url = URL.createObjectURL(new Blob([responseBytes.get(bundle)], {type: 'application/json'}));
     const a = document.createElement('a'); a.href = url; a.download = `safehire-private-${task.task_id}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     status(`Exported. Preserve this head independently: ${bundle.integrity.head}. Bundle contains private inputs, not the task token.`);
@@ -362,7 +365,7 @@ const taskJSON = {
   }));
   $('export-delivery').addEventListener('click', () => {
     if (!acceptedDelivery) return;
-    const url = URL.createObjectURL(new Blob([json(acceptedDelivery)], {type: 'application/json'}));
+    const url = URL.createObjectURL(new Blob([responseBytes.get(acceptedDelivery)], {type: 'application/json'}));
     const a = document.createElement('a'); a.href = url; a.download = `safehire-acceptance-${acceptedDelivery.job_id}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });

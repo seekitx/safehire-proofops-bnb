@@ -1,4 +1,5 @@
 // Keep large JSON integers as exact numeric tokens, distinct from decimal strings.
+const responseBytes = new WeakMap();
 const taskJSON = {
   parse(text) {
     return JSON.parse(text, (key, value, context) => {
@@ -89,7 +90,9 @@ async function api(path, options = {}) {
     ...options,
     headers: { "Content-Type": "application/json", Accept: "application/json", ...(options.headers || {}) },
   });
-  const body = taskJSON.parse(await response.text());
+  const raw = await response.text();
+  const body = taskJSON.parse(raw);
+  if (body && typeof body === "object") responseBytes.set(body, raw);
   if (!response.ok) throw new Error(body.detail || body.message || `HTTP ${response.status}`);
   return body;
 }
@@ -699,7 +702,7 @@ async function sendFinal(transaction, kind) {
 }
 
 function downloadJson(payload, filename) {
-  const blob = new Blob([`${taskJSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
+  const blob = new Blob([responseBytes.get(payload) || `${taskJSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = filename;

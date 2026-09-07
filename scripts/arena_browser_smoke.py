@@ -37,6 +37,8 @@ def main() -> int:
     errors, checks = [], []
     with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
         from arena_local_server import build_local_app
+
+        from proofops.arena.store import verify_bundle
         asgi_app = build_local_app(root, Path(temporary)/'offline.sqlite3') if args.offline_asgi else None
         async def binding(
             _source: Any, path: str, options: dict[str, Any]
@@ -120,6 +122,7 @@ def main() -> int:
                     lp_path = Path(temporary) / f'lp-exact-{width}.json'
                     lp_download.value.save_as(str(lp_path))
                     assert json.loads(lp_path.read_text())['task']['inputs']['liquidity_raw'] == int(exact_liquidity)
+                    assert verify_bundle(json.loads(lp_path.read_text()))['valid']
                     page.once('dialog', lambda dialog: dialog.accept())
                     page.locator('#forget-task').click()
                     # Persist exact valid and invalid plans against one frozen grid task.
@@ -158,7 +161,7 @@ def main() -> int:
                     bundle_path = Path(temporary)/f'bundle-{width}.json'
                     download.save_as(str(bundle_path))
                     bundle = json.loads(bundle_path.read_text())
-                    assert bundle['integrity']['valid'] and not bundle['paid_delivery_verified']
+                    assert verify_bundle(bundle)['valid'] and not bundle['paid_delivery_verified']
                     # No task capability or wallet secret is exported.
                     assert 'task_token' not in bundle_path.read_text()
                     page.locator('#refresh-task').click()
