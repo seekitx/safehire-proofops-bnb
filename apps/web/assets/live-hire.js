@@ -22,6 +22,7 @@ const examples = {
 
 const state = {
   skillId: null,
+  arenaTask: null,
   agentTokenId: null,
   quotePayload: null,
   owner: null,
@@ -98,6 +99,13 @@ function taskExample() {
 }
 
 function resetTask() {
+  if (state.arenaTask) {
+    byId("taskInput").value = JSON.stringify(state.arenaTask.inputs, null, 2);
+    byId("taskInput").readOnly = true;
+    byId("resetTask").disabled = true;
+    byId("prepareNote").textContent = "Frozen Arena task attached. Inputs cannot be edited here; return to Arena to create a changed task. Fresh signed terms must include the full task before any wallet action.";
+    return;
+  }
   byId("taskInput").value = JSON.stringify(taskExample(), null, 2);
 }
 
@@ -263,6 +271,18 @@ async function loadQuote() {
   state.skillId = SKILLS.has(requested) ? requested : "grid_plan";
   const token = Number(params.get("agent_token_id") || 0);
   state.agentTokenId = Number.isSafeInteger(token) && token > 0 ? token : null;
+  if (params.get("arena") === "1") {
+    try {
+      const handoff = JSON.parse(sessionStorage.getItem("safehire-arena-handoff-v1"));
+      const expectedRef = `56:${state.agentTokenId}:${state.skillId}`;
+      const categories = {rebalance_plan: 'rebalancing', grid_plan: 'grid_trading', yield_plan: 'yield_optimisation', health_factor: 'health_factor_monitoring'};
+      if (!handoff?.task || handoff.agent_ref !== expectedRef || handoff.task.category !== categories[state.skillId]) throw new Error('Saved task and selected provider do not match.');
+      state.arenaTask = handoff.task;
+    } catch (error) {
+      byId("quoteState").textContent = "TASK UNAVAILABLE";
+      throw new Error(`Return to Arena and open the saved task again: ${error.message}`);
+    }
+  }
   resetTask();
   try {
     const payload = await api("/api/live-market/quote", {
@@ -344,6 +364,7 @@ async function prepareHire() {
         skill_id: state.skillId,
         agent_token_id: state.agentTokenId,
         task_input: taskInput,
+        ...(state.arenaTask ? {arena_task: state.arenaTask} : {}),
       }),
     });
     showQuote(state.plan);
@@ -447,6 +468,7 @@ async function resumeJob(jobId) {
       throw new Error("The connected wallet does not own the saved job");
     }
     state.jobId = jobId;
+    state.arenaTask = status.task_spec.arena_task || null;
     state.skillId = status.task_spec.service;
     state.agentTokenId = Number(status.task_spec.erc8004_token_id);
     byId("taskInput").value = JSON.stringify(status.task_spec.task_input, null, 2);

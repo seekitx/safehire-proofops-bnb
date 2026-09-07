@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -149,6 +150,30 @@ def main() -> int:
                     page.screenshot(path=str(args.output/f'arena-{width}.png'), full_page=True)
                     page.evaluate('window.scrollTo(0, 0)')
                     page.screenshot(path=str(args.output/f'arena-overview-{width}.png'))
+                    if not args.offline_asgi:
+                        page.route(re.compile(r'/hire-live\?'), lambda route: route.fulfill(
+                            content_type='text/html', body=(root/'apps/web/live-hire.html').read_text()))
+                        page.route('**/assets/live-hire.js', lambda route: route.fulfill(
+                            content_type='text/javascript', body=(root/'apps/web/assets/live-hire.js').read_text()))
+                        page.route('**/api/runtime', lambda route: route.fulfill(json={'external_mainnet_hire_enabled': True}))
+                        page.route('**/api/live-market/quote', lambda route: route.fulfill(status=422, json={'detail': 'Synthetic test: no provider signature'}))
+                        captured: list[dict[str, Any]] = []
+                        def reject_prepare(route: Any, _request: Any, sink: list[dict[str, Any]] = captured) -> None:
+                            sink.append(route.request.post_data_json)
+                            route.fulfill(status=422, json={'detail': 'Synthetic test: no wallet plan created'})
+                        page.route('**/api/live-hire/prepare', reject_prepare)
+                        page.locator('#open-hire').click()
+                        page.wait_for_function("document.querySelector('#quoteState')?.textContent === 'UNAVAILABLE'")
+                        assert page.evaluate('state.arenaTask') == bundle['task']
+                        assert page.locator('#taskInput').get_attribute('readonly') is not None
+                        page.evaluate("state.owner = '0x' + '1'.repeat(40); state.quotePayload = {}; state.writeEnabled = true")
+                        page.locator('#riskConfirm').check()
+                        page.evaluate('prepareHire()')
+                        assert captured[0]['arena_task'] == bundle['task']
+                        assert captured[0]['task_input'] == bundle['task']['inputs']
+                        page.goto(origin + '/hire-live?arena=1&skill_id=grid_plan&agent_token_id=1')
+                        page.wait_for_function("document.querySelector('#quoteState')?.textContent === 'TASK UNAVAILABLE'")
+                        assert page.locator('#prepareHire').is_disabled()
                     checks.append({'viewport':[width,height], 'four_guided_categories':True,
                                    'valid_and_invalid_plan_distinguished':True, 'native_http_calls':not args.offline_asgi,
                                    'capability_save_compare_export_refresh':True,

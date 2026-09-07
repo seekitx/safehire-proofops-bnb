@@ -181,6 +181,7 @@
       const option = element('option', `${p.operator_label} — ${p.skill_id}`); option.value = p.agent_ref;
       $('provider-select').append(option);
     }
+    $('open-hire').disabled = !task || !rows.length;
     $('quote').disabled = !task || !capabilities.quotes_enabled || !rows.some(p => p.quote_enabled);
   }
   $('task-input').addEventListener('change', renderTaskForm);
@@ -294,6 +295,16 @@
     const a = document.createElement('a'); a.href = url; a.download = `safehire-private-${task.task_id}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     status(`Exported. Preserve this head independently: ${bundle.integrity.head}. Bundle contains private inputs, not the task token.`);
+  }));
+  $('open-hire').addEventListener('click', () => act(async () => {
+    if (!task) throw new Error('Open a private task first.');
+    const provider = capabilities.providers.providers.find(p => p.agent_ref === $('provider-select').value);
+    if (!provider || provider.category !== category) throw new Error('Select a matching provider route.');
+    if (provider.reviewed_scope.includes('not_lp_execution')) throw new Error('This provider offers portfolio analysis, not LP range management. Choose a compatible LP provider before hiring for this task.');
+    const bundle = await api(`/tasks/${task.task_id}`);
+    sessionStorage.setItem('safehire-arena-handoff-v1', json({task: bundle.task, agent_ref: provider.agent_ref}));
+    const params = new URLSearchParams({skill_id: provider.skill_id, agent_token_id: String(provider.token_id), arena: '1'});
+    location.assign(`/hire-live?${params}`);
   }));
   $('quote').addEventListener('click', () => act(async () => {
     if (!$('consent').checked) throw new Error('Approve sending the task to this provider first.');

@@ -1,0 +1,87 @@
+{
+  "observed_at": "2026-09-07T16:17:46.064312+00:00",
+  "http_status": 200,
+  "synthetic_task": true,
+  "funds_moved": false,
+  "request": {
+    "jsonrpc": "2.0",
+    "id": "safehire-integration-probe-2026-09-08",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "messageId": "safehire-integration-probe-2026-09-08",
+        "parts": [
+          {
+            "kind": "data",
+            "data": {
+              "skill": "negotiate",
+              "service": "yield_plan",
+              "request": {
+                "task_description": "{\"arena_task\":{\"category\":\"yield_optimisation\",\"inputs\":{\"capital_usd\":1000.0,\"current_apy_pct\":5.0,\"horizon_days\":90,\"min_improvement_usd\":1.0,\"venues\":[{\"apy_pct\":8.0,\"capacity_usd\":100000.0,\"migration_cost_usd\":1.0,\"venue_id\":\"scenario-venue-a\",\"withdrawal_delay_days\":0},{\"apy_pct\":12.0,\"capacity_usd\":100000.0,\"migration_cost_usd\":50.0,\"venue_id\":\"scenario-venue-b\",\"withdrawal_delay_days\":0}]},\"limits\":{\"max_cost_usd\":10.0,\"max_slippage_bps\":100,\"max_snapshot_age_seconds\":300},\"schema_version\":\"safehire-task/2\",\"snapshot\":{\"block_hash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"block_number\":1,\"chain_id\":56,\"observed_at\":\"2026-09-07T16:17:44.226116Z\",\"source\":\"SYNTHETIC_EXAMPLE_NOT_CHAIN_DATA\"}},\"erc8004_token_id\":304493,\"request_nonce\":\"safehire-integration-probe-2026-09-08\",\"schema_version\":\"safehire-external-hire-v2\",\"service\":\"yield_plan\",\"task_input\":{\"amountUsd\":1000,\"currentApyPct\":5}}",
+                "terms": {
+                  "deliverables": "Ranks Venus markets using measured BSC block time, cross-checks published APY and estimates when a move repays its gas cost.",
+                  "quality_standards": "Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds.",
+                  "evaluation_required": true,
+                  "evaluator_type": "optimistic_policy",
+                  "success_criteria": [
+                    "Answer the selected SafeHire task and no unrelated task.",
+                    "Name material data sources and observation times or blocks.",
+                    "State risks, uncertainty and any condition that would change the recommendation.",
+                    "Return a self-contained deliverable suitable for independent review.",
+                    "Deliver response.content as a safehire-proposal/2 JSON object for the exact arena_task: agent_ref=56:304493:yield_plan, task_hash=586405c3b54f166505423680a00678868b432f9ef6bcc0c7de945bb2b610168d, snapshot_hash=687e988e89c97047f3f939aa263afcbe97f7eca781a0cef7f9abdfe7ff11b16e, with action and parameters. Use schema_version=safehire-proposal/2. Do not substitute narrative output. Do not accept these terms if this exact structured delivery is unsupported."
+                  ]
+                },
+                "request_id": "safehire-integration-probe-2026-09-08"
+              },
+              "task_description": "{\"arena_task\":{\"category\":\"yield_optimisation\",\"inputs\":{\"capital_usd\":1000.0,\"current_apy_pct\":5.0,\"horizon_days\":90,\"min_improvement_usd\":1.0,\"venues\":[{\"apy_pct\":8.0,\"capacity_usd\":100000.0,\"migration_cost_usd\":1.0,\"venue_id\":\"scenario-venue-a\",\"withdrawal_delay_days\":0},{\"apy_pct\":12.0,\"capacity_usd\":100000.0,\"migration_cost_usd\":50.0,\"venue_id\":\"scenario-venue-b\",\"withdrawal_delay_days\":0}]},\"limits\":{\"max_cost_usd\":10.0,\"max_slippage_bps\":100,\"max_snapshot_age_seconds\":300},\"schema_version\":\"safehire-task/2\",\"snapshot\":{\"block_hash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"block_number\":1,\"chain_id\":56,\"observed_at\":\"2026-09-07T16:17:44.226116Z\",\"source\":\"SYNTHETIC_EXAMPLE_NOT_CHAIN_DATA\"}},\"erc8004_token_id\":304493,\"request_nonce\":\"safehire-integration-probe-2026-09-08\",\"schema_version\":\"safehire-external-hire-v2\",\"service\":\"yield_plan\",\"task_input\":{\"amountUsd\":1000,\"currentApyPct\":5}}",
+              "terms": {
+                "deliverables": "Ranks Venus markets using measured BSC block time, cross-checks published APY and estimates when a move repays its gas cost.",
+                "quality_standards": "Use current BNB Chain evidence, name sources and timestamps, disclose uncertainty, return a complete reviewable result, and never promise profit or move funds.",
+                "evaluation_required": true,
+                "evaluator_type": "optimistic_policy",
+                "success_criteria": [
+                  "Answer the selected SafeHire task and no unrelated task.",
+                  "Name material data sources and observation times or blocks.",
+                  "State risks, uncertainty and any condition that would change the recommendation.",
+                  "Return a self-contained deliverable suitable for independent review.",
+                  "Deliver response.content as a safehire-proposal/2 JSON object for the exact arena_task: agent_ref=56:304493:yield_plan, task_hash=586405c3b54f166505423680a00678868b432f9ef6bcc0c7de945bb2b610168d, snapshot_hash=687e988e89c97047f3f939aa263afcbe97f7eca781a0cef7f9abdfe7ff11b16e, with action and parameters. Use schema_version=safehire-proposal/2. Do not substitute narrative output. Do not accept these terms if this exact structured delivery is unsupported."
+                ]
+              },
+              "request_id": "safehire-integration-probe-2026-09-08"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": "safehire-integration-probe-2026-09-08",
+    "result": {
+      "accepted": true,
+      "provider": "0x73809F69916FcF7Ddc5BB1315fBdf96A569a5963",
+      "price": "100000000000000000",
+      "price_display": "0.10 $U",
+      "currency": "U",
+      "service": "yield_plan",
+      "category": "yield-optimization",
+      "deliverables": "Every Venus core-pool market ranked by supply APY, computed from the rate per block and a block time measured against the chain rather than the 10,512,000-blocks-a-year constant most published BSC yield figures still use — which understates these rates by about 6.7x. Cross-checked against Venus's own published APY, with divergences named. Given an amount and what you earn today it returns the days until a move pays for its own gas, which below a certain position size is never.",
+      "needs": {
+        "amountUsd": "position size in USD, optional",
+        "from": "the Venus market held today, optional",
+        "currentApyPct": "what you earn today, optional"
+      },
+      "estimated_completion_seconds": 120,
+      "instructions": "Create a job in 0xEa4DAa3100A767e86FDed867729ae7446476EBA6 naming 0x73809F69916FcF7Ddc5BB1315fBdf96A569a5963 as provider, set the budget to 100000000000000000 (0.10 $U), fund it, then send skill:\"notify_funded\" with job_id and the parameters listed under \"needs\".",
+      "chain_id": 56,
+      "verifying_contract": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+      "payment_token": "0xcE24439F2D9C6a2289F741120FE202248B666666"
+    }
+  },
+  "verification": {
+    "signed_quote_compatible": false,
+    "reason": "Missing complete signed negotiation envelope",
+    "delivery_format_verified": false
+  }
+}
