@@ -26,6 +26,7 @@
       <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>不用代理，亲自完成同一任务。</h2></div><span id="timerState">NOT STARTED</span></div>
       <div class="field-grid">
         <label>Task<select id="taskSelect">
+          <option value="live-20260908-health-followup">④ 新借贷任务（替代练习）</option>
           <option value="live-20260908-health">① 真实借贷账户检查</option>
           <option value="live-20260908-grid">② 真实价格的网格计划</option>
           <option value="live-20260908-yield">③ 真实利率的收益比较</option>
@@ -44,7 +45,8 @@
         <label>币种<input id="manualCurrency" value="USD" maxlength="12" /></label>
       </div>
       <label>实际使用的工具<input id="manualTools" placeholder="例如：系统计算器、Venus 官网；如实列出" /></label><label><input id="manualAttestation" type="checkbox" /> 我亲自完成了本次操作，未使用 AI 或市场代理，并保留完整答案。</label>
-      <div class="lab-actions"><button class="button" id="startTimer" type="button">开始计时</button><button class="button secondary" id="finishManual" type="button" disabled>结束并下载记录</button></div>
+      <div class="lab-actions"><button class="button" id="startTimer" type="button">开始计时</button><button class="button secondary" id="finishManual" type="button" disabled>结束并下载记录</button><button class="button secondary" id="finishPractice" type="button" disabled>结束并保存为辅助练习</button></div>
+      <p>如果本轮使用过 AI 或只想保留未完成的尝试，请选择“辅助练习”；它不会计入无 AI 正式对照。</p>
     </section>
 
     <section class="lab-card">

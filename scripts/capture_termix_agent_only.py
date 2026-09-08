@@ -1,9 +1,11 @@
 """Capture sponsored public Agent responses, without inventing manual runs or scores."""
 from __future__ import annotations
 
+import argparse
 import asyncio
 import hashlib
 import json
+import re
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,10 +15,11 @@ import httpx
 ROOT = Path(__file__).resolve().parents[1]
 
 
-async def main() -> None:
+async def main(task_ids: list[str]) -> None:
     async with httpx.AsyncClient(timeout=30) as client:
-        for kind in ('health', 'grid', 'yield'):
-            task_id = f'live-20260908-{kind}'
+        for task_id in task_ids:
+            if not re.fullmatch(r'live-[0-9]{8}-[a-z0-9-]+', task_id):
+                raise ValueError('Invalid task identifier')
             task = json.loads((ROOT / f'evidence/termix/tasks/{task_id}.json').read_text())
             target = ROOT / f'evidence/termix/raw/{task_id}/agent-output.json'
             if target.exists():
@@ -46,4 +49,7 @@ async def main() -> None:
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--task', action='append', dest='tasks')
+    args = parser.parse_args()
+    asyncio.run(main(args.tasks or ['live-20260908-health', 'live-20260908-grid', 'live-20260908-yield']))

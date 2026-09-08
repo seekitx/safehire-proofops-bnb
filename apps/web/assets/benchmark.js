@@ -86,15 +86,16 @@ function startTimer() {
   byId("manualOutput").focus();
   byId("startTimer").disabled = true;
   byId("finishManual").disabled = false;
+  byId("finishPractice").disabled = false;
   byId("timerState").textContent = "RUNNING";
   timerHandle = setInterval(renderTimer, 100);
   renderTimer();
 }
 
-function finishManual() {
+function finishManual(assisted = false) {
   const answer = byId("manualOutput").value.trim();
   if (!answer) return toast("请先写下完整答案，再结束计时。", true);
-  if (!byId("manualAttestation").checked || !byId("manualTools").value.trim()) return toast("请填写实际使用的工具，并勾选亲自完成的声明。", true);
+  if ((!assisted && !byId("manualAttestation").checked) || !byId("manualTools").value.trim()) return toast("请填写实际使用的工具，并勾选亲自完成的声明。", true);
   const cost = Number(byId("manualCost").value);
   if (!Number.isFinite(cost) || cost < 0) return toast("Enter a valid non-negative cost.", true);
   const duration = elapsedSeconds();
@@ -103,7 +104,7 @@ function finishManual() {
   const finishedAt = new Date();
   const record = {
     schema_version: "safehire-termix-manual-v2",
-    evidence_mode: uiTest ? "ui_verification_not_human" : "human_timed_manual_run",
+    evidence_mode: uiTest ? "ui_verification_not_human" : assisted ? "assisted_practice_not_control" : "human_timed_manual_run",
     task_id: task.task_id,
     task_snapshot: task,
     operator: byId("operatorName").value.trim(),
@@ -114,15 +115,16 @@ function finishManual() {
     cost: { amount: cost, currency: byId("manualCurrency").value.trim() || "USD" },
     output: answer,
     attestations: {
-      no_safehire_agent_called: !uiTest,
+      no_safehire_agent_called: !uiTest && !assisted,
       no_pause_available_in_timer: true,
       complete_output_preserved: true,
     },
   };
   byId("finishManual").disabled = true;
+  byId("finishPractice").disabled = true;
   byId("manualOutput").disabled = true;
   byId("timerState").textContent = "RECORDED";
-  downloadJson(`${task.task_id}-manual-output.json`, record);
+  downloadJson(`${task.task_id}-${assisted ? "assisted-practice" : "manual-output"}.json`, record);
   toast("人工记录已下载。请保留原文件，然后告诉我已完成。");
 }
 
@@ -223,13 +225,17 @@ function downloadReview() {
 
 byId("taskSelect").addEventListener("change", () => loadTask().catch((error) => toast(error.message, true)));
 byId("startTimer").addEventListener("click", startTimer);
-byId("finishManual").addEventListener("click", finishManual);
+byId("finishManual").addEventListener("click", () => finishManual());
+byId("finishPractice").addEventListener("click", () => finishManual(true));
 byId("agentFile").addEventListener("change", maybeEnablePacket);
 byId("manualFile").addEventListener("change", maybeEnablePacket);
 byId("buildPacket").addEventListener("click", buildPacket);
 byId("packetFile").addEventListener("change", loadPacket);
 byId("downloadReview").addEventListener("click", downloadReview);
 const requestedTask = new URLSearchParams(location.search).get('task');
-if ([...byId('taskSelect').options].some(option => option.value === requestedTask)) byId('taskSelect').value = requestedTask;
+if ([...byId('taskSelect').options].some(option => option.value === requestedTask)) {
+  byId('taskSelect').value = requestedTask;
+  byId('taskSelect').disabled = true;
+}
 renderScores();
 loadTask().catch((error) => toast(error.message, true));

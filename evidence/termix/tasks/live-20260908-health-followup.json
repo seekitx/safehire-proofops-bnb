@@ -1,0 +1,27 @@
+{
+  "schema_version": "safehire-termix-task/2",
+  "task_id": "live-20260908-health-followup",
+  "title_zh": "新借贷账户检查：自定保守目标",
+  "manual_brief_zh": "这是新读取并保存的真实公开账户数据，不是你的账户，也不执行交易。你已做过类似练习，本次报告会披露这段学习经历。请独立使用普通计算器或表格完成，不使用 AI 计算或代写。\n\n本题把提醒线设为 2.5、目标健康系数设为 3.0。这两个数是用于比较的假设，不是 Venus 官方参数或投资建议。\n计算健康系数，判断是否低于本题的 2.5 提醒线，并计算达到 3.0 目标需要偿还多少美元。\n公式：健康系数 = 抵押品价值 × 加权清算阈值 ÷ 债务。\n目标允许债务 = 抵押品价值 × 加权清算阈值 ÷ 3.0。\n需要偿还 = 债务 − 目标允许债务；小于零填零。\n写出计算过程、判断和金额，并说明这份快照为什么不能保证以后不会被清算。不会的部分如实写明。不转账，不签名。",
+  "source_snapshot": {
+    "path": "evidence/termix/sources/live-20260908-health-followup.json",
+    "observation_hash": "afe8fc0bcdd15db01bc0e906fefdea1bfb0f1edd21ad30c14ac1e124599ef653",
+    "block_number": 120640472,
+    "observed_at": "2026-09-08T06:44:45.250771+00:00"
+  },
+  "agent_request": {
+    "skill": "hire_analysis",
+    "task_id": "live-20260908-health-followup",
+    "agent_id": "hf-shield-demo",
+    "input": {
+      "collateral_usd": 7073075.196824969,
+      "debt_usd": 2360364.7999056843,
+      "liquidation_threshold": 0.75,
+      "alert_health_factor": 2.5,
+      "target_health_factor": 3.0,
+      "source": "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+    }
+  },
+  "comparison_rule": "Identical frozen inputs and formulas. Manual participant previously practiced a related task with AI assistance; disclose learning effect. No AI assistance during this new run. Preserve repeated attempts; do not cherry-pick fastest time.",
+  "boundary": "Real recorded core-account snapshot with hypothetical conservative targets. Sponsored first-party analysis; no paid external delivery, protocol parameter change, execution, or guaranteed liquidation prevention."
+}

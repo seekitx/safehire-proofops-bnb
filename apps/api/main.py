@@ -1246,6 +1246,7 @@ async def public_termix_report() -> dict[str, Any]:
 async def public_termix_task(task_id: str) -> dict[str, Any]:
     allowed_tasks = {
         "live-20260908-health",
+        "live-20260908-health-followup",
         "live-20260908-grid",
         "live-20260908-yield",
         "pancakeswap-grid-route",
@@ -1262,6 +1263,7 @@ async def public_termix_task(task_id: str) -> dict[str, Any]:
 async def public_termix_raw(task_id: str, side: str) -> dict[str, Any]:
     allowed_tasks = {
         "live-20260908-health",
+        "live-20260908-health-followup",
         "live-20260908-grid",
         "live-20260908-yield",
         "pancakeswap-grid-route",
