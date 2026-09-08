@@ -1,0 +1,94 @@
+{
+  "evidence_mode": "live_readonly_receipt_recheck",
+  "purpose": "Recheck known job receipt on canonical chain instead of rescan; no settlement or transaction sent",
+  "result": {
+    "acceptance": {
+      "schema": "safehire-grid-acceptance/1",
+      "passed": true,
+      "failures": [],
+      "checks": [
+        "task parameters",
+        "sides and level count",
+        "prices",
+        "sizes",
+        "quantities",
+        "total budget"
+      ],
+      "human_quality_review": "pending",
+      "trade_executed": false,
+      "boundary": "Arithmetic against signed caller inputs only. No live-price, fees, profit, order placement or stop-loss verification."
+    },
+    "schema_version": "1.0",
+    "evidence_mode": "live",
+    "chain_id": 56,
+    "job_id": 56741,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "task_spec": {
+      "schema_version": "chainhelix-grid/1",
+      "service": "grid_plan",
+      "erc8004_token_id": 269224,
+      "task_input": {
+        "price": 750.0,
+        "budgetUsd": 1000,
+        "spanPct": 2,
+        "levels": 5
+      },
+      "request_nonce": null,
+      "arena_binding_supported": false
+    },
+    "success_criteria": [],
+    "onchain": {
+      "deliverable_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56741/response",
+      "deliverable_hash": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+      "submitted_at": 1788854293,
+      "block_number": 120650302,
+      "transaction_hash": "0x906d14f45f9c46ad4349c04d8d906dd08dcbea8960f35981a896183f30799545"
+    },
+    "manifest_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56741/response",
+    "manifest": {
+      "chain_id": 56,
+      "contracts": {
+        "commerce": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+        "policy": "0x9C01845705b3078Aa2e8cfF7520a6376FD766dE5",
+        "router": "0x51895229E12F9876011789B04f8698af06cCD6DA"
+      },
+      "job_id": 56741,
+      "metadata": {
+        "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+        "generator": "gridtrader",
+        "job_id": 56741
+      },
+      "response": {
+        "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+        "content_type": "text/plain"
+      },
+      "version": 1
+    },
+    "verification": {
+      "hash_matches": true,
+      "job_matches": true,
+      "chain_matches": true,
+      "contracts_match": true,
+      "provider_submit_authorized_by_contract": true,
+      "human_success_criteria_review_required": true,
+      "valid": true,
+      "computed_hash": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+      "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+      "content_type": "text/plain",
+      "metadata": {
+        "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+        "generator": "gridtrader",
+        "job_id": 56741
+      }
+    },
+    "settlement": {
+      "can_settle": false,
+      "can_dispute": true,
+      "review_window_closed": false,
+      "seconds_until_settle": 598064,
+      "policy_verdict": "UNDECIDED",
+      "disputed": false
+    },
+    "evidence_boundary": "SafeHire verified the retrieved manifest against the on-chain deliverable hash, job, chain and contract trio. A human still decides whether the content satisfies the signed success criteria before settle or dispute."
+  }
+}

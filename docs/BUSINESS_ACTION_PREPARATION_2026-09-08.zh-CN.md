@@ -38,3 +38,11 @@
 - [Venus v10.3.0 状态和额度定义](https://raw.githubusercontent.com/VenusProtocol/venus-protocol/v10.3.0/contracts/Comptroller/ComptrollerStorage.sol)
 - [Venus 动作枚举及接口](https://raw.githubusercontent.com/VenusProtocol/venus-protocol/v10.3.0/contracts/Comptroller/ComptrollerInterface.sol)
 - [Venus VBep20 返回码及偿还实现](https://raw.githubusercontent.com/VenusProtocol/venus-protocol/v10.3.0/contracts/Tokens/VTokens/VBep20.sol)
+
+## 发布时发现并修复的交付读取问题
+
+已付款订单 #56741 曾因公共日志节点 403 而显示读取失败。官方默认节点也禁用日志查询，另一个公开节点实测出现 429，不能把公共节点可用性当成保证。补了日志读取失败时的固定备用源，以及有据可查的交易指针配置 `config/live-delivery-receipt-hints.json`。指针只用于定位；每次重新读取交易成功回执、规范区块、精确合约与订单事件，随后仍检查当前链上交付哈希和原始结果。绿云只读复核 #56741 验收通过。未知订单仍需发现事件，公共数据源全部失败时明确显示未核验。
+
+历史交付不再因一次读取失败消失；页面明确标记历史时间与当前未重新核验。最终本地 395 项测试通过，覆盖率 78.87%；没有结算、退款、付款或发送交易。
+
+依据：[BNB 官方说明日志查询限制](https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/)、[dRPC 的 BSC 接口](https://drpc.org/docs/bsc-api)。备用源仍是共享公共服务，不能保证持续可用。

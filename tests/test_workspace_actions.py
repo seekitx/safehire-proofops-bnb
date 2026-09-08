@@ -167,3 +167,49 @@ def test_private_action_endpoint_isolation_consent_and_resume(tmp_path,monkeypat
             assert (await c.post(path+'/resume',headers=headers,json={})).status_code==200
             assert journal.watch(cred['space_id'],watch)['active']==1
     asyncio.run(scenario())
+
+
+def test_log_source_failover_and_fail_closed(monkeypatch):
+    async def run():
+        import httpx
+    
+        from proofops.services import live_erc8183
+        seen=[]
+        fail_all=False
+        class Client:
+            def __init__(self,**kwargs):pass
+            async def __aenter__(self):return self
+            async def __aexit__(self,*args):pass
+            async def post(self,url,json):
+                seen.append((url,json['method']))
+                request=httpx.Request('POST',url)
+                if 'publicnode' in url or fail_all:
+                    return httpx.Response(403,request=request)
+                return httpx.Response(200,json={'result':[]},request=request)
+        monkeypatch.delenv('SAFEHIRE_BSC_LOG_RPC',raising=False)
+        monkeypatch.setattr(live_erc8183.httpx,'AsyncClient',Client)
+        assert await live_erc8183._rpc('eth_getLogs',[{}])==[]
+        assert seen==[('https://bsc-rpc.publicnode.com','eth_getLogs'),('https://bsc.drpc.org','eth_getLogs')]
+        fail_all=True
+        with pytest.raises(ValueError,match='current state unverified'):
+            await live_erc8183._rpc('eth_getLogs',[{}])
+    asyncio.run(run())
+
+
+def test_receipt_hint_requires_canonical_exact_job(monkeypatch):
+    async def run():
+        from proofops.services import live_erc8183 as m
+        tx='0x'+'a'*64
+        receipt={'status':'0x1','transactionHash':tx,'blockNumber':'0x10','blockHash':HASH}
+        log={'address':m.POLICY,'topics':[m.JOB_INITIALISED_TOPIC,m._topic_uint(56741)],'transactionHash':tx,'blockNumber':'0x10','blockHash':HASH}
+        receipt['logs']=[log]
+        async def rpc(method,params):
+            return receipt if method=='eth_getTransactionReceipt' else {'hash':HASH}
+        monkeypatch.setattr(m,'_rpc',rpc)
+        assert await m._receipt_delivery_log(56741,tx)==log
+        with pytest.raises(ValueError,match='exact job'):
+            await m._receipt_delivery_log(56742,tx)
+        receipt['blockHash']='0x'+'b'*64
+        with pytest.raises(ValueError,match='canonical'):
+            await m._receipt_delivery_log(56741,tx)
+    asyncio.run(run())

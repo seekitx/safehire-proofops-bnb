@@ -1,0 +1,232 @@
+{
+  "evidence_mode": "live_release_api_verification_not_user_adoption",
+  "candidate": "07d446ec6991a10b369778977482dd8a0b16a6a7",
+  "checks": {
+    "grid": {
+      "summary": "假设成本下单次价差不足，应停止这份计划",
+      "plan_hash": "3304760ca6afc6c92f00b01cd33308efc1298a22726e7edb1f69041d4f0df42c",
+      "trade_executed": false,
+      "simulation": null,
+      "blockers": [
+        "尚未接入经过审核的自动网格订单执行器",
+        "尚须核查每笔实际报价、钱包库存和链上费用"
+      ]
+    },
+    "yield": {
+      "summary": "保留现有去处更合适",
+      "plan_hash": "7f10ba07c3b0a7ba3b77f381269664902818a4761d0915afd5a7b788d6a7b33d",
+      "trade_executed": false,
+      "simulation": null,
+      "blockers": [
+        "尚未核验本账户实际可退出余额和钱包余额",
+        "尚未取得稳定币换币报价、完整费用和授权"
+      ]
+    },
+    "health": {
+      "summary": "已计算压力情景和偿还准备条件",
+      "plan_hash": "84811733bef7732151c0e73d1ad11a28920c783f5dbf961cdfb31ea768254bf8",
+      "trade_executed": false,
+      "simulation": null,
+      "blockers": [
+        "选择实际债务代币和金额后，才能准备偿还交易草稿"
+      ]
+    },
+    "lp": {
+      "summary": "仓位仍在区间内，先核对调整是否值得",
+      "plan_hash": "35ad4ab76281d59a1cc03803bbc452e3a56d9fba91a4260f314a920b7249b13c",
+      "trade_executed": false,
+      "simulation": {
+        "passed": true,
+        "method": "eth_call",
+        "deadline": 1788861322,
+        "principal_minimum_raw": [
+          "627648990457575664",
+          "330183682266117"
+        ],
+        "collect_raw": [
+          "632778916695644868",
+          "334418529727654"
+        ],
+        "transaction_sent": false
+      },
+      "blockers": [
+        "移出后须根据实际到账资产，重新取得换币和新仓位报价",
+        "尚未取得钱包持有人确认，也未核实整套操作的链上费用"
+      ]
+    }
+  },
+  "stored_plans": 4,
+  "all_test_watches_paused": true,
+  "capabilities": {
+    "enabled": true,
+    "server_followup": true,
+    "worker_running": true,
+    "check_interval_seconds": 300,
+    "monitor_duration_hours": 24,
+    "in_app_alerts": true,
+    "external_push": false,
+    "automatic_payment": false,
+    "automatic_trading": false,
+    "independent_review": false
+  },
+  "services": {
+    "services": [
+      {
+        "token_id": 269224,
+        "name": "ChainHelix — Grid calculation",
+        "category": "grid_trading",
+        "skill_id": "grid_plan",
+        "operator": "ChainHelix",
+        "description": "A deterministic 10-level or custom-size buy/sell ladder from your supplied reference price. No trading, custody, stop loss or profit claim.",
+        "scope": "calculation_only",
+        "pause": null,
+        "availability": {
+          "checked_at": 1788860687.1808045,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "quote_verified",
+          "price_raw": "500000000000000000",
+          "price_display": "0.50 U",
+          "expires_at": 1788861587,
+          "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+          "duration_seconds": 1.135,
+          "can_request_quote": true
+        },
+        "quote_price_is_live": false,
+        "price_raw": "500000000000000000",
+        "submitted_evidence": [
+          56741
+        ],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=grid_plan&agent_token_id=269224"
+      },
+      {
+        "token_id": 265375,
+        "name": "BNB LP Range Rebalancer",
+        "category": "rebalancing",
+        "skill_id": "rebalance_plan",
+        "operator": "BNB LP Range operator (identity 265375)",
+        "description": "Read-only analysis of the supplied LP range task, with current pool sources and observed block. Never move funds or alter an LP position.",
+        "scope": "analysis_only",
+        "pause": "New hires paused: funded job 56733 has no submitted delivery. Existing jobs remain readable; expiry refund remains available under the contract rules.",
+        "availability": {
+          "checked_at": 1788860688.4733036,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "paused",
+          "reason": "New hires paused: funded job 56733 has no submitted delivery. Existing jobs remain readable; expiry refund remains available under the contract rules.",
+          "duration_seconds": 0.0,
+          "can_request_quote": false
+        },
+        "quote_price_is_live": false,
+        "price_raw": null,
+        "submitted_evidence": [],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=rebalance_plan&agent_token_id=265375"
+      },
+      {
+        "token_id": 302257,
+        "name": "Brain on BNB — Venus Health Factor Monitor",
+        "category": "health_factor_monitoring",
+        "skill_id": "health_factor",
+        "operator": "Brain On BNB AI",
+        "description": "Reads a Venus position market by market, computes liquidation distance and cross-checks against the protocol account-liquidity result.",
+        "scope": "analysis_only",
+        "pause": null,
+        "availability": {
+          "checked_at": 1788860688.4328923,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "unavailable",
+          "reason": "QuoteVerificationError: quote verification failed",
+          "duration_seconds": 0.036,
+          "can_request_quote": false
+        },
+        "quote_price_is_live": false,
+        "price_raw": null,
+        "submitted_evidence": [],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=health_factor&agent_token_id=302257"
+      },
+      {
+        "token_id": 302258,
+        "name": "Brain on BNB — BSC Grid Planner",
+        "category": "grid_trading",
+        "skill_id": "grid_plan",
+        "operator": "Brain On BNB AI",
+        "description": "Sizes a grid against a real BSC pool and reports fee, price impact, observed transfer tax and break-even spacing.",
+        "scope": "analysis_only",
+        "pause": null,
+        "availability": {
+          "checked_at": 1788860688.3611014,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "unavailable",
+          "reason": "QuoteVerificationError: quote verification failed",
+          "duration_seconds": 0.032,
+          "can_request_quote": false
+        },
+        "quote_price_is_live": false,
+        "price_raw": null,
+        "submitted_evidence": [],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=grid_plan&agent_token_id=302258"
+      },
+      {
+        "token_id": 304493,
+        "name": "Brain on BNB — Venus Yield Ranking",
+        "category": "yield_optimisation",
+        "skill_id": "yield_plan",
+        "operator": "Brain On BNB AI",
+        "description": "Ranks Venus markets using measured BSC block time, cross-checks published APY and estimates when a move repays its gas cost.",
+        "scope": "analysis_only",
+        "pause": null,
+        "availability": {
+          "checked_at": 1788860688.3963277,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "unavailable",
+          "reason": "QuoteVerificationError: quote verification failed",
+          "duration_seconds": 0.033,
+          "can_request_quote": false
+        },
+        "quote_price_is_live": false,
+        "price_raw": null,
+        "submitted_evidence": [],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=yield_plan&agent_token_id=304493"
+      },
+      {
+        "token_id": 304494,
+        "name": "Brain on BNB — Portfolio Rebalance Pricer",
+        "category": "rebalancing",
+        "skill_id": "rebalance_plan",
+        "operator": "Brain On BNB AI",
+        "description": "Prices a BSC portfolio rebalance against the pools that would execute it, including swap fee, price impact and observed transfer tax.",
+        "scope": "analysis_only",
+        "pause": null,
+        "availability": {
+          "checked_at": 1788860688.320674,
+          "sample_task_only": true,
+          "paid_delivery_proved": false,
+          "state": "unavailable",
+          "reason": "QuoteVerificationError: quote verification failed",
+          "duration_seconds": 0.037,
+          "can_request_quote": false
+        },
+        "quote_price_is_live": false,
+        "price_raw": null,
+        "submitted_evidence": [],
+        "completion_rate": null,
+        "sample_size_note": "No success-rate estimate from a single order",
+        "hire_url": "/hire-live?skill_id=rebalance_plan&agent_token_id=304494"
+      }
+    ],
+    "evidence_boundary": "Listings describe reviewed scope; a current valid quote is required before purchase. Operators are grouped, never counted as independent agents."
+  }
+}

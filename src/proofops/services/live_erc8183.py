@@ -199,16 +199,25 @@ def validate_task_input(skill_id: str, raw: Any) -> dict[str, Any]:
 
 
 async def _rpc(method: str, params: list[Any]) -> Any:
+    # Public log endpoints can refuse a region or throttle a request. Both sources
+    # only locate events; downstream task/hash checks still apply.
+    urls = [os.getenv('SAFEHIRE_BSC_LOG_RPC', 'https://bsc-rpc.publicnode.com'),
+            'https://bsc.drpc.org'] if method == 'eth_getLogs' else [BSC_MAINNET_RPC]
+    last_error: Exception | None = None
     async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.post(
-            os.getenv('SAFEHIRE_BSC_LOG_RPC', 'https://bsc-rpc.publicnode.com') if method == 'eth_getLogs' else BSC_MAINNET_RPC,
-            json={"jsonrpc": "2.0", "id": method, "method": method, "params": params},
-        )
-        response.raise_for_status()
-        payload = response.json()
-    if not isinstance(payload, dict) or payload.get("error") or "result" not in payload:
-        raise ValueError(f"BSC mainnet rejected {method}")
-    return payload["result"]
+        for url in dict.fromkeys(urls):
+            try:
+                response = await client.post(url, json={"jsonrpc": "2.0", "id": method, "method": method, "params": params})
+                response.raise_for_status()
+                payload = response.json()
+                if not isinstance(payload, dict) or payload.get("error") or "result" not in payload:
+                    raise ValueError(f"BSC mainnet rejected {method}")
+                if method == 'eth_getLogs' and not isinstance(payload['result'], list):
+                    raise ValueError('Invalid event log response')
+                return payload["result"]
+            except (httpx.HTTPError, ValueError) as exc:
+                last_error = exc
+    raise ValueError(f"BSC mainnet sources unavailable for {method}; current state unverified") from last_error
 
 
 async def _policy_dispute_window() -> int:
@@ -779,8 +788,34 @@ async def _find_event_log(*, address: str, topic0: str, job_id: int) -> dict[str
     return None
 
 
+async def _receipt_delivery_log(job_id: int, tx_hash: str) -> dict[str, Any]:
+    if not re.fullmatch(r"0x[0-9a-fA-F]{64}", tx_hash):
+        raise ValueError('Invalid delivery receipt hint')
+    receipt = await _rpc('eth_getTransactionReceipt', [tx_hash])
+    if not isinstance(receipt, dict) or receipt.get('status') != '0x1' or str(receipt.get('transactionHash','')).lower() != tx_hash.lower():
+        raise ValueError('Delivery receipt is missing or unsuccessful')
+    block = await _rpc('eth_getBlockByNumber', [receipt['blockNumber'], False])
+    if not isinstance(block, dict) or not block.get('hash') or str(block['hash']).lower() != str(receipt.get('blockHash','')).lower():
+        raise ValueError('Delivery receipt is not on the canonical chain')
+    matches = [log for log in receipt.get('logs',[]) if isinstance(log,dict)
+               and str(log.get('address','')).lower() == POLICY.lower()
+               and [str(t).lower() for t in log.get('topics',[])] == [JOB_INITIALISED_TOPIC.lower(),_topic_uint(job_id)]
+               and not log.get('removed')
+               and str(log.get('transactionHash','')).lower() == tx_hash.lower()
+               and log.get('blockNumber') == receipt['blockNumber']
+               and str(log.get('blockHash','')).lower() == str(block['hash']).lower()]
+    if len(matches) != 1:
+        raise ValueError('Receipt does not contain the exact job delivery event')
+    return matches[0]
+
+
 async def _delivery_pointer(job_id: int, expected_hash: str) -> dict[str, Any]:
-    log = await _find_event_log(
+    # A reviewed receipt pointer only avoids repeated history scans; every field
+    # and the current canonical receipt, job hash and downloaded output are rechecked.
+    hints_path = Path(__file__).resolve().parents[3] / 'config/live-delivery-receipt-hints.json'
+    hints = json.loads(hints_path.read_text()) if hints_path.exists() else {}
+    hint = hints.get(str(job_id))
+    log = await _receipt_delivery_log(job_id, hint) if hint else await _find_event_log(
         address=POLICY, topic0=JOB_INITIALISED_TOPIC, job_id=job_id
     )
     if log is None:

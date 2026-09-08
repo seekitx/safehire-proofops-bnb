@@ -1,8 +1,8 @@
 {
   "evidence_mode": "development_verification_not_user_study",
   "python_tests": {
-    "passed": 393,
-    "coverage_percent": 78.76
+    "passed": 395,
+    "coverage_percent": 78.87
   },
   "ruff": "passed",
   "mypy": "104 source files passed",
@@ -21,5 +21,10 @@
     "new paid service delivery",
     "independent human quality review",
     "mobile viewport"
+  ],
+  "additional_checks": [
+    "log endpoint failover fails closed",
+    "receipt hint must match canonical block and exact job event",
+    "GreenCloud live Job 56741 receipt recheck acceptance passed"
   ]
 }

@@ -197,3 +197,5 @@ All research reports belong in tracked `docs/` or `docs/research/`, never in ign
 ## 2026-09-08 action preparation overlay
 
 Read `docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md` for scoped unsigned drafts, fresh supply probes and security review. Action preparation never broadcasts; LP exit simulation is not a full rebalance. Preserve manual-study provenance holds and recovered-run timing labels.
+
+Build incident notes: `docs/编译踩坑记录.md`; load only for authorized builds or actual build issues. Upload must finish before Docker consumes the release directory, then compare packaged tracked-file hashes.
