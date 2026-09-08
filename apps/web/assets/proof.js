@@ -170,3 +170,23 @@ async function loadProof() {
 loadProof().catch((error) => {
   byId("jobTimeline").innerHTML = `<p class="load-error">Could not load public evidence: ${escapeHtml(error.message)}</p>`;
 });
+
+async function loadHumanStudy() {
+  const response = await fetch('/api/evidence/termix/human-study');
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const report = await response.json();
+  const titles = {'live-20260908-grid': 'Grid price plan', 'live-20260908-yield': 'Venus yield comparison', 'live-20260908-health-followup': 'Lending account follow-up'};
+  const container = byId('humanStudyRows');
+  container.replaceChildren();
+  for (const row of report.pairs) {
+    if (!Object.hasOwn(titles, row.task_id)) continue;
+    const card = document.createElement('article'); card.className = 'termix-card';
+    const heading = document.createElement('h3'); heading.textContent = titles[row.task_id];
+    const details = document.createElement('p');
+    details.textContent = `Human ${Number(row.human_seconds).toFixed(3)}s · Agent HTTP ${Number(row.agent_seconds).toFixed(3)}s. Reported fees: human ${row.human_cost.amount} ${row.human_cost.currency}; Agent ${row.agent_cost.amount} ${row.agent_cost.currency}, sponsored.`;
+    const link = document.createElement('a'); link.textContent = 'Read both complete outputs and the shared task ↗';
+    link.href = `/api/evidence/termix/human-study/${encodeURIComponent(row.task_id)}`; link.target = '_blank'; link.rel = 'noreferrer';
+    card.append(heading, details, link); container.append(card);
+  }
+}
+loadHumanStudy().catch(() => { byId('humanStudyRows').textContent = 'Recorded comparison data unavailable. No result is assumed.'; });

@@ -68,8 +68,8 @@ The LLM is advisory. Deterministic controls remain authoritative:
 |---|---|---|---|
 | Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | first paid external mainnet delivery |
 | Data Quality | Conditional | current A2A probe, 8004scan signals, source/time labels, raw hashes | independent blind review and paid outcomes |
-| Agent Diversity | Conditional | all four required categories with equal activation depth | second independent provider |
-| TermiX | Conditional | three raw Agent/no-Agent pairs and reproducible baseline | human timing and independent blind review |
+| Agent Diversity | Conditional | all four category routes; execution depth remains conditional | second independent provider |
+| TermiX | Conditional | three self-attested human/sponsored Agent pairs, original outputs and timings | independent review and full workflow timing |
 | PancakeSwap | Conditional | same-block multi-size quote and gas-aware benefit evidence | controlled real-use receipt would strengthen it |
 | Altana | Not claimed | permission architecture alone is not eligibility | live session-key transaction and in-product revoke |
 
@@ -81,7 +81,7 @@ a fabricated green status.
 
 - Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,
   yield optimisation and health-factor monitoring.
-- Each card can request a live `0.10 U` quote without connecting a wallet; the hardened buyer verifies request/response hashes, chain and Commerce binding, quote expiry, and the provider's EIP-191 or ERC-1271 signature.
+- Quote availability and fees depend on the supplier. New quotes for supplier #265375 are paused after funded Job #56733 produced no delivery; the hardened buyer verifies request/response hashes, chain and Commerce binding, quote expiry, and the provider's EIP-191 or ERC-1271 signature.
 - `/hire-live` anchors the exact signed JobDescription, calculates expiry from provider ETA plus the on-chain dispute window, restores an interrupted job from BSC state, verifies the retrieved delivery manifest against its on-chain hash, and exposes explicit dispute/settle/refund branches.
 - BSC Testnet Job #808 has successful create, register, budget, approve, fund,
   delivery and settlement receipts plus observed provider payment.
@@ -100,13 +100,14 @@ Primary evidence:
 - `evidence/sponsor-integration/erc8004-registration.json`
 - `evidence/sponsor-integration/erc8183-job-808.json`
 - `evidence/pancakeswap/live-benefit-report.json`
-- `evidence/termix/agent-advantage-report.json`
+- [Human comparison report](https://safehire.eyesonchain.xyz/api/evidence/termix/human-study) — three recorded pairs; names removed, answers unchanged, no independent scores.
+- `evidence/termix/agent-advantage-report.json` — archived automated baseline.
 - `deployments/bsc-testnet.json`
 
 ## Manual gates that code cannot complete honestly
 
 1. Execute and capture one bounded external mainnet `0.10 U` paid delivery.
-2. Complete at least three human no-Agent runs and independent blind A/B reviews.
+2. Three self-attested human no-Agent runs are collected; independent review remains unavailable.
 3. Onboard a second independent ERC-8004 provider.
 4. Use non-sleeping hosting during judging and publish a 2–3 minute single-path demo.
 5. The owner must verify identity, prize wallet, contact fields and terms before

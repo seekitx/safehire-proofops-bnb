@@ -190,7 +190,8 @@ def test_public_marketplace_a2a_validation_and_proof(tmp_path, monkeypatch) -> N
     assert public_proof.json()["result"]["erc8183"]["job_id"] == 808
     assert public_proof.json()["result"]["erc8183"]["status"] == "COMPLETED"
     runtime = public_proof.json()["result"]["agent_studio"]
-    assert runtime["provider"] == "render"
+    assert runtime["provider"] == "greencloud"
+    assert runtime["endpoint"] == "https://safehire.eyesonchain.xyz/.well-known/agent-card.json"
     assert runtime["expires_at"] is None
     assert runtime["historical_trial"]["provider"] == "bnb"
 

@@ -1,0 +1,202 @@
+{
+  "schema_version": "safehire-termix-public-pair/1",
+  "task_id": "live-20260908-health-followup",
+  "task_snapshot": {
+    "schema_version": "safehire-termix-task/2",
+    "task_id": "live-20260908-health-followup",
+    "title_zh": "新借贷账户检查：自定保守目标",
+    "manual_brief_zh": "这是新读取并保存的真实公开账户数据，不是你的账户，也不执行交易。你已做过类似练习，本次报告会披露这段学习经历。请独立使用普通计算器或表格完成，不使用 AI 计算或代写。\n\n本题把提醒线设为 2.5、目标健康系数设为 3.0。这两个数是用于比较的假设，不是 Venus 官方参数或投资建议。\n计算健康系数，判断是否低于本题的 2.5 提醒线，并计算达到 3.0 目标需要偿还多少美元。\n公式：健康系数 = 抵押品价值 × 加权清算阈值 ÷ 债务。\n目标允许债务 = 抵押品价值 × 加权清算阈值 ÷ 3.0。\n需要偿还 = 债务 − 目标允许债务；小于零填零。\n写出计算过程、判断和金额，并说明这份快照为什么不能保证以后不会被清算。不会的部分如实写明。不转账，不签名。",
+    "source_snapshot": {
+      "path": "evidence/termix/sources/live-20260908-health-followup.json",
+      "observation_hash": "afe8fc0bcdd15db01bc0e906fefdea1bfb0f1edd21ad30c14ac1e124599ef653",
+      "block_number": 120640472,
+      "observed_at": "2026-09-08T06:44:45.250771+00:00"
+    },
+    "agent_request": {
+      "skill": "hire_analysis",
+      "task_id": "live-20260908-health-followup",
+      "agent_id": "hf-shield-demo",
+      "input": {
+        "collateral_usd": 7073075.196824969,
+        "debt_usd": 2360364.7999056843,
+        "liquidation_threshold": 0.75,
+        "alert_health_factor": 2.5,
+        "target_health_factor": 3.0,
+        "source": "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+      }
+    },
+    "comparison_rule": "Identical frozen inputs and formulas. Manual participant previously practiced a related task with AI assistance; disclose learning effect. No AI assistance during this new run. Preserve repeated attempts; do not cherry-pick fastest time.",
+    "boundary": "Real recorded core-account snapshot with hypothetical conservative targets. Sponsored first-party analysis; no paid external delivery, protocol parameter change, execution, or guaranteed liquidation prevention."
+  },
+  "manual": {
+    "schema_version": "safehire-termix-manual-v2",
+    "evidence_mode": "human_timed_manual_run",
+    "task_id": "live-20260908-health-followup",
+    "task_snapshot": {
+      "schema_version": "safehire-termix-task/2",
+      "task_id": "live-20260908-health-followup",
+      "title_zh": "新借贷账户检查：自定保守目标",
+      "manual_brief_zh": "这是新读取并保存的真实公开账户数据，不是你的账户，也不执行交易。你已做过类似练习，本次报告会披露这段学习经历。请独立使用普通计算器或表格完成，不使用 AI 计算或代写。\n\n本题把提醒线设为 2.5、目标健康系数设为 3.0。这两个数是用于比较的假设，不是 Venus 官方参数或投资建议。\n计算健康系数，判断是否低于本题的 2.5 提醒线，并计算达到 3.0 目标需要偿还多少美元。\n公式：健康系数 = 抵押品价值 × 加权清算阈值 ÷ 债务。\n目标允许债务 = 抵押品价值 × 加权清算阈值 ÷ 3.0。\n需要偿还 = 债务 − 目标允许债务；小于零填零。\n写出计算过程、判断和金额，并说明这份快照为什么不能保证以后不会被清算。不会的部分如实写明。不转账，不签名。",
+      "source_snapshot": {
+        "path": "evidence/termix/sources/live-20260908-health-followup.json",
+        "observation_hash": "afe8fc0bcdd15db01bc0e906fefdea1bfb0f1edd21ad30c14ac1e124599ef653",
+        "block_number": 120640472,
+        "observed_at": "2026-09-08T06:44:45.250771+00:00"
+      },
+      "agent_request": {
+        "skill": "hire_analysis",
+        "task_id": "live-20260908-health-followup",
+        "agent_id": "hf-shield-demo",
+        "input": {
+          "collateral_usd": 7073075.196824969,
+          "debt_usd": 2360364.7999056843,
+          "liquidation_threshold": 0.75,
+          "alert_health_factor": 2.5,
+          "target_health_factor": 3,
+          "source": "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+        }
+      },
+      "comparison_rule": "Identical frozen inputs and formulas. Manual participant previously practiced a related task with AI assistance; disclose learning effect. No AI assistance during this new run. Preserve repeated attempts; do not cherry-pick fastest time.",
+      "boundary": "Real recorded core-account snapshot with hypothetical conservative targets. Sponsored first-party analysis; no paid external delivery, protocol parameter change, execution, or guaranteed liquidation prevention."
+    },
+    "started_at": "2026-09-08T06:54:23.871Z",
+    "finished_at": "2026-09-08T06:59:41.284Z",
+    "duration_seconds": 317.412,
+    "tools_used": "excel",
+    "cost": {
+      "amount": 0,
+      "currency": "USD"
+    },
+    "output": "1. 计算当前健康系数\n\n公式：\n\n健康系数 = 抵押品价值 × 加权清算阈值 ÷ 债务\n\n代入：\n\n= 7,073,075.196824969 × 0.75 ÷ 2,360,364.7999056843\n\n先计算抵押品按清算阈值折算后的价值：\n\n7,073,075.196824969 × 0.75\n= 5,304,806.397618727 美元\n\n所以：\n\n健康系数\n= 5,304,806.397618727 ÷ 2,360,364.7999056843\n≈ 2.24745\n\n2. 判断是否触发 2.5 提醒线\n\n当前健康系数约为：\n\n2.24745\n\n因为：\n\n2.24745 < 2.5\n\n所以：\n\n低于本题设定的 2.5 提醒线，应触发提醒。\n\n这里的 2.5 是本题用于比较的假设提醒线，不代表 Venus 官方清算线或投资建议。\n\n3. 计算达到健康系数 3.0 时允许的债务\n\n公式：\n\n目标允许债务\n= 抵押品价值 × 加权清算阈值 ÷ 3.0\n\n代入：\n\n= 7,073,075.196824969 × 0.75 ÷ 3\n\n= 5,304,806.397618727 ÷ 3\n\n= 1,768,268.799206242 美元\n\n4. 计算需要偿还多少\n\n公式：\n\n需要偿还\n= 当前债务 − 目标允许债务\n\n= 2,360,364.7999056843 − 1,768,268.7992062422\n\n= 592,096.0006994421 美元\n\n因此约需要偿还：\n\n592,096.00 美元\n\n在其他条件不变的前提下，偿还这部分债务后，按本题公式计算的健康系数可达到约 3.0。\n\n结论\n\n当前健康系数：约 2.2475\n\n是否低于 2.5 提醒线：是，触发提醒\n\n达到目标健康系数 3.0 时允许的最大债务：\n约 1,768,268.80 美元\n\n需要偿还：\n约 592,096.00 美元",
+    "attestations": {
+      "no_safehire_agent_called": true,
+      "no_pause_available_in_timer": true,
+      "complete_output_preserved": true
+    },
+    "redactions": [
+      "operator"
+    ],
+    "original_private_file_sha256": "9b4cea12b0105030d3e36a070630fe3b1d0d613033dd40029195c41352b200ae",
+    "authenticity_boundary": "Participant self-attestation, not independently observed or authenticated."
+  },
+  "agent": {
+    "schema_version": "safehire-termix-agent/2",
+    "evidence_mode": "sponsored",
+    "task_id": "live-20260908-health-followup",
+    "task_snapshot": {
+      "schema_version": "safehire-termix-task/2",
+      "task_id": "live-20260908-health-followup",
+      "title_zh": "新借贷账户检查：自定保守目标",
+      "manual_brief_zh": "这是新读取并保存的真实公开账户数据，不是你的账户，也不执行交易。你已做过类似练习，本次报告会披露这段学习经历。请独立使用普通计算器或表格完成，不使用 AI 计算或代写。\n\n本题把提醒线设为 2.5、目标健康系数设为 3.0。这两个数是用于比较的假设，不是 Venus 官方参数或投资建议。\n计算健康系数，判断是否低于本题的 2.5 提醒线，并计算达到 3.0 目标需要偿还多少美元。\n公式：健康系数 = 抵押品价值 × 加权清算阈值 ÷ 债务。\n目标允许债务 = 抵押品价值 × 加权清算阈值 ÷ 3.0。\n需要偿还 = 债务 − 目标允许债务；小于零填零。\n写出计算过程、判断和金额，并说明这份快照为什么不能保证以后不会被清算。不会的部分如实写明。不转账，不签名。",
+      "source_snapshot": {
+        "path": "evidence/termix/sources/live-20260908-health-followup.json",
+        "observation_hash": "afe8fc0bcdd15db01bc0e906fefdea1bfb0f1edd21ad30c14ac1e124599ef653",
+        "block_number": 120640472,
+        "observed_at": "2026-09-08T06:44:45.250771+00:00"
+      },
+      "agent_request": {
+        "skill": "hire_analysis",
+        "task_id": "live-20260908-health-followup",
+        "agent_id": "hf-shield-demo",
+        "input": {
+          "collateral_usd": 7073075.196824969,
+          "debt_usd": 2360364.7999056843,
+          "liquidation_threshold": 0.75,
+          "alert_health_factor": 2.5,
+          "target_health_factor": 3.0,
+          "source": "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+        }
+      },
+      "comparison_rule": "Identical frozen inputs and formulas. Manual participant previously practiced a related task with AI assistance; disclose learning effect. No AI assistance during this new run. Preserve repeated attempts; do not cherry-pick fastest time.",
+      "boundary": "Real recorded core-account snapshot with hypothetical conservative targets. Sponsored first-party analysis; no paid external delivery, protocol parameter change, execution, or guaranteed liquidation prevention."
+    },
+    "request": {
+      "jsonrpc": "2.0",
+      "id": "live-20260908-health-followup",
+      "method": "message/send",
+      "params": {
+        "message": {
+          "role": "user",
+          "messageId": "live-20260908-health-followup",
+          "parts": [
+            {
+              "kind": "data",
+              "data": {
+                "skill": "hire_analysis",
+                "task_id": "live-20260908-health-followup",
+                "agent_id": "hf-shield-demo",
+                "input": {
+                  "collateral_usd": 7073075.196824969,
+                  "debt_usd": 2360364.7999056843,
+                  "liquidation_threshold": 0.75,
+                  "alert_health_factor": 2.5,
+                  "target_health_factor": 3.0,
+                  "source": "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": "live-20260908-health-followup",
+      "result": {
+        "status": "completed",
+        "hire_receipt": {
+          "record_id": "ev_ca0d41a437c225fb9ee7",
+          "record_hash": "ca0d41a437c225fb9ee73f44eb40b41b06bcc3caceb996d804cf20d78f10d254",
+          "occurred_at": "2026-09-08T06:45:16.782736+00:00",
+          "task_id": "live-20260908-health-followup",
+          "agent_id": "hf-shield-demo",
+          "price_amount": 0,
+          "price_currency": "U",
+          "payment_mode": "sponsored"
+        },
+        "agent_result": {
+          "invocation_id": "inv_20260908064516779706",
+          "agent_id": "hf-shield-demo",
+          "agent_version": "0.1.0",
+          "observed_at": "2026-09-08T06:45:16.779734+00:00",
+          "category": "health_factor_monitoring",
+          "action": "repay_or_add_collateral",
+          "executable": true,
+          "confidence": 0.9,
+          "confidence_kind": "uncalibrated_policy_heuristic_not_probability",
+          "execution_authority": "none_preview_only",
+          "result": {
+            "health_factor": 2.247452,
+            "alert_health_factor": 2.5,
+            "target_health_factor": 3.0,
+            "repay_to_target_usd": 592096.0007,
+            "status": "at_risk",
+            "no_liquidation_prevention_guarantee": true
+          },
+          "risk_checks": [
+            "positive_debt",
+            "liquidation_threshold_validated",
+            "target_above_alert",
+            "execution_requires_scoped_permission"
+          ],
+          "source_labels": [
+            "recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target"
+          ]
+        },
+        "evidence_boundary": "A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808."
+      }
+    },
+    "raw_response_text": "{\"jsonrpc\":\"2.0\",\"id\":\"live-20260908-health-followup\",\"result\":{\"status\":\"completed\",\"hire_receipt\":{\"record_id\":\"ev_ca0d41a437c225fb9ee7\",\"record_hash\":\"ca0d41a437c225fb9ee73f44eb40b41b06bcc3caceb996d804cf20d78f10d254\",\"occurred_at\":\"2026-09-08T06:45:16.782736+00:00\",\"task_id\":\"live-20260908-health-followup\",\"agent_id\":\"hf-shield-demo\",\"price_amount\":0,\"price_currency\":\"U\",\"payment_mode\":\"sponsored\"},\"agent_result\":{\"invocation_id\":\"inv_20260908064516779706\",\"agent_id\":\"hf-shield-demo\",\"agent_version\":\"0.1.0\",\"observed_at\":\"2026-09-08T06:45:16.779734+00:00\",\"category\":\"health_factor_monitoring\",\"action\":\"repay_or_add_collateral\",\"executable\":true,\"confidence\":0.9,\"confidence_kind\":\"uncalibrated_policy_heuristic_not_probability\",\"execution_authority\":\"none_preview_only\",\"result\":{\"health_factor\":2.247452,\"alert_health_factor\":2.5,\"target_health_factor\":3.0,\"repay_to_target_usd\":592096.0007,\"status\":\"at_risk\",\"no_liquidation_prevention_guarantee\":true},\"risk_checks\":[\"positive_debt\",\"liquidation_threshold_validated\",\"target_above_alert\",\"execution_requires_scoped_permission\"],\"source_labels\":[\"recorded_bsc_block_120640472_with_disclosed_hypothetical_alert_and_target\"]},\"evidence_boundary\":\"A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808.\"}}",
+    "raw_response_sha256": "3df98d49abb1b317cb48f728e91c6072b21676b192fa971490e725bc443dddaa",
+    "started_at": "2026-09-08T06:45:13.070066+00:00",
+    "finished_at": "2026-09-08T06:45:16.177054+00:00",
+    "duration_seconds": 3.1060016250121407,
+    "cost": {
+      "amount": 0,
+      "currency": "U",
+      "mode": "sponsored"
+    },
+    "boundary": "Actual public first-party sponsored analysis. No paid job, no independent supplier, no executed strategy. Timing excludes shared source collection and participant setup; no human score generated."
+  },
+  "boundary": "Operator field removed; human answer text unchanged. Original private file hash identifies the unredacted export. Sponsored deterministic Agent analysis, not paid external delivery."
+}

@@ -1242,6 +1242,18 @@ async def public_termix_report() -> dict[str, Any]:
     return report
 
 
+@app.get("/api/evidence/termix/human-study")
+async def public_termix_human_study() -> dict[str, Any]:
+    return _public_evidence_json("evidence/termix/human-study/report.json")
+
+
+@app.get("/api/evidence/termix/human-study/{task_id}")
+async def public_termix_human_pair(task_id: str) -> dict[str, Any]:
+    if task_id not in {"live-20260908-grid", "live-20260908-yield", "live-20260908-health-followup"}:
+        raise HTTPException(status_code=404, detail="Human study task was not found")
+    return _public_evidence_json(f"evidence/termix/human-study/{task_id}.json")
+
+
 @app.get("/api/evidence/termix/tasks/{task_id}")
 async def public_termix_task(task_id: str) -> dict[str, Any]:
     allowed_tasks = {

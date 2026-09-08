@@ -1,0 +1,106 @@
+{
+  "schema_version": "safehire-termix-public-study/1",
+  "created_at": "2026-09-08T07:02:07.117298+00:00",
+  "status": "three_distinct_raw_pairs_collected_independent_review_missing",
+  "evidence_mode": "mixed_sponsored_agent_and_self_attested_human",
+  "pairs": [
+    {
+      "task_id": "live-20260908-grid",
+      "title": "网格价格计划",
+      "human_seconds": 211.572,
+      "agent_seconds": 0.28798700000334065,
+      "human_cost": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "agent_cost": {
+        "amount": 0,
+        "currency": "U",
+        "mode": "sponsored"
+      },
+      "human_tools_self_reported": "excel",
+      "manual_raw_sha256": "80e7aa96194a3ba1b11ff67367975b892073991dbfa4393c9c147bc13cbe0491",
+      "agent_raw_sha256": "982996bd104ecc9441ff8e1535dcd52a5f06d5f64745be25b4d8727d7af7f5ed",
+      "task_raw_sha256": "680f9306eece7a5c44160f092f993c92f3420ddbe12374a775786e426350a8d2",
+      "same_full_task_snapshot": true,
+      "independent_review": "not_available",
+      "quality_score": null,
+      "pair_sha256": "64ecc2d7b19dbfa969f6382d03c7b87143862da8492b079ff0169c94d662a0f4",
+      "pair_url": "/api/evidence/termix/human-study/live-20260908-grid"
+    },
+    {
+      "task_id": "live-20260908-yield",
+      "title": "两种存款收益比较",
+      "human_seconds": 154.684,
+      "agent_seconds": 0.28993683301087003,
+      "human_cost": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "agent_cost": {
+        "amount": 0,
+        "currency": "U",
+        "mode": "sponsored"
+      },
+      "human_tools_self_reported": "excel",
+      "manual_raw_sha256": "cf79d2c0c0f39b6e35b86c9e74524187c923075832adf29e8f0ed393a453a335",
+      "agent_raw_sha256": "aeb801869b7ac66049bde5d9b9e73b6162a6171c03583e98690fd1ce38942733",
+      "task_raw_sha256": "90ca1b134b33fca91595115a5908ffe8096085a43802d103ed1cef47df27c7a4",
+      "same_full_task_snapshot": true,
+      "independent_review": "not_available",
+      "quality_score": null,
+      "pair_sha256": "e7ef4862eabda7364887923678475e3a96169e80c1b43f16fd97d02b27c9c3ad",
+      "pair_url": "/api/evidence/termix/human-study/live-20260908-yield"
+    },
+    {
+      "task_id": "live-20260908-health-followup",
+      "title": "新借贷账户检查",
+      "human_seconds": 317.412,
+      "agent_seconds": 3.1060016250121407,
+      "human_cost": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "agent_cost": {
+        "amount": 0,
+        "currency": "U",
+        "mode": "sponsored"
+      },
+      "human_tools_self_reported": "excel",
+      "manual_raw_sha256": "9b4cea12b0105030d3e36a070630fe3b1d0d613033dd40029195c41352b200ae",
+      "agent_raw_sha256": "abb35045ec88deaec187d03044291c67ddc7f2770f0a5081bcc7a8a719ccb155",
+      "task_raw_sha256": "1de5674fd7f9cf9ae1033bceac73befdc229f0b84a00082d3d472b7b141dfad1",
+      "same_full_task_snapshot": true,
+      "independent_review": "not_available",
+      "quality_score": null,
+      "pair_sha256": "f16437ad26ba8fd9f02215ce27d6c10590498167189efb577228652c50c1a50c",
+      "pair_url": "/api/evidence/termix/human-study/live-20260908-health-followup"
+    }
+  ],
+  "human_total_seconds": 683.668,
+  "limitations": [
+    "Human no-AI use and tools are self-attested, not independently observed.",
+    "Prior AI-assisted health exercise excluded; followup includes learning effect.",
+    "Duplicate grid attempt retained separately, not counted as a fourth category or substituted for first run.",
+    "Agent is first-party sponsored deterministic analysis, not paid independent provider delivery or proof of LLM reasoning advantage.",
+    "Agent HTTP timing excludes shared source collection and setup; human timer includes reading, calculation and writing. Ratios are not end-to-end productivity proof.",
+    "All direct fees recorded as zero; this excludes subscription costs, equipment, platform hosting and participant labor.",
+    "No independent reviewer, no blinded scores, no official acceptance or prize eligibility proof.",
+    "Original answers retained unchanged, including omissions."
+  ],
+  "report_url": "/api/evidence/termix/human-study",
+  "independent_review": "not_available",
+  "quality_score": null,
+  "quality_assessment": {
+    "method": "Entrant AI-assisted formula and completeness check; not independent human scoring.",
+    "numeric_findings": "Reported grid levels, yield calculations and health-factor/repayment figures agree with the supplied formulas at displayed precision.",
+    "manual_omissions": {
+      "grid": "Execution prerequisites and whether drawdown is enforced are missing.",
+      "yield": "Explicit ranking conclusion and changing-rate/cost/return limitations are missing.",
+      "health-followup": "Future liquidation-risk explanation is missing."
+    },
+    "agent_limitations": "Risk labels are not full explanations. TVL zero is an unknown-input placeholder. All outputs are deterministic previews without execution authority."
+  },
+  "comparison_claim": "Descriptive records only. No end-to-end speedup, superiority, profit or eligibility claim.",
+  "privacy": "Operator names removed from public copies; exact original exports retained privately."
+}

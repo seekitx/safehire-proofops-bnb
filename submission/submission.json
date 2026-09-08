@@ -18,5 +18,6 @@
   ],
   "evidence_mode": "live",
   "winner_readiness": "conditional_manual_proof_gates",
-  "submission_status": "ready_for_owner_review_not_submitted"
+  "submission_status": "ready_for_owner_review_not_submitted",
+  "termix_human_study_url": "https://safehire.eyesonchain.xyz/api/evidence/termix/human-study"
 }

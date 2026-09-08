@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "evidence_mode": "live",
   "source": "per_agent_receipts_or_current_registry_reads_and_public_a2a",
-  "observed_at": "2026-09-07T16:12:26.811389Z",
+  "observed_at": "2026-09-08T07:12:49.694223Z",
   "chain_id": 56,
   "network": "bsc-mainnet",
   "registry_address": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
@@ -110,9 +110,10 @@
       "observed_at": "2026-09-07T16:54:00Z"
     }
   ],
-  "trust_boundary": "These are externally operated agents discovered through the official ERC-8004 index. Registration and current A2A list access were checked, but SafeHire has not yet funded a paid mainnet job with them.",
+  "trust_boundary": "Registration and advertised service access are discovery evidence, not working signed quotes or useful paid delivery. Job #56733 with supplier #265375 has been funded but remains without delivery; new quotes for that supplier are paused. The refresh scope is limited to the four Brain registrations.",
   "verification": {
     "chain_id": 56,
+    "scope": "four Brain On BNB registrations only; other observations retain their dates",
     "successful_registration_receipts": 4,
     "a2a_can_sign": true,
     "a2a_skill_ids": [
