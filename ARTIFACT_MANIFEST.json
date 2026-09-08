@@ -1,6 +1,6 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T13:28:36.600269+00:00",
+  "generated_at_utc": "2026-09-08T13:36:07.376097+00:00",
   "file_count_excluding_manifest": 419,
   "files": [
     {
@@ -505,8 +505,8 @@
     },
     {
       "path": "config/live-delivery-receipt-hints.json",
-      "bytes": 84,
-      "sha256": "3c17bf14837d967873cac4899eb4d07904c937ee8cc4658601126d7ee674cab5"
+      "bytes": 165,
+      "sha256": "6357b8b1dbb74ec432c138d800b74d15bb2064e68d5b2569de1015f1d862974e"
     },
     {
       "path": "config/live-hire-pauses.json",
@@ -705,8 +705,8 @@
     },
     {
       "path": "docs/ENGLISH_REDESIGN_2026-09-08.zh-CN.md",
-      "bytes": 3609,
-      "sha256": "881ad3358fedc06cab77b8239c9da3fb9a13e0ad8a6bd1f8cbf8550e5d51ef82"
+      "bytes": 4383,
+      "sha256": "236c3814c5de1224995274346354d89f22a8d9147f2aadca4bf4b29cd8f337f8"
     },
     {
       "path": "docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md",
