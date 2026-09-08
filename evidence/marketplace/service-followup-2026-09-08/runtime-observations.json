@@ -1,0 +1,261 @@
+{
+  "evidence_mode": "live",
+  "purpose": "Release acceptance with artificial grid threshold; not user usefulness feedback or a naturally occurring market risk event",
+  "deployed_revision": "72c25e303b74903f766244054ec206c37f9ff9f7",
+  "records": [
+    {
+      "kind": "grid",
+      "spec": {
+        "lower": 1.0,
+        "upper": 2.0
+      },
+      "state": "alert",
+      "created": 1788857245.2609932,
+      "latest": {
+        "observation": {
+          "chain_id": 56,
+          "block_number": 120656849,
+          "block_hash": "0x9a515af412e545bb654ac93d2d18598be2eed9db18b70c04fcbb26438bb36ecd",
+          "observed_at": "2026-09-08T08:47:29.477310+00:00",
+          "pool": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+          "pair": "WBNB/USDT",
+          "price_usdt_per_wbnb": "757.8647711746199105103972782",
+          "raw_reads": [
+            {
+              "to": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+              "function": "getPool(address,address,uint24)",
+              "data": "0x1698ee8200000000000000000000000055d398326f99059ff775485246999027b3197955000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000000000000000001f4",
+              "result": "0x00000000000000000000000036696169c63e42cd08ce11f5deebbcebae652050"
+            },
+            {
+              "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+              "function": "token0()",
+              "data": "0x0dfe1681",
+              "result": "0x00000000000000000000000055d398326f99059ff775485246999027b3197955"
+            },
+            {
+              "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+              "function": "slot0()",
+              "data": "0x3850c7bd",
+              "result": "0x0000000000000000000000000000000000000000094c964a5a40c93c56344ea1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffefcfb000000000000000000000000000000000000000000000000000000000000016b00000000000000000000000000000000000000000000000000000000000003840000000000000000000000000000000000000000000000000000000000000384000000000000000000000000000000000000000000000000000000000d480d480000000000000000000000000000000000000000000000000000000000000001"
+            },
+            {
+              "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+              "function": "factory()",
+              "data": "0xc45a0155",
+              "result": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+            },
+            {
+              "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+              "function": "token1()",
+              "data": "0xd21220a7",
+              "result": "0x000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+            },
+            {
+              "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+              "function": "fee()",
+              "data": "0xddca3f43",
+              "result": "0x00000000000000000000000000000000000000000000000000000000000001f4"
+            },
+            {
+              "to": "0x55d398326f99059ff775485246999027b3197955",
+              "function": "decimals()",
+              "data": "0x313ce567",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+            },
+            {
+              "to": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+              "function": "decimals()",
+              "data": "0x313ce567",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+            }
+          ],
+          "trade_executed": false,
+          "boundary": "Spot price in one fixed pool, not USD fair value, TWAP, oracle or executable quote. USDT may depeg; no trade or automatic stop loss.",
+          "observation_hash": "4060d16faa3bf54a3e79de5d3c9b21e01231d03927721b84fb5f1fb157c6278a"
+        },
+        "in_range": false,
+        "triggered": true,
+        "trade_executed": false,
+        "orders_managed": false,
+        "notification_channel": "private_in_app_inbox",
+        "next_action": "Review your grid plan. This alert does not cancel orders or enforce a stop loss."
+      }
+    },
+    {
+      "kind": "order",
+      "spec": {
+        "job_id": 56741,
+        "notify_provider": false
+      },
+      "state": "submitted",
+      "created": 1788857244.973822,
+      "latest": {
+        "observed_at": 1788857247.1829066,
+        "chain": {
+          "price_raw": "500000000000000000",
+          "price_u": "0.5",
+          "chain_id": 56,
+          "job_id": 56741,
+          "client": "0xE144264e2B71EC885cb10A10c6881b45fDf54F5F",
+          "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+          "evaluator": "0x51895229E12F9876011789B04f8698af06cCD6DA",
+          "description": {
+            "chain_id": 56,
+            "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+            "negotiated_at": 1788854254,
+            "negotiation_hash": "0xe2f527605002cebb65e5fbd8057b11e5faf0e3720a8c24c5164864a32e3bf836",
+            "price": "500000000000000000",
+            "provider_sig": "0xb9fda14b24d3d879114c3729a041de114e12eb9f348dddb959b6e743ea35817f6e995abdb936bec50ed0d241c450f79115ef43a2c2e62609cfb59eb4986843ad1b",
+            "quote_expires_at": 1788855154,
+            "task": "{\"budgetUsd\":1000,\"levels\":5,\"price\":750.0,\"spanPct\":2}",
+            "terms": {
+              "deliverables": "grid level plan with per-level sizes",
+              "quality_standards": "deterministic arithmetic, levels within the stated span"
+            },
+            "verifying_contract": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+            "version": 1
+          },
+          "task_spec": {
+            "schema_version": "chainhelix-grid/1",
+            "service": "grid_plan",
+            "erc8004_token_id": 269224,
+            "task_input": {
+              "price": 750.0,
+              "budgetUsd": 1000,
+              "spanPct": 2,
+              "levels": 5
+            },
+            "request_nonce": null,
+            "arena_binding_supported": false
+          },
+          "description_verification": {
+            "valid": true,
+            "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+            "signature_method": "eip191",
+            "negotiation_hash": "0xe2f527605002cebb65e5fbd8057b11e5faf0e3720a8c24c5164864a32e3bf836"
+          },
+          "budget_raw": "500000000000000000",
+          "budget_u": "0.5",
+          "expired_at": 1789631854,
+          "status": "SUBMITTED",
+          "status_value": 2,
+          "submitted_at": 1788854293,
+          "deliverable_hash": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+          "can_settle": false,
+          "can_dispute": true,
+          "completed": false,
+          "expired": false,
+          "can_refund": false,
+          "delivery_progress": {
+            "state": "SUBMITTED",
+            "result_available": true,
+            "provider_internal_progress_available": false,
+            "refund_after": 1789631854,
+            "message": "The state shown is read from BSC, not a provider promise."
+          },
+          "policy_final": false,
+          "policy_verdict": "UNDECIDED",
+          "policy_reason": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "policy_submitted_at": 1788854293,
+          "dispute_window_seconds": 604800,
+          "settle_after": 1789459093,
+          "seconds_until_settle": 601846,
+          "review_window_closed": false,
+          "disputed": false
+        },
+        "transaction_sent": false,
+        "delivery": {
+          "acceptance": {
+            "schema": "safehire-grid-acceptance/1",
+            "passed": true,
+            "failures": [],
+            "checks": [
+              "task parameters",
+              "sides and level count",
+              "prices",
+              "sizes",
+              "quantities",
+              "total budget"
+            ],
+            "human_quality_review": "pending",
+            "trade_executed": false,
+            "boundary": "Arithmetic against signed caller inputs only. No live-price, fees, profit, order placement or stop-loss verification."
+          },
+          "schema_version": "1.0",
+          "evidence_mode": "live",
+          "chain_id": 56,
+          "job_id": 56741,
+          "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+          "task_spec": {
+            "schema_version": "chainhelix-grid/1",
+            "service": "grid_plan",
+            "erc8004_token_id": 269224,
+            "task_input": {
+              "price": 750.0,
+              "budgetUsd": 1000,
+              "spanPct": 2,
+              "levels": 5
+            },
+            "request_nonce": null,
+            "arena_binding_supported": false
+          },
+          "success_criteria": [],
+          "onchain": {
+            "deliverable_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56741/response",
+            "deliverable_hash": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+            "submitted_at": 1788854293,
+            "block_number": 120650302,
+            "transaction_hash": "0x906d14f45f9c46ad4349c04d8d906dd08dcbea8960f35981a896183f30799545"
+          },
+          "manifest_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56741/response",
+          "manifest": {
+            "chain_id": 56,
+            "contracts": {
+              "commerce": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+              "policy": "0x9C01845705b3078Aa2e8cfF7520a6376FD766dE5",
+              "router": "0x51895229E12F9876011789B04f8698af06cCD6DA"
+            },
+            "job_id": 56741,
+            "metadata": {
+              "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+              "generator": "gridtrader",
+              "job_id": 56741
+            },
+            "response": {
+              "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+              "content_type": "text/plain"
+            },
+            "version": 1
+          },
+          "verification": {
+            "hash_matches": true,
+            "job_matches": true,
+            "chain_matches": true,
+            "contracts_match": true,
+            "provider_submit_authorized_by_contract": true,
+            "human_success_criteria_review_required": true,
+            "valid": true,
+            "computed_hash": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+            "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+            "content_type": "text/plain",
+            "metadata": {
+              "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+              "generator": "gridtrader",
+              "job_id": 56741
+            }
+          },
+          "settlement": {
+            "can_settle": false,
+            "can_dispute": true,
+            "review_window_closed": false,
+            "seconds_until_settle": 601846,
+            "policy_verdict": "UNDECIDED",
+            "disputed": false
+          },
+          "evidence_boundary": "SafeHire verified the retrieved manifest against the on-chain deliverable hash, job, chain and contract trio. A human still decides whether the content satisfies the signed success criteria before settle or dispute."
+        }
+      }
+    }
+  ]
+}
