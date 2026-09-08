@@ -812,7 +812,7 @@ async def _receipt_delivery_log(job_id: int, tx_hash: str) -> dict[str, Any]:
 async def _delivery_pointer(job_id: int, expected_hash: str) -> dict[str, Any]:
     # A reviewed receipt pointer only avoids repeated history scans; every field
     # and the current canonical receipt, job hash and downloaded output are rechecked.
-    hints_path = Path(__file__).resolve().parents[3] / 'config/live-delivery-receipt-hints.json'
+    hints_path = Path(os.getenv('SAFEHIRE_CONFIG_DIR', 'config')) / 'live-delivery-receipt-hints.json'
     hints = json.loads(hints_path.read_text()) if hints_path.exists() else {}
     hint = hints.get(str(job_id))
     log = await _receipt_delivery_log(job_id, hint) if hint else await _find_event_log(

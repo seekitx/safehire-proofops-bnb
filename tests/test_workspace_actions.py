@@ -172,7 +172,7 @@ def test_private_action_endpoint_isolation_consent_and_resume(tmp_path,monkeypat
 def test_log_source_failover_and_fail_closed(monkeypatch):
     async def run():
         import httpx
-    
+
         from proofops.services import live_erc8183
         seen=[]
         fail_all=False
