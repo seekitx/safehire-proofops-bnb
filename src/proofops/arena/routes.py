@@ -57,6 +57,11 @@ class LpTaskRequest(StrictModel):
     consent_read_public_position: StrictBool
 
 
+class ExternalLpRequest(StrictModel):
+    position_id: StrictInt = Field(gt=0, lt=2**53)
+    consent_send_position: StrictBool
+
+
 class WalletReadRequest(StrictModel):
     account: str = Field(pattern=r'^0x[0-9a-fA-F]{40}$')
     consent_read_public_account: StrictBool
@@ -126,6 +131,42 @@ def make_router(root: Path, *, store: TaskStore | None = None, gateway: QuoteGat
             raise HTTPException(422, 'Wallet snapshot rejected; no synthetic fallback') from exc
         except (httpx.HTTPError, OSError, TimeoutError) as exc:
             raise HTTPException(502, 'Wallet source unavailable; no transaction attempted') from exc
+
+    @router.post('/sources/venus-health')
+    async def venus_health(request: WalletReadRequest) -> dict[str, Any]:
+        from proofops.arena.health_sources import observe_health
+
+        if not active:
+            raise HTTPException(503, 'Account reports disabled by deployment')
+        if not request.consent_read_public_account:
+            raise HTTPException(422, 'Consent to query the public account is required')
+        if source_slots.locked():
+            raise HTTPException(429, 'Collector busy; retry later')
+        try:
+            async with source_slots:
+                return await asyncio.wait_for(observe_health(request.account), timeout=50)
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            raise HTTPException(422, 'Unsupported or inconsistent Venus core account. No safety claim or synthetic fallback.') from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'Venus source unavailable. No repayment or transaction attempted.') from exc
+
+    @router.post('/external-reports/lp')
+    async def external_lp_report(request: ExternalLpRequest) -> dict[str, Any]:
+        from proofops.arena.external_reports import read_lp_report
+
+        if not active:
+            raise HTTPException(503, 'External reports disabled by deployment')
+        if not request.consent_send_position:
+            raise HTTPException(422, 'Consent to send the public position ID to Brain is required')
+        if source_slots.locked():
+            raise HTTPException(429, 'Report collector busy; retry later')
+        try:
+            async with source_slots:
+                return await asyncio.wait_for(read_lp_report(request.position_id), timeout=30)
+        except (ValueError, TypeError, KeyError, UnicodeError) as exc:
+            raise HTTPException(422, 'Supplier report rejected; no payment or substitute result') from exc
+        except (httpx.HTTPError, OSError, TimeoutError) as exc:
+            raise HTTPException(502, 'Supplier unavailable; no payment made. You can retry this read-only request.') from exc
 
     @router.get('/synthetic-walkthrough/{category}')
     def synthetic_walkthrough(category: str) -> dict[str, Any]:

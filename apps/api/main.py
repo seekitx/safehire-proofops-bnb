@@ -1245,6 +1245,9 @@ async def public_termix_report() -> dict[str, Any]:
 @app.get("/api/evidence/termix/tasks/{task_id}")
 async def public_termix_task(task_id: str) -> dict[str, Any]:
     allowed_tasks = {
+        "live-20260908-health",
+        "live-20260908-grid",
+        "live-20260908-yield",
         "pancakeswap-grid-route",
         "pancakeswap-lp-rebalance",
         "venus-stablecoin-yield",
@@ -1258,6 +1261,9 @@ async def public_termix_task(task_id: str) -> dict[str, Any]:
 @app.get("/api/evidence/termix/raw/{task_id}/{side}")
 async def public_termix_raw(task_id: str, side: str) -> dict[str, Any]:
     allowed_tasks = {
+        "live-20260908-health",
+        "live-20260908-grid",
+        "live-20260908-yield",
         "pancakeswap-grid-route",
         "venus-stablecoin-yield",
         "venus-health-factor-response",

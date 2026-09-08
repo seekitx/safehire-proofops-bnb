@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SafeHire — Task Acceptance Arena</title>
 <link rel="stylesheet" href="/assets/decision.css"><link rel="stylesheet" href="/assets/arena.css">
-<script src="/assets/arena.js" defer></script></head>
+<script src="/assets/arena.js" defer></script><script src="/assets/external-reports.js" defer></script></head>
 <body><main class="shell">
 <header class="top"><a class="brand" href="/">SafeHire <span>Acceptance Arena<small>ONE TASK · ONE SNAPSHOT · EXPLICIT LIMITS</small></span></a>
 <nav><a href="/decision">Live market</a><a href="/hire-live">Wallet-confirmed hire</a><a href="/proof">Chain evidence</a></nav></header>
@@ -12,6 +12,15 @@
 <aside class="boundary"><strong>No funds move here.</strong><p>Samples are synthetic. A passing constraint check is not a live trade, paid delivery, verified authorship or proof of profit. Mainnet hiring stays in the existing wallet flow.</p></aside></section>
 <p id="status" class="status" role="status" aria-live="polite">Loading capabilities…</p>
 <div class="categories" id="categories" aria-label="Financial task category"></div>
+<section class="panel" id="external-report"><p class="eyebrow">LIVE EXTERNAL SERVICE · FREE READ-ONLY REPORT</p>
+<h2>Get a real position report from Brain</h2>
+<p>Enter a PancakeSwap V3 position number. Brain reads its range, holdings and fees. SafeHire preserves the original answer and checks that the position and timestamp match. This does not move funds or certify the report's financial accuracy.</p>
+<label for="external-lp-position">Public position number</label><input id="external-lp-position" type="number" min="1" max="9007199254740991" step="1" required placeholder="7319347" autocomplete="off">
+<p class="muted">7319347 is a public supplier-owned example, not your wallet or proof of profit.</p>
+<label class="consent"><input id="external-lp-consent" type="checkbox"> Send this public position number to Brain On BNB. Save the returned report in this tab for refresh recovery.</label>
+<button id="external-lp-run">Get free live report</button><button id="external-lp-export" disabled>Download report and original text</button>
+<p id="external-lp-state" role="status" aria-live="polite">No wallet connection, signature or payment required.</p><p id="external-lp-summary"></p>
+<details><summary>Original supplier answer</summary><pre id="external-lp-raw"></pre></details></section>
 <section class="panel"><h2>Wallet holdings — no protocol deposit required</h2>
 <p class="muted">Read BNB, USDT and USDC held directly on BSC. This is a three-asset watchlist, not your entire wallet. Reference prices are timestamped oracle readings, not executable sale quotes. Missing prices stay unknown; holding coins does not establish a yield or profit.</p>
 <label for="wallet-account">Public BSC address</label><input id="wallet-account" autocomplete="off" placeholder="0x…">
@@ -30,6 +39,11 @@
 <label for="lp-position">Position NFT number (the position’s public ID)</label><input id="lp-position" type="number" min="1" step="1" placeholder="7319347">
 <label class="consent"><input id="lp-consent" type="checkbox"> I approve reading this public position and saving its source data with my private task.</label>
 <button id="lp-create">Read position and create private LP task</button><pre id="lp-result" aria-live="polite"></pre></section>
+<section class="panel"><p class="eyebrow">LIVE PROTOCOL DATA · SAFEHIRE READ-ONLY SERVICE</p><h2>Check a Venus core lending account</h2>
+<p>Read entered markets at one confirmed block and compare the calculation with Venus itself. Supports core mode without VAI debt; other pools and modes are rejected. This is a single check, not continuous protection.</p>
+<label for="health-account">Public borrower address</label><input id="health-account" autocomplete="off" placeholder="0x…" pattern="0x[0-9a-fA-F]{40}" required>
+<label class="consent"><input id="health-consent" type="checkbox"> Send this public address to the configured chain reader. No repayment or wallet access.</label>
+<button id="health-read">Read lending position</button><button id="health-export" disabled>Export source report</button><p id="health-state" role="status"></p><pre id="health-result"></pre></section>
 <section class="panel"><h2>Read Venus rates and optional public positions</h2>
 <button id="venus-template" class="secondary">Load Venus template (review assumed capital and costs)</button>
 <p class="muted">Create a yield task using live USDT / USDC core-market rates. Load the Venus template, then review the amount, costs and market capacity in the form above. Only rates and the block snapshot are replaced: capital, costs, withdrawal capacity and delays remain your assumptions. These are projected rates, not guaranteed returns. Optional account reads cover only these two markets, not your complete portfolio.</p>

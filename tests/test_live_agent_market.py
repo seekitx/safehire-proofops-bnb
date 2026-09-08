@@ -219,3 +219,11 @@ async def test_live_quote_verifies_signature_and_binds_reviewed_task(
         await live_agent_market.request_live_agent_quote(
             tmp_path, skill_id="unknown", rpc_call=fake_rpc
         )
+
+
+@pytest.mark.anyio
+async def test_paused_supplier_cannot_create_new_quote():
+    root = Path(__file__).resolve().parents[1]
+    with pytest.raises(ValueError, match='New hires paused'):
+        await live_agent_market.request_live_agent_quote(
+            root, skill_id='rebalance_plan', agent_token_id=265375)

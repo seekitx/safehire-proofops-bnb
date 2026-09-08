@@ -266,8 +266,15 @@ async def test_followup_plan_is_resume_safe_and_only_returns_missing_steps(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize('acknowledgement', [
+    {'accepted': True},
+    {'parts': [{'data': {'status': 'accepted', 'job_id': 77}}]},
+    {'parts': [{'data': {'status': 'rejected', 'job_id': 77}}]},
+    {'parts': [{'data': {'status': 'accepted', 'job_id': 78}}]},
+    {'status': 'working'},
+])
 async def test_notify_is_idempotent_and_routes_by_signed_agent_identity(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, acknowledgement: dict[str, Any]
 ) -> None:
     async def submitted_status(*, job_id: int) -> dict[str, Any]:
         return {"status": "SUBMITTED"}
@@ -298,7 +305,7 @@ async def test_notify_is_idempotent_and_routes_by_signed_agent_identity(
             return None
 
         def json(self) -> dict[str, Any]:
-            return {"result": {"accepted": True}}
+            return {"result": acknowledgement}
 
     class NotifyClient:
         def __init__(self, **_kwargs: Any) -> None:
@@ -317,6 +324,10 @@ async def test_notify_is_idempotent_and_routes_by_signed_agent_identity(
             return NotifyResponse()
 
     monkeypatch.setattr(live_erc8183.httpx, "AsyncClient", NotifyClient)
+    if acknowledgement not in ({'accepted': True}, {'parts': [{'data': {'status': 'accepted', 'job_id': 77}}]}):
+        with pytest.raises(ValueError):
+            await live_erc8183.notify_live_agent(tmp_path, job_id=77)
+        return
     notification = await live_erc8183.notify_live_agent(tmp_path, job_id=77)
     assert notification["status"] == "accepted"
     assert notification["erc8004_token_id"] == 42

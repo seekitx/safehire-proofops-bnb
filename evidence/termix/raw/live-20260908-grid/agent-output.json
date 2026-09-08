@@ -1,0 +1,138 @@
+{
+  "schema_version": "safehire-termix-agent/2",
+  "evidence_mode": "sponsored",
+  "task_id": "live-20260908-grid",
+  "task_snapshot": {
+    "schema_version": "safehire-termix-task/2",
+    "task_id": "live-20260908-grid",
+    "title_zh": "网格价格计划",
+    "manual_brief_zh": "这是同一时间保存的数据对照，不是现在的交易指令。可用普通计算器或表格，不使用任何 AI 或市场代理。写出计算过程、结论和限制；不要转账。\n\n根据真实池子价格，计算上下界之间的 9 档等比价格，以及每档分配多少美元。\n公式：第 i 档价格 = 下界 × (上界 ÷ 下界)^(i ÷ 8)，i 从 0 到 8。每档资金 = 总资金 ÷ 9。\n列出 9 档价格（保留两位小数即可），写明设置的最大回撤比例是否已经自动执行，以及真正下单前还缺什么。\n资金 1000 美元、上下 5% 和 9 档是任务设定；USDT 按 1 美元估算。手续费、滑点和燃料费未知，不计算净利润。",
+    "source_snapshot": {
+      "path": "evidence/termix/sources/live-20260908-grid.json",
+      "observation_hash": "c43feb2a8a5c152bec94fea169df367a2ad8fef2ded3b06ddf754b64aa84dcc0",
+      "block_number": 120618214,
+      "observed_at": "2026-09-08T03:57:45.876954+00:00"
+    },
+    "agent_request": {
+      "skill": "hire_analysis",
+      "task_id": "live-20260908-grid",
+      "agent_id": "grid-sentinel-demo",
+      "input": {
+        "current_price": 743.2031731262153,
+        "lower_price": 706.0430144699045,
+        "upper_price": 780.3633317825262,
+        "levels": 9,
+        "capital_usd": 1000,
+        "max_drawdown_pct": 5,
+        "source": "recorded_bsc_block_120618214_with_disclosed_task_assumptions"
+      }
+    },
+    "comparison_rule": "Identical frozen inputs and formulas; manual participant uses no AI. Time includes reading, calculation and writing. Agent transport timing excludes shared source collection; record this limitation.",
+    "boundary": "Real recorded chain data plus declared hypothetical capital/targets. Sponsored first-party analysis, not a paid independent provider or executed strategy."
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "id": "live-20260908-grid",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "messageId": "live-20260908-grid",
+        "parts": [
+          {
+            "kind": "data",
+            "data": {
+              "skill": "hire_analysis",
+              "task_id": "live-20260908-grid",
+              "agent_id": "grid-sentinel-demo",
+              "input": {
+                "current_price": 743.2031731262153,
+                "lower_price": 706.0430144699045,
+                "upper_price": 780.3633317825262,
+                "levels": 9,
+                "capital_usd": 1000,
+                "max_drawdown_pct": 5,
+                "source": "recorded_bsc_block_120618214_with_disclosed_task_assumptions"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": "live-20260908-grid",
+    "result": {
+      "status": "completed",
+      "hire_receipt": {
+        "record_id": "ev_8f48c477bb258f2869a9",
+        "record_hash": "8f48c477bb258f2869a922bc0278e6c222b6e0dec529b28a82eae4d602758d68",
+        "occurred_at": "2026-09-08T03:59:46.814549+00:00",
+        "task_id": "live-20260908-grid",
+        "agent_id": "grid-sentinel-demo",
+        "price_amount": 0,
+        "price_currency": "U",
+        "payment_mode": "sponsored"
+      },
+      "agent_result": {
+        "invocation_id": "inv_20260908035946811122",
+        "agent_id": "grid-sentinel-demo",
+        "agent_version": "0.1.0",
+        "observed_at": "2026-09-08T03:59:46.811149+00:00",
+        "category": "grid_trading",
+        "action": "propose_grid",
+        "executable": false,
+        "confidence": 0.78,
+        "confidence_kind": "uncalibrated_policy_heuristic_not_probability",
+        "execution_authority": "none_preview_only",
+        "result": {
+          "grid_prices": [
+            706.04301447,
+            714.93140067,
+            723.93168289,
+            733.04526981,
+            742.27358781,
+            751.61808124,
+            761.08021264,
+            770.66146296,
+            780.36333178
+          ],
+          "capital_per_order_usd": 111.11,
+          "configured_max_drawdown_pct": 5.0,
+          "range_width_pct": 10.0,
+          "orders": 9,
+          "costs_complete": false,
+          "gross_cycle_spread_usd": 1.398779,
+          "round_trip_cost_usd": null,
+          "net_cycle_spread_usd": null,
+          "decision_reason": "round_trip_costs_missing",
+          "cycle_model": "one_adjacent_buy_sell_fill_not_a_backtest",
+          "drawdown_limit_enforced_onchain": false,
+          "no_profit_guarantee": true
+        },
+        "risk_checks": [
+          "price_inside_range",
+          "order_count_capped",
+          "drawdown_budget_capped",
+          "execution_requires_scoped_permission"
+        ],
+        "source_labels": [
+          "recorded_bsc_block_120618214_with_disclosed_task_assumptions"
+        ]
+      },
+      "evidence_boundary": "A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808."
+    }
+  },
+  "raw_response_text": "{\"jsonrpc\":\"2.0\",\"id\":\"live-20260908-grid\",\"result\":{\"status\":\"completed\",\"hire_receipt\":{\"record_id\":\"ev_8f48c477bb258f2869a9\",\"record_hash\":\"8f48c477bb258f2869a922bc0278e6c222b6e0dec529b28a82eae4d602758d68\",\"occurred_at\":\"2026-09-08T03:59:46.814549+00:00\",\"task_id\":\"live-20260908-grid\",\"agent_id\":\"grid-sentinel-demo\",\"price_amount\":0,\"price_currency\":\"U\",\"payment_mode\":\"sponsored\"},\"agent_result\":{\"invocation_id\":\"inv_20260908035946811122\",\"agent_id\":\"grid-sentinel-demo\",\"agent_version\":\"0.1.0\",\"observed_at\":\"2026-09-08T03:59:46.811149+00:00\",\"category\":\"grid_trading\",\"action\":\"propose_grid\",\"executable\":false,\"confidence\":0.78,\"confidence_kind\":\"uncalibrated_policy_heuristic_not_probability\",\"execution_authority\":\"none_preview_only\",\"result\":{\"grid_prices\":[706.04301447,714.93140067,723.93168289,733.04526981,742.27358781,751.61808124,761.08021264,770.66146296,780.36333178],\"capital_per_order_usd\":111.11,\"configured_max_drawdown_pct\":5.0,\"range_width_pct\":10.0,\"orders\":9,\"costs_complete\":false,\"gross_cycle_spread_usd\":1.398779,\"round_trip_cost_usd\":null,\"net_cycle_spread_usd\":null,\"decision_reason\":\"round_trip_costs_missing\",\"cycle_model\":\"one_adjacent_buy_sell_fill_not_a_backtest\",\"drawdown_limit_enforced_onchain\":false,\"no_profit_guarantee\":true},\"risk_checks\":[\"price_inside_range\",\"order_count_capped\",\"drawdown_budget_capped\",\"execution_requires_scoped_permission\"],\"source_labels\":[\"recorded_bsc_block_120618214_with_disclosed_task_assumptions\"]},\"evidence_boundary\":\"A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808.\"}}",
+  "raw_response_sha256": "478a8cb3b532affe810a3121ee662ea0d4eb6df58409eab33ce94be31304447c",
+  "started_at": "2026-09-08T03:59:45.642381+00:00",
+  "finished_at": "2026-09-08T03:59:45.930449+00:00",
+  "duration_seconds": 0.28798700000334065,
+  "cost": {
+    "amount": 0,
+    "currency": "U",
+    "mode": "sponsored"
+  },
+  "boundary": "Actual public first-party sponsored analysis. No paid job, no independent supplier, no executed strategy. Timing excludes shared source collection and participant setup; no human score generated."
+}

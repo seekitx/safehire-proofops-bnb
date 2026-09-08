@@ -478,6 +478,18 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
         "expired": expired,
         "can_refund": status_value == 1 and expired,
     }
+    result["delivery_progress"] = {
+        "state": status_name,
+        "result_available": status_value in {2, 3},
+        "provider_internal_progress_available": False,
+        "refund_after": int(fields[6]),
+        "message": (
+            "Funds are in escrow. The provider has not submitted a result. "
+            "Do not pay again. Internal provider progress is unavailable; "
+            "if no result is submitted, expiry refund follows the contract deadline."
+            if status_value == 1 else "The state shown is read from BSC, not a provider promise."
+        ),
+    }
     if status_value == 0:
         result["open_progress"] = await _open_job_progress(result["client"], job_id)
     if status_value != 2:
@@ -690,6 +702,19 @@ async def notify_live_agent(project_root: Path, *, job_id: int) -> dict[str, Any
         payload = response.json()
     if not isinstance(payload, dict) or payload.get("error"):
         raise ValueError("external Agent rejected the funded-job notification")
+    acknowledgement = payload.get("result")
+    accepted = isinstance(acknowledgement, dict) and acknowledgement.get("accepted") is True
+    if isinstance(acknowledgement, dict):
+        for part in acknowledgement.get("parts", []):
+            data_part = part.get("data") if isinstance(part, dict) else None
+            if isinstance(data_part, dict) and data_part.get("status") == "rejected":
+                raise ValueError("provider explicitly rejected the delivery request")
+            if isinstance(data_part, dict) and data_part.get("status") == "accepted":
+                if data_part.get("job_id") != job_id:
+                    raise ValueError("provider acknowledged a different job")
+                accepted = True
+    if not accepted:
+        raise ValueError("provider did not explicitly acknowledge this funded request")
     return {
         "job_id": job_id,
         "skill_id": skill_id,

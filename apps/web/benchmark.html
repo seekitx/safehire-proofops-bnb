@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -17,31 +17,34 @@
   <main class="benchmark-shell shell">
     <section class="benchmark-hero">
       <div class="eyebrow">TERMIX · HUMAN-VERIFIABLE COMPARISON</div>
-      <h1>Measure the work.<br/><span>Do not invent the proof.</span></h1>
-      <p>This lab records real manual time, keeps complete outputs, and separates blind review from the secret Agent/No-Agent mapping.</p>
-      <div class="truth-row"><strong>LOCAL ONLY</strong><span>Your text and uploaded files stay in this browser tab. The page only downloads JSON to your computer.</span></div>
+      <h1>三项真实对照。<br/><span>亲手完成，保存原始记录。</span></h1>
+      <p>先填写姓名，点击开始后阅读题目。可用计算器；不要使用 AI。计算和写答案都计入时间。完成后下载记录，再进行下一项。</p>
+      <div class="truth-row"><strong>LOCAL ONLY</strong><span>答案保留在本页，完成后下载到电脑。进行中不要刷新或关闭页面，以免丢失记录。</span></div>
     </section>
 
     <section class="lab-card" id="manualLab">
-      <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>Run the same task without an Agent.</h2></div><span id="timerState">NOT STARTED</span></div>
+      <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>不用代理，亲自完成同一任务。</h2></div><span id="timerState">NOT STARTED</span></div>
       <div class="field-grid">
         <label>Task<select id="taskSelect">
+          <option value="live-20260908-health">① 真实借贷账户检查</option>
+          <option value="live-20260908-grid">② 真实价格的网格计划</option>
+          <option value="live-20260908-yield">③ 真实利率的收益比较</option>
           <option value="pancakeswap-grid-route">PancakeSwap grid route</option>
           <option value="pancakeswap-lp-rebalance">PancakeSwap LP rebalance</option>
           <option value="venus-stablecoin-yield">Venus stablecoin yield</option>
           <option value="venus-health-factor-response">Venus health factor response</option>
         </select></label>
-        <label>Manual operator<input id="operatorName" placeholder="Real person's name or public handle" /></label>
+        <label>实际操作人<input id="operatorName" placeholder="填写姓名或公开昵称" /></label>
       </div>
-      <div class="task-brief"><small>LOCKED TASK BRIEF</small><pre id="taskBrief">Loading…</pre></div>
-      <div class="timer-strip"><strong id="elapsedTime">00:00.0</strong><span>The timer includes research, calculations and writing. Pausing is intentionally unavailable.</span></div>
-      <label>Complete manual answer<textarea id="manualOutput" rows="13" disabled placeholder="Start the timer to unlock the task and answer field."></textarea></label>
+      <div class="task-brief"><small>开始计时后显示题目</small><pre id="taskBrief">Loading…</pre></div>
+      <div class="timer-strip"><strong id="elapsedTime">00:00.0</strong><span>阅读、计算和写答案都计时，中途不能暂停。</span></div>
+      <label>完整答案（写出计算过程、结论和限制）<textarea id="manualOutput" rows="13" disabled placeholder="开始后可以写答案；不确定的地方如实写明。"></textarea></label>
       <div class="cost-row">
-        <label>Direct cost<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
-        <label>Currency<input id="manualCurrency" value="USD" maxlength="12" /></label>
+        <label>实际花费<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
+        <label>币种<input id="manualCurrency" value="USD" maxlength="12" /></label>
       </div>
-      <label>Tools actually used<input id="manualTools" placeholder="For example: calculator, Venus website; disclose every tool" /></label><label><input id="manualAttestation" type="checkbox" /> I performed this run myself without calling a marketplace Agent and preserved the full answer.</label>
-      <div class="lab-actions"><button class="button" id="startTimer" type="button">Start real timer</button><button class="button secondary" id="finishManual" type="button" disabled>Finish &amp; download manual record</button></div>
+      <label>实际使用的工具<input id="manualTools" placeholder="例如：系统计算器、Venus 官网；如实列出" /></label><label><input id="manualAttestation" type="checkbox" /> 我亲自完成了本次操作，未使用 AI 或市场代理，并保留完整答案。</label>
+      <div class="lab-actions"><button class="button" id="startTimer" type="button">开始计时</button><button class="button secondary" id="finishManual" type="button" disabled>结束并下载记录</button></div>
     </section>
 
     <section class="lab-card">

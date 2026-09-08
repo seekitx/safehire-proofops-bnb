@@ -638,6 +638,14 @@ async function checkDelivery() {
       await inspectDelivery();
       return toast("The full manifest was retrieved and its hash matches the on-chain commitment.");
     }
+    if (status.status === "FUNDED") {
+      const deadline = new Date(status.expired_at * 1000).toLocaleString();
+      byId("jobBadge").textContent = `JOB #${state.jobId} · FUNDED`;
+      setStep("agent_delivery", "active", "Funds in escrow; no result submitted");
+      byId("nextAction").textContent = `Waiting on the provider. No additional payment needed. If no result arrives, refund is available after ${deadline}. Internal provider progress is unavailable.`;
+      updateReceipt(`Job #${state.jobId} · checked ${new Date().toLocaleString()} · no delivery yet`);
+      return toast(`Funds are in escrow; the provider has not submitted a result. No need to pay again. Expiry refund: ${deadline}.`);
+    }
     toast(`Current on-chain status: ${status.status}.`);
   } catch (error) {
     toast(`Delivery check stopped: ${error.message}`, true);

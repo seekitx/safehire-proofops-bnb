@@ -1,0 +1,40 @@
+{
+  "schema_version": "safehire-termix-task/2",
+  "task_id": "live-20260908-yield",
+  "title_zh": "两种存款收益比较",
+  "manual_brief_zh": "这是同一时间保存的数据对照，不是现在的交易指令。可用普通计算器或表格，不使用任何 AI 或市场代理。写出计算过程、结论和限制；不要转账。\n\n用真实读取的两种 Venus 利率，比较 10000 美元放置 30 天的预计净收益和扣除风险分后的排序。\nAPY 是按当前利率推算的年收益率（百分数），不是保证收益。\n公式：净收益 = 10000 × [(1 + APY ÷ 100)^(30 ÷ 365) − 1] − 0.09。\n扣分后收益 = 净收益 − |净收益| × 风险分 ÷ 125。对两种市场分别计算，按扣分后收益从大到小排序。\n风险分 22 / 18、成本 0.09 美元、资金和期限是任务假设。TVL（存款总规模）未读取，接口中的 0 仅表示未知，不能写成实际规模为零。\n说明为什么不能仅凭本次估算就直接存款或保证获利。",
+  "source_snapshot": {
+    "path": "evidence/termix/sources/live-20260908-yield.json",
+    "observation_hash": "3762135e8ae7232bcfda9c5e92ac61523256b859a498e584b22484a624e0c4e1",
+    "block_number": 120618214,
+    "observed_at": "2026-09-08T03:57:47.531703+00:00"
+  },
+  "agent_request": {
+    "skill": "hire_analysis",
+    "task_id": "live-20260908-yield",
+    "agent_id": "yield-scout-demo",
+    "input": {
+      "capital_usd": 10000,
+      "horizon_days": 30,
+      "candidates": [
+        {
+          "protocol": "venus-core-usdt",
+          "gross_apy": 2.83177363,
+          "risk_score": 22,
+          "tvl_usd": 0,
+          "transaction_cost_usd": 0.09
+        },
+        {
+          "protocol": "venus-core-usdc",
+          "gross_apy": 2.16199647,
+          "risk_score": 18,
+          "tvl_usd": 0,
+          "transaction_cost_usd": 0.09
+        }
+      ],
+      "source": "recorded_bsc_block_120618214_with_disclosed_task_assumptions"
+    }
+  },
+  "comparison_rule": "Identical frozen inputs and formulas; manual participant uses no AI. Time includes reading, calculation and writing. Agent transport timing excludes shared source collection; record this limitation.",
+  "boundary": "Real recorded chain data plus declared hypothetical capital/targets. Sponsored first-party analysis, not a paid independent provider or executed strategy."
+}

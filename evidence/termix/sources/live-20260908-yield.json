@@ -1,0 +1,105 @@
+{
+  "schema_version": "safehire-venus-observation/1",
+  "chain_id": 56,
+  "block_number": 120618214,
+  "block_hash": "0xcf5f5a5c71ebfabfcff1141e172c14acb6500d47296e8bd6a20a09501eec96a7",
+  "block_timestamp": 1788839848,
+  "observed_at": "2026-09-08T03:57:47.531703+00:00",
+  "account": null,
+  "markets": [
+    {
+      "venue_id": "venus-core-usdt",
+      "vtoken": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+      "underlying": "0x55d398326f99059ff775485246999027b3197955",
+      "underlying_decimals": 18,
+      "supply_rate_per_block_raw": "398477019",
+      "projected_supply_apy_pct": "2.83177363",
+      "accrual_block_number": 120618213
+    },
+    {
+      "venue_id": "venus-core-usdc",
+      "vtoken": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+      "underlying": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+      "underlying_decimals": 18,
+      "supply_rate_per_block_raw": "305225384",
+      "projected_supply_apy_pct": "2.16199647",
+      "accrual_block_number": 120617374
+    }
+  ],
+  "raw_reads": [
+    {
+      "to": "0x55d398326f99059ff775485246999027b3197955",
+      "function": "decimals()",
+      "calldata": "0x313ce567",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+    },
+    {
+      "to": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+      "function": "decimals()",
+      "calldata": "0x313ce567",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+    },
+    {
+      "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+      "function": "comptroller()",
+      "calldata": "0x5fe3b567",
+      "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+    },
+    {
+      "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+      "function": "accrualBlockNumber()",
+      "calldata": "0x6c540baf",
+      "result": "0x000000000000000000000000000000000000000000000000000000000730799e"
+    },
+    {
+      "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+      "function": "underlying()",
+      "calldata": "0x6f307dc3",
+      "result": "0x0000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    },
+    {
+      "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+      "function": "supplyRatePerBlock()",
+      "calldata": "0xae9d70b0",
+      "result": "0x0000000000000000000000000000000000000000000000000000000012315ea800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+      "function": "comptroller()",
+      "calldata": "0x5fe3b567",
+      "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+    },
+    {
+      "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+      "function": "accrualBlockNumber()",
+      "calldata": "0x6c540baf",
+      "result": "0x0000000000000000000000000000000000000000000000000000000007307ce5"
+    },
+    {
+      "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+      "function": "underlying()",
+      "calldata": "0x6f307dc3",
+      "result": "0x00000000000000000000000055d398326f99059ff775485246999027b3197955"
+    },
+    {
+      "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+      "function": "supplyRatePerBlock()",
+      "calldata": "0xae9d70b0",
+      "result": "0x0000000000000000000000000000000000000000000000000000000017c046db00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "annualization": {
+    "method": "daily_compounding_constant_spot_rate_365_days",
+    "window_blocks": 1200,
+    "window_seconds": 540,
+    "window_start_block": 120617014,
+    "window_start_hash": "0xc0fa1618e00ecfebbbf5d667a9fb769e1882080cdb718e957e1a63cfce56716e",
+    "rewards_included": false,
+    "forecast_not_guarantee": true
+  },
+  "scope": "Two reviewed Venus core markets only; NOT a complete account portfolio",
+  "financial_inputs_authenticated": false,
+  "settlement_authorized": false,
+  "trust_boundary": "Single trusted RPC observation, not a consensus proof. Stored balances and rate inputs may lag interest accrual. No USD price, withdrawal capacity, gas, tax, complete debt or liquidation safety certified. Token depeg and conversion risks are not priced.",
+  "observation_hash": "3762135e8ae7232bcfda9c5e92ac61523256b859a498e584b22484a624e0c4e1"
+}

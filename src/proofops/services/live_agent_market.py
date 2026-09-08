@@ -37,6 +37,15 @@ A2A_CARD_URL = DEFAULT_A2A_CARD_URL
 A2A_ENDPOINT = DEFAULT_A2A_ENDPOINT
 
 
+def new_hire_pause(project_root: Path, token_id: int) -> str | None:
+    path = project_root / "config/live-hire-pauses.json"
+    if not path.exists():
+        return None
+    pauses = json.loads(path.read_text())
+    reason = pauses.get(str(token_id))
+    return str(reason) if reason else None
+
+
 def _load_catalog(project_root: Path) -> dict[str, Any]:
     path = project_root / "evidence" / "marketplace" / "live-agent-catalog.json"
     try:
@@ -298,6 +307,7 @@ async def live_agent_market(project_root: Path) -> dict[str, Any]:
                 "agent_card_url": route["agent_card_url"],
                 "current_capability": current,
                 "currently_callable": callable_now,
+                "new_hire_paused_reason": new_hire_pause(project_root, token_id),
                 "market_signals": market_signals,
                 "signal_disagreement": (
                     "SafeHire reached this A2A service now, while the indexer's cached health is "
@@ -404,6 +414,9 @@ async def request_live_agent_quote(
     selected = _select_agent(
         catalog, skill_id=skill_id, agent_token_id=agent_token_id
     )
+    pause = new_hire_pause(project_root, int(selected["token_id"]))
+    if pause:
+        raise ValueError(pause)
     route = _agent_route(selected, catalog)
     quote_format = str(_provider_field(selected, catalog, "quote_format") or "safehire-v2")
     nonce = request_nonce or f"safehire-{secrets.token_hex(16)}"

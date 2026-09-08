@@ -8,6 +8,11 @@ let agentRaw = null;
 let manualRaw = null;
 let packet = null;
 let toastTimer = null;
+const uiTest = new URLSearchParams(location.search).get('ui_test') === '1';
+if (uiTest) byId('manualAttestation').parentElement.lastChild.textContent = '这是自动化页面检查，不作为真人实验。';
+window.addEventListener('beforeunload', event => {
+  if (startedAt && !byId('finishManual').disabled) { event.preventDefault(); event.returnValue = ''; }
+});
 
 function toast(message, error = false) {
   const element = byId("toast");
@@ -44,25 +49,39 @@ function renderTimer() {
 }
 
 async function loadTask() {
+  task = null;
   const taskId = byId("taskSelect").value;
   const response = await fetch(`/api/evidence/termix/tasks/${encodeURIComponent(taskId)}`);
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
+  if (byId("taskSelect").value !== taskId) return;
   task = payload;
-  byId("taskBrief").textContent = "Task brief is locked. Start the timer to reveal it.";
+  byId("taskBrief").textContent = "题目已准备好。填写姓名后，点“开始计时”才会显示题目。";
   byId("manualOutput").value = "";
   byId("manualOutput").disabled = true;
+}
+
+function readableInputs(input) {
+  const labels = {collateral_usd: '抵押品价值（美元）', debt_usd: '债务（美元）', liquidation_threshold: '加权清算阈值（小数）', alert_health_factor: '提醒线', target_health_factor: '目标健康系数', current_price: '当前价格', lower_price: '价格下界', upper_price: '价格上界', levels: '档数', capital_usd: '资金（美元）', max_drawdown_pct: '设置的最大回撤（%）', horizon_days: '天数', protocol: '市场', gross_apy: '年收益率 APY（%）', risk_score: '假设风险分', tvl_usd: '未读取的规模占位值', transaction_cost_usd: '假设成本（美元）'};
+  return Object.entries(input).filter(([key]) => key !== 'source').map(([key, value]) =>
+    key === 'candidates' ? value.map(row => readableInputs(row)).join('\n\n') : `${labels[key] || key}：${value}`).join('\n');
+}
+
+function canonical(value) {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])]));
+  return value;
 }
 
 function startTimer() {
   if (!task) return toast("Task brief is not loaded.", true);
   const operator = byId("operatorName").value.trim();
-  if (!operator) return toast("Enter the real manual operator name first.", true);
+  if (!operator) return toast("请先填写实际操作人的姓名或公开昵称。", true);
   startedAt = new Date();
   startedClock = performance.now();
   byId("taskSelect").disabled = true;
   byId("operatorName").disabled = true;
-  byId("taskBrief").textContent = JSON.stringify(task, null, 2);
+  byId("taskBrief").textContent = task.manual_brief_zh ? `${task.title_zh}\n\n${task.manual_brief_zh}\n\n数据读取时间：${task.source_snapshot.observed_at}\n\n计算数据：\n${readableInputs(task.agent_request.input)}` : JSON.stringify(task, null, 2);
   byId("manualOutput").disabled = false;
   byId("manualOutput").focus();
   byId("startTimer").disabled = true;
@@ -74,8 +93,8 @@ function startTimer() {
 
 function finishManual() {
   const answer = byId("manualOutput").value.trim();
-  if (!answer) return toast("Paste the complete manual answer before finishing.", true);
-  if (!byId("manualAttestation").checked || !byId("manualTools").value.trim()) return toast("Confirm the real run and list the tools used.", true);
+  if (!answer) return toast("请先写下完整答案，再结束计时。", true);
+  if (!byId("manualAttestation").checked || !byId("manualTools").value.trim()) return toast("请填写实际使用的工具，并勾选亲自完成的声明。", true);
   const cost = Number(byId("manualCost").value);
   if (!Number.isFinite(cost) || cost < 0) return toast("Enter a valid non-negative cost.", true);
   const duration = elapsedSeconds();
@@ -84,7 +103,7 @@ function finishManual() {
   const finishedAt = new Date();
   const record = {
     schema_version: "safehire-termix-manual-v2",
-    evidence_mode: "human_timed_manual_run",
+    evidence_mode: uiTest ? "ui_verification_not_human" : "human_timed_manual_run",
     task_id: task.task_id,
     task_snapshot: task,
     operator: byId("operatorName").value.trim(),
@@ -95,7 +114,7 @@ function finishManual() {
     cost: { amount: cost, currency: byId("manualCurrency").value.trim() || "USD" },
     output: answer,
     attestations: {
-      no_safehire_agent_called: true,
+      no_safehire_agent_called: !uiTest,
       no_pause_available_in_timer: true,
       complete_output_preserved: true,
     },
@@ -104,7 +123,7 @@ function finishManual() {
   byId("manualOutput").disabled = true;
   byId("timerState").textContent = "RECORDED";
   downloadJson(`${task.task_id}-manual-output.json`, record);
-  toast("Manual record downloaded. Keep it with the matching Agent output.");
+  toast("人工记录已下载。请保留原文件，然后告诉我已完成。");
 }
 
 function renderScores() {
@@ -132,7 +151,9 @@ function answerContent(raw) {
 }
 
 function buildPacket() {
+  if (manualRaw?.evidence_mode !== "human_timed_manual_run") return toast("需要真实人工操作记录，页面测试不能参加比较。", true);
   if (!agentRaw?.task_id || agentRaw.task_id !== manualRaw?.task_id) return toast("Both outputs must have the same explicit task_id.", true);
+  if (!agentRaw.task_snapshot || !manualRaw.task_snapshot || JSON.stringify(canonical(agentRaw.task_snapshot)) !== JSON.stringify(canonical(manualRaw.task_snapshot))) return toast("两份文件的完整题目和输入不一致，不能配对比较。", true);
   let agentAnswer, manualAnswer;
   try { agentAnswer = answerContent(agentRaw); manualAnswer = answerContent(manualRaw); }
   catch (error) { return toast(error.message, true); }
@@ -208,5 +229,7 @@ byId("manualFile").addEventListener("change", maybeEnablePacket);
 byId("buildPacket").addEventListener("click", buildPacket);
 byId("packetFile").addEventListener("change", loadPacket);
 byId("downloadReview").addEventListener("click", downloadReview);
+const requestedTask = new URLSearchParams(location.search).get('task');
+if ([...byId('taskSelect').options].some(option => option.value === requestedTask)) byId('taskSelect').value = requestedTask;
 renderScores();
 loadTask().catch((error) => toast(error.message, true));

@@ -1,0 +1,119 @@
+{
+  "schema_version": "safehire-termix-agent/2",
+  "evidence_mode": "sponsored",
+  "task_id": "live-20260908-health",
+  "task_snapshot": {
+    "schema_version": "safehire-termix-task/2",
+    "task_id": "live-20260908-health",
+    "title_zh": "借贷账户检查",
+    "manual_brief_zh": "这是同一时间保存的数据对照，不是现在的交易指令。可用普通计算器或表格，不使用任何 AI 或市场代理。写出计算过程、结论和限制；不要转账。\n\n用下面的真实公开借贷账户数据，判断是否触发 1.25 的提醒线，并计算达到 1.5 目标需要偿还多少美元。\n公式：健康系数 = 抵押品美元价值 × 加权清算阈值 ÷ 债务美元价值。\n目标允许债务 = 抵押品美元价值 × 加权清算阈值 ÷ 1.5。需偿还 = 债务 − 目标允许债务；小于零时填零。\n健康系数小于 1.25 时提醒，否则继续观察。说明为什么这一结果不能保证以后不会被清算。账户不是你的钱包。",
+    "source_snapshot": {
+      "path": "evidence/termix/sources/live-20260908-health.json",
+      "observation_hash": "3d819bf3822f5ceecabd8cb41e27e47d181dbc38a411faef3ca53910c26cc7a8",
+      "block_number": 120618213,
+      "observed_at": "2026-09-08T03:57:44.039804+00:00"
+    },
+    "agent_request": {
+      "skill": "hire_analysis",
+      "task_id": "live-20260908-health",
+      "agent_id": "hf-shield-demo",
+      "input": {
+        "collateral_usd": 7120842.617117818,
+        "debt_usd": 2360386.212195511,
+        "liquidation_threshold": 0.75,
+        "alert_health_factor": 1.25,
+        "target_health_factor": 1.5,
+        "source": "recorded_bsc_block_120618213_with_disclosed_task_assumptions"
+      }
+    },
+    "comparison_rule": "Identical frozen inputs and formulas; manual participant uses no AI. Time includes reading, calculation and writing. Agent transport timing excludes shared source collection; record this limitation.",
+    "boundary": "Real recorded chain data plus declared hypothetical capital/targets. Sponsored first-party analysis, not a paid independent provider or executed strategy."
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "id": "live-20260908-health",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "messageId": "live-20260908-health",
+        "parts": [
+          {
+            "kind": "data",
+            "data": {
+              "skill": "hire_analysis",
+              "task_id": "live-20260908-health",
+              "agent_id": "hf-shield-demo",
+              "input": {
+                "collateral_usd": 7120842.617117818,
+                "debt_usd": 2360386.212195511,
+                "liquidation_threshold": 0.75,
+                "alert_health_factor": 1.25,
+                "target_health_factor": 1.5,
+                "source": "recorded_bsc_block_120618213_with_disclosed_task_assumptions"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": "live-20260908-health",
+    "result": {
+      "status": "completed",
+      "hire_receipt": {
+        "record_id": "ev_24b9867d71fa5628a168",
+        "record_hash": "24b9867d71fa5628a168d137532a332bfe248a2eb8c474643cfde74f56cfc31d",
+        "occurred_at": "2026-09-08T03:59:46.501543+00:00",
+        "task_id": "live-20260908-health",
+        "agent_id": "hf-shield-demo",
+        "price_amount": 0,
+        "price_currency": "U",
+        "payment_mode": "sponsored"
+      },
+      "agent_result": {
+        "invocation_id": "inv_20260908035946498200",
+        "agent_id": "hf-shield-demo",
+        "agent_version": "0.1.0",
+        "observed_at": "2026-09-08T03:59:46.498243+00:00",
+        "category": "health_factor_monitoring",
+        "action": "monitor",
+        "executable": false,
+        "confidence": 0.9,
+        "confidence_kind": "uncalibrated_policy_heuristic_not_probability",
+        "execution_authority": "none_preview_only",
+        "result": {
+          "health_factor": 2.262609,
+          "alert_health_factor": 1.25,
+          "target_health_factor": 1.5,
+          "repay_to_target_usd": 0.0,
+          "status": "healthy",
+          "no_liquidation_prevention_guarantee": true
+        },
+        "risk_checks": [
+          "positive_debt",
+          "liquidation_threshold_validated",
+          "target_above_alert",
+          "execution_requires_scoped_permission"
+        ],
+        "source_labels": [
+          "recorded_bsc_block_120618213_with_disclosed_task_assumptions"
+        ]
+      },
+      "evidence_boundary": "A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808."
+    }
+  },
+  "raw_response_text": "{\"jsonrpc\":\"2.0\",\"id\":\"live-20260908-health\",\"result\":{\"status\":\"completed\",\"hire_receipt\":{\"record_id\":\"ev_24b9867d71fa5628a168\",\"record_hash\":\"24b9867d71fa5628a168d137532a332bfe248a2eb8c474643cfde74f56cfc31d\",\"occurred_at\":\"2026-09-08T03:59:46.501543+00:00\",\"task_id\":\"live-20260908-health\",\"agent_id\":\"hf-shield-demo\",\"price_amount\":0,\"price_currency\":\"U\",\"payment_mode\":\"sponsored\"},\"agent_result\":{\"invocation_id\":\"inv_20260908035946498200\",\"agent_id\":\"hf-shield-demo\",\"agent_version\":\"0.1.0\",\"observed_at\":\"2026-09-08T03:59:46.498243+00:00\",\"category\":\"health_factor_monitoring\",\"action\":\"monitor\",\"executable\":false,\"confidence\":0.9,\"confidence_kind\":\"uncalibrated_policy_heuristic_not_probability\",\"execution_authority\":\"none_preview_only\",\"result\":{\"health_factor\":2.262609,\"alert_health_factor\":1.25,\"target_health_factor\":1.5,\"repay_to_target_usd\":0.0,\"status\":\"healthy\",\"no_liquidation_prevention_guarantee\":true},\"risk_checks\":[\"positive_debt\",\"liquidation_threshold_validated\",\"target_above_alert\",\"execution_requires_scoped_permission\"],\"source_labels\":[\"recorded_bsc_block_120618213_with_disclosed_task_assumptions\"]},\"evidence_boundary\":\"A sponsored zero-cost marketplace hire completed and was added to the SafeHire hash-chain ledger. No wallet signature, token payment or fund execution occurred; paid ERC-8183 capability is proven separately by Job #808.\"}}",
+  "raw_response_sha256": "43a748557cc7223dbf2ade2a95469954d9f78fa76023b9204acba2cd7f8316d6",
+  "started_at": "2026-09-08T03:59:44.122587+00:00",
+  "finished_at": "2026-09-08T03:59:45.640695+00:00",
+  "duration_seconds": 1.516786125008366,
+  "cost": {
+    "amount": 0,
+    "currency": "U",
+    "mode": "sponsored"
+  },
+  "boundary": "Actual public first-party sponsored analysis. No paid job, no independent supplier, no executed strategy. Timing excludes shared source collection and participant setup; no human score generated."
+}
