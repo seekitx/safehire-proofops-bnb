@@ -69,7 +69,7 @@ The LLM is advisory. Deterministic controls remain authoritative:
 | Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | first paid external mainnet delivery |
 | Data Quality | Conditional | current A2A probe, 8004scan signals, source/time labels, raw hashes | independent blind review and paid outcomes |
 | Agent Diversity | Conditional | all four category routes; execution depth remains conditional | second independent provider |
-| TermiX | Conditional | three self-attested human/sponsored Agent pairs, original outputs and timings | independent review and full workflow timing |
+| TermiX | Provenance review required | three recorded pairs, original outputs and timings preserved | verify no-AI provenance, independent review and full workflow timing |
 | PancakeSwap | Conditional | same-block multi-size quote and gas-aware benefit evidence | controlled real-use receipt would strengthen it |
 | Altana | Not claimed | permission architecture alone is not eligibility | live session-key transaction and in-product revoke |
 
@@ -78,6 +78,9 @@ adoption/quality claim still requires a real-world action. It is not replaced wi
 a fabricated green status.
 
 ## Current live and on-chain evidence
+
+- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. No automatic trading or external push.
+- ChainHelix #269224 delivered paid mainnet Job #56741 (0.5 U). Signed task, raw manifest and grid arithmetic were independently checked on GreenCloud. This was purchased on the supplier site; it is submitted delivery, not final settlement or a newly measured SafeHire purchase.
 
 - Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,
   yield optimisation and health-factor monitoring.
@@ -100,15 +103,15 @@ Primary evidence:
 - `evidence/sponsor-integration/erc8004-registration.json`
 - `evidence/sponsor-integration/erc8183-job-808.json`
 - `evidence/pancakeswap/live-benefit-report.json`
-- [Human comparison report](https://safehire.eyesonchain.xyz/api/evidence/termix/human-study) — three recorded pairs; names removed, answers unchanged, no independent scores.
+- [Human comparison report](https://safehire.eyesonchain.xyz/api/evidence/termix/human-study) — three recorded pairs; names removed, answers unchanged. No-AI provenance needs review; no independent scores or verified efficiency multiplier.
 - `evidence/termix/agent-advantage-report.json` — archived automated baseline.
 - `deployments/bsc-testnet.json`
 
 ## Manual gates that code cannot complete honestly
 
-1. Execute and capture one bounded external mainnet `0.10 U` paid delivery.
-2. Three self-attested human no-Agent runs are collected; independent review remains unavailable.
-3. Onboard a second independent ERC-8004 provider.
+1. Have a real user complete a new in-product purchase and assess usefulness; paid ChainHelix Job #56741 already has verified submitted delivery, but not final settlement.
+2. Resolve the no-AI provenance hold on the three recorded comparisons; independent review remains unavailable.
+3. Obtain a second independently operated, compatible same-task signed offer and useful paid delivery; separate operator identities alone are insufficient.
 4. Use non-sleeping hosting during judging and publish a 2–3 minute single-path demo.
 5. The owner must verify identity, prize wallet, contact fields and terms before
    submitting.
@@ -203,5 +206,5 @@ keystores, virtual environments, caches, build output and dependencies.
 Self-operated execution adapters remain mainnet-disabled by default. The external
 `/hire-live` path is a separate, explicit opt-in flow; every transaction is shown to
 the wallet, and the maximum service price currently exposed by the reviewed catalog
-is `0.10 U` plus BNB gas. Contracts and integrations have not received a third-party
+is `0.50 U` for the wallet-pinned ChainHelix adapter; legacy reviewed orders remain `0.10 U`, plus BNB gas. Contracts and integrations have not received a third-party
 audit. Use only a disposable, low-value contest wallet.
