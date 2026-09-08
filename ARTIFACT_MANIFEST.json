@@ -1,7 +1,7 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T11:22:45.303262+00:00",
-  "file_count_excluding_manifest": 399,
+  "generated_at_utc": "2026-09-08T11:28:57.512504+00:00",
+  "file_count_excluding_manifest": 400,
   "files": [
     {
       "path": ".dockerignore",
@@ -645,8 +645,8 @@
     },
     {
       "path": "docs/IN_PRODUCT_DELIVERY_AND_SUBMISSION_2026-09-08.zh-CN.md",
-      "bytes": 3876,
-      "sha256": "a4c5e537f4d9b641811e421da22ca0b70210fe211111e9fdffd2d28e8391feb9"
+      "bytes": 4827,
+      "sha256": "d5314f7bf01894a56d74d5a856d52ba0210be56e255ab25d9c30b8bbe0d58c2f"
     },
     {
       "path": "docs/MANUAL_COMPLETION_GATES_2026-08-31.md",
@@ -1789,9 +1789,14 @@
       "sha256": "a60da8ab3f3470c3f124528a77965a2d6f4855a7fbc0f8dcd8ba9fd16f9d0852"
     },
     {
+      "path": "submission/official-confirmation-2026-09-08.json",
+      "bytes": 1816,
+      "sha256": "1de97c8d877247ed70c0ddf82bf21141e64833f56d63dcf9e9aaffcbd7c5112d"
+    },
+    {
       "path": "submission/submission.json",
-      "bytes": 1618,
-      "sha256": "abd986d5030b776bef539134ced201a33a5a14de394f98adbbabfe6da804e150"
+      "bytes": 1749,
+      "sha256": "954514e1d72d010cfd7656ee58f82afdf75282ab7e5905daf3d8e38a1ce54105"
     },
     {
       "path": "templates/deployments/bsc-testnet.template.json",

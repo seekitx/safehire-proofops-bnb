@@ -1,0 +1,30 @@
+{
+  "schema": "safehire-official-submission-confirmation/1",
+  "project": "SafeHire / ProofOps",
+  "status": "response_recorded",
+  "confirmation_observed_at_utc": "2026-09-08T11:27:42Z",
+  "confirmation_observed_at_local": "2026-09-08 19:27:42 Asia/Shanghai",
+  "user_target_local": "2026-09-08 20:00:00 Asia/Shanghai",
+  "before_user_target": true,
+  "official_entry_url": "https://www.bnbchain.org/en/hackathons/smart-money-era?tab=tracks",
+  "form_title": "Build the Era Hackathon Registration",
+  "form_response_url": "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdFb30r24sZcFJVDbMqXNJ1_45BJHanc7eFqwUniScDYZfX9A/formResponse",
+  "confirmation_text": "您的回复已记录。",
+  "evidence_method": "Live Chrome DOM plus screenshot preserved in the owner conversation",
+  "submission_action": "Owner explicitly authorized final submission; owner supplied personal fields and agreed to terms. Assistant clicked Submit and observed confirmation.",
+  "email_copy_requested": true,
+  "email_copy_received_verified": false,
+  "submitted_runtime_commit": "14f79261a38356546519cd171a3223e3eca018d4",
+  "ci_url": "https://github.com/seekitx/safehire-proofops-bnb/actions/runs/34220459873",
+  "ci_status": "success",
+  "demo_page_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html",
+  "demo_video_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/safehire-demo.mp4",
+  "demo_duration_seconds": 138.577333,
+  "demo_sha256": "f1115e71cd6fc731bcca11fe44ffefa418b71f557530811699e5ef6d9ea791f2",
+  "tracks_interested": [
+    "PancakeSwap",
+    "TermiX"
+  ],
+  "eligibility_boundary": "Official form receipt is not shortlist, award, sponsor eligibility approval, or final on-chain settlement. TermiX provenance limitations were disclosed.",
+  "private_fields_omitted": true
+}
