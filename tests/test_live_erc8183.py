@@ -180,7 +180,7 @@ async def test_prepare_live_hire_uses_signed_description_and_dynamic_timeline(
 async def test_live_job_status_decodes_and_closes_settlement_window(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    async def fake_verify(_description: Any, *, provider: str) -> dict[str, Any]:
+    async def fake_verify(_description: Any, *, provider: str, require_current_quote: bool) -> dict[str, Any]:
         return {"valid": True, "provider": provider, "signature_method": "eip191"}
 
     async def funded_rpc(_method: str, _params: list[Any]) -> str:

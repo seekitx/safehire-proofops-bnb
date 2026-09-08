@@ -271,7 +271,7 @@ def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
 
 
 async def _verify_anchored_description(
-    description: Mapping[str, Any], *, provider: str
+    description: Mapping[str, Any], *, provider: str, require_current_quote: bool = True
 ) -> dict[str, Any]:
     result = await verify_job_description(
         description=description,
@@ -282,6 +282,7 @@ async def _verify_anchored_description(
         expected_price_raw=PRICE_RAW,
         rpc_url=BSC_MAINNET_RPC,
         rpc_call=_rpc,
+        require_current_quote=require_current_quote,
     )
     if not isinstance(result, dict):
         raise TypeError("job-description verifier returned an unexpected result")
@@ -452,7 +453,8 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
     provider = to_checksum_address(fields[2])
     task_spec = _parse_task_spec(description)
     description_verification = await _verify_anchored_description(
-        description, provider=provider
+        # Quote expiry gates new funding, not review of an already funded job.
+        description, provider=provider, require_current_quote=status_value == 0
     )
     result: dict[str, Any] = {
         "chain_id": CHAIN_ID,

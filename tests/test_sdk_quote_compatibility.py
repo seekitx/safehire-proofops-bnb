@@ -78,3 +78,34 @@ def test_sdk_refuses_task_arrays_instead_of_sanitizing_them():
     envelope['request']['task_description'] = '{"holdings":[]}'
     with pytest.raises(ValueError, match='sanitization'):
         sdk_description_content(envelope)
+
+
+@pytest.mark.anyio
+async def test_paid_description_survives_expiry_without_relaxing_new_quotes_or_signatures():
+    from proofops.integrations.erc8183_quote import verify_job_description
+
+    sample = json.loads(SAMPLE.read_text())
+    verified = await verify(sample)
+    description = json.loads(verified.job_description)
+
+    async def rpc(method, params):
+        if method == 'eth_chainId':
+            return '0x38'
+        if method == 'eth_getBlockByNumber':
+            return {'timestamp': hex(description['quote_expires_at'] + 600)}
+        if method == 'eth_getCode':
+            return '0x'
+        raise AssertionError(method)
+
+    args = {'description': description, 'provider': sample['quote']['provider'],
+                'expected_chain_id': 56,
+                'expected_verifying_contract': sample['quote']['verifying_contract'],
+                'expected_payment_token': sample['quote']['payment_token'],
+                'expected_price_raw': 10**17, 'rpc_url': 'unused-offline-test', 'rpc_call': rpc}
+    with pytest.raises(ValueError, match='not currently valid'):
+        await verify_job_description(**args)
+    result = await verify_job_description(**args, require_current_quote=False)
+    assert result['valid'] is True
+    description['task'] = '{}'
+    with pytest.raises(ValueError, match='negotiation hash'):
+        await verify_job_description(**args, require_current_quote=False)

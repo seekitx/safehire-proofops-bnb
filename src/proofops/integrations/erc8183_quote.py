@@ -262,6 +262,7 @@ def _validated_description(
     expected_payment_token: str,
     expected_price_raw: int,
     chain_timestamp: int,
+    require_current_quote: bool = True,
 ) -> tuple[dict[str, Any], str, str]:
     content = {
         str(key): value
@@ -290,7 +291,7 @@ def _validated_description(
         raise QuoteVerificationError("quote negotiation time is invalid")
     if not isinstance(expires_at, int) or isinstance(expires_at, bool):
         raise QuoteVerificationError("quote expiry is invalid")
-    if negotiated_at > chain_timestamp + 30 or expires_at <= chain_timestamp:
+    if negotiated_at > chain_timestamp + 30 or (require_current_quote and expires_at <= chain_timestamp):
         raise QuoteVerificationError("quote is not currently valid at the latest chain timestamp")
     if expires_at <= negotiated_at or expires_at - negotiated_at > 86_400:
         raise QuoteVerificationError("quote validity window is invalid")
@@ -419,6 +420,7 @@ async def verify_job_description(
     expected_price_raw: int,
     rpc_url: str,
     rpc_call: RpcCall | None = None,
+    require_current_quote: bool = True,
 ) -> dict[str, Any]:
     """Re-verify the signed description read back from an on-chain job."""
     call, chain_timestamp = await _read_chain_context(rpc_url=rpc_url, rpc_call=rpc_call, expected_chain_id=expected_chain_id)
@@ -429,6 +431,7 @@ async def verify_job_description(
         expected_payment_token=expected_payment_token,
         expected_price_raw=expected_price_raw,
         chain_timestamp=chain_timestamp,
+        require_current_quote=require_current_quote,
     )
     signature_method = await _verify_signature(
         provider=provider,
