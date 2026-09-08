@@ -17,6 +17,29 @@ ADDRESS = re.compile(r"^0x[a-fA-F0-9]{40}$")
 JUDGING_END = datetime(2026, 9, 23, 23, 59, 59, tzinfo=UTC)
 
 
+def _registry_observation_valid(item: dict[str, Any]) -> bool:
+    """Structural gate only. Live replay remains a separate acceptance step."""
+    from eth_abi.abi import encode
+    from eth_utils.crypto import keccak
+    observation = item.get('registration_observation')
+    if not isinstance(observation, dict):
+        return False
+    try:
+        token_id = int(item['token_id'])
+        wallet = str(observation['agent_wallet']).lower()
+        expected_call = '0x' + (keccak(text='getAgentWallet(uint256)')[:4] + encode(['uint256'], [token_id])).hex()
+        return bool(observation['chain_id'] == 56 and observation['token_id'] == token_id
+                    and observation['registry'].lower() == '0x8004a169fb4a3325136eb29fa0ceb6d2e539a432'
+                    and TX_HASH.fullmatch(observation['block_hash'])
+                    and type(observation['block_number']) is int and observation['block_number'] > 0
+                    and ADDRESS.fullmatch(wallet) and int(wallet, 16) != 0
+                    and wallet == item['provider_address'].lower()
+                    and observation['calldata'] == expected_call
+                    and observation['return_data'] == '0x' + encode(['address'], [wallet]).hex())
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return False
+
+
 @dataclass(frozen=True)
 class GateCheck:
     check_id: str
@@ -201,7 +224,7 @@ class SubmissionValidator:
             and all(
                 isinstance(item, dict)
                 and int(item.get("token_id", 0)) > 0
-                and TX_HASH.fullmatch(str(item.get("created_tx_hash", "")))
+                and (TX_HASH.fullmatch(str(item.get("created_tx_hash", ""))) or _registry_observation_valid(item))
                 and _public_https(str(item.get("registration_url", "")))
                 and _public_https(str(item.get("registry_url", "")))
                 and str(item.get("skill_id", "")).strip()

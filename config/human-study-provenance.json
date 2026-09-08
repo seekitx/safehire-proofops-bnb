@@ -1,0 +1,14 @@
+{
+  "schema": "safehire-study-provenance-review/1",
+  "status": "needs_review",
+  "unassisted_runs_verified": false,
+  "hold_eligibility_claims": true,
+  "affected_task_ids": [
+    "live-20260908-grid",
+    "live-20260908-yield",
+    "live-20260908-health-followup"
+  ],
+  "reason": "A contemporaneous user ChatGPT conversation contained worked answers to these task prompts. This is not proof that each saved answer used AI, but self-attestation alone cannot resolve the inconsistency. Match original run timestamps and assistance before treating any affected run as an unassisted control.",
+  "raw_outputs_preserved": true,
+  "independent_review": "not_available"
+}

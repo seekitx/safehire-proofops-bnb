@@ -177,6 +177,9 @@ async function loadHumanStudy() {
   const report = await response.json();
   const titles = {'live-20260908-grid': 'Grid price plan', 'live-20260908-yield': 'Venus yield comparison', 'live-20260908-health-followup': 'Lending account follow-up'};
   const container = byId('humanStudyRows');
+  const hold = document.createElement('p');
+  hold.textContent = '来源待复核：另有 AI 代算对话涉及这些题目，须核对原始计时与辅助情况。不能默认这三组是有效无 AI 对照；原始答案不变，资格暂不作结论。';
+  container.before(hold);
   container.replaceChildren();
   for (const row of report.pairs) {
     if (!Object.hasOwn(titles, row.task_id)) continue;

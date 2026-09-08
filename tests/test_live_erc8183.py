@@ -246,6 +246,7 @@ async def test_followup_plan_is_resume_safe_and_only_returns_missing_steps(
             "status": "OPEN",
             "budget_raw": str(live_erc8183.PRICE_RAW),
             "task_spec": _task_spec(),
+            "description": _description(),
             "description_verification": {"valid": True},
             "open_progress": {
                 "registered_policy": live_erc8183.POLICY,
@@ -288,6 +289,7 @@ async def test_notify_is_idempotent_and_routes_by_signed_agent_identity(
             "status": "FUNDED",
             "budget_raw": str(live_erc8183.PRICE_RAW),
             "task_spec": _task_spec(),
+            "description": _description(),
         }
 
     monkeypatch.setattr(live_erc8183, "live_job_status", funded_status)
@@ -360,7 +362,7 @@ async def test_delivery_hash_verification_and_dispute_plan(
             "client": BUYER,
             "deliverable_hash": deliverable_hash,
             "task_spec": _task_spec(),
-            "description": {"terms": {"success_criteria": ["Cite current evidence"]}},
+            "description": _description(),
             "can_settle": False,
             "can_dispute": True,
             "review_window_closed": False,
@@ -424,6 +426,7 @@ async def test_settle_refund_and_verified_receipt_plans(
             "provider": PROVIDER,
             "client": BUYER,
             "task_spec": _task_spec(),
+            "description": _description(),
             "description_verification": {"valid": True, "negotiation_hash": "0x" + "01" * 32},
         }
 

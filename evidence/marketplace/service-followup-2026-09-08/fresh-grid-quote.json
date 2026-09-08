@@ -1,0 +1,101 @@
+{
+  "schema_version": "2.0",
+  "evidence_mode": "live",
+  "observed_at": "2026-09-08T08:27:04.630537+00:00",
+  "agent": {
+    "name": "ChainHelix — Grid calculation",
+    "operator": "ChainHelix",
+    "category": "grid_trading",
+    "skill_id": "grid_plan",
+    "erc8004_token_id": 269224,
+    "registration_url": "https://8004scan.io/agents/bsc/269224",
+    "agent_card_url": "https://agents.chainhelix.io/gridtrader/.well-known/agent-card.json",
+    "a2a_endpoint": "https://agents.chainhelix.io/gridtrader/",
+    "requires_arena": false
+  },
+  "task_spec": {
+    "schema_version": "chainhelix-grid/1",
+    "service": "grid_plan",
+    "erc8004_token_id": 269224,
+    "task_input": {
+      "price": 750,
+      "budgetUsd": 1000,
+      "spanPct": 2,
+      "levels": 5,
+      "request_nonce": "safehire-65135ece2f9fae87963553651d3754b6"
+    },
+    "request_nonce": "safehire-65135ece2f9fae87963553651d3754b6"
+  },
+  "quote": {
+    "accepted": true,
+    "service": "grid_plan",
+    "chain_id": 56,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "price": "500000000000000000",
+    "price_display": "0.50 U",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788856915,
+    "deliverables": "grid level plan with per-level sizes",
+    "quality_standards": "deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+    "success_criteria": []
+  },
+  "quote_format": "bnbagent-sdk-v1",
+  "identity_verification": {
+    "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+    "block_hash": "0x59efd3d37977cafe9556c0b298ef096a5791b8080bc12f9d9979a750f940497e",
+    "agent_wallet": "0xb8143345687aa5a527f4f9568d508ebbc612d06d",
+    "signer_matches": true
+  },
+  "quote_envelope": {
+    "request": {
+      "task_description": "{\"budgetUsd\":1000,\"levels\":5,\"price\":750,\"request_nonce\":\"safehire-65135ece2f9fae87963553651d3754b6\",\"spanPct\":2}",
+      "terms": {
+        "deliverables": "grid level plan with per-level sizes",
+        "quality_standards": "deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+        "evaluation_required": true,
+        "evaluator_type": "uma_oov3"
+      }
+    },
+    "request_hash": "0xa807ae4c4cf712e002383a728f3fa4b2d73bf22f7decd893b197c7d5614c2c09",
+    "response": {
+      "accepted": true,
+      "terms": {
+        "deliverables": "grid level plan with per-level sizes",
+        "quality_standards": "deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+        "evaluation_required": true,
+        "evaluator_type": "uma_oov3",
+        "price": "500000000000000000",
+        "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666"
+      },
+      "estimated_completion_seconds": 600,
+      "quote_expires_at": 1788856915,
+      "negotiated_at": 1788856015
+    },
+    "response_hash": "0x04f3dd9a96ee18e6d87ba98b1b2d9c94d7a28c57ef47d6505c07b390b498814c",
+    "negotiation_hash": "0x0b016d0baffc8db3eae6e0b6759343f6ea4148f48882d43c429f8f82e2fafe38",
+    "provider_sig": "0x1001507d3bda256ff6092e11dcf0824cbe7a4223953a5ec80340b3e4a4fe37e01b41c6b7d527f6e7d3d12bf92f57fbb812d258faf1c17a00157d2bfb0140d5af1c",
+    "chain_id": 56,
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6"
+  },
+  "quote_verification": {
+    "valid": true,
+    "chain_id": 56,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "price_raw": "500000000000000000",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788856915,
+    "signature_method": "eip191",
+    "request_hash": "0xa807ae4c4cf712e002383a728f3fa4b2d73bf22f7decd893b197c7d5614c2c09",
+    "response_hash": "0x04f3dd9a96ee18e6d87ba98b1b2d9c94d7a28c57ef47d6505c07b390b498814c",
+    "negotiation_hash": "0x0b016d0baffc8db3eae6e0b6759343f6ea4148f48882d43c429f8f82e2fafe38",
+    "job_description": "{\"chain_id\":56,\"currency\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\",\"negotiated_at\":1788856015,\"negotiation_hash\":\"0x0b016d0baffc8db3eae6e0b6759343f6ea4148f48882d43c429f8f82e2fafe38\",\"price\":\"500000000000000000\",\"provider_sig\":\"0x1001507d3bda256ff6092e11dcf0824cbe7a4223953a5ec80340b3e4a4fe37e01b41c6b7d527f6e7d3d12bf92f57fbb812d258faf1c17a00157d2bfb0140d5af1c\",\"quote_expires_at\":1788856915,\"task\":\"{\\\"budgetUsd\\\":1000,\\\"levels\\\":5,\\\"price\\\":750,\\\"request_nonce\\\":\\\"safehire-65135ece2f9fae87963553651d3754b6\\\",\\\"spanPct\\\":2}\",\"terms\":{\"deliverables\":\"grid level plan with per-level sizes\",\"quality_standards\":\"deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.\"},\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"version\":1}"
+  },
+  "next_action": "review_signed_quote_before_wallet_funding",
+  "transaction_sent": false,
+  "wallet_connected": false,
+  "evidence_boundary": "SafeHire verified the provider signature, request/response hashes, chain, commerce contract, exact token price and quote expiry. No wallet was connected and no token approval, job creation or payment occurred."
+}

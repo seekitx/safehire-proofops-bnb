@@ -18,7 +18,8 @@ const taskJSON = {
 
 const CHAIN_ID_HEX = "0x38";
 const EXPLORER = "https://bscscan.com";
-const PRICE_RAW = 100000000000000000n;
+const expectedPrice = () => BigInt(state.quotePayload?.quote?.price || (state.agentTokenId === 269224 ? '500000000000000000' : '100000000000000000'));
+const priceLabel = () => `${Number(expectedPrice()) / 1e18} U`;
 const U_TOKEN = "0xcE24439F2D9C6a2289F741120FE202248B666666";
 const COMMERCE = "0xEa4DAa3100A767e86FDed867729ae7446476EBA6";
 const SKILLS = new Set(["rebalance_plan", "grid_plan", "yield_plan", "health_factor"]);
@@ -98,6 +99,10 @@ async function api(path, options = {}) {
 }
 
 function selectedInput() {
+  if (state.agentTokenId === 269224 && byId('gridPrice')) {
+    return {price: Number(byId('gridPrice').value), budgetUsd: Number(byId('gridBudget').value),
+      levels: Number(byId('gridLevels').value), spanPct: Number(byId('gridSpan').value)};
+  }
   let value;
   try {
     value = taskJSON.parse(byId("taskInput").value);
@@ -111,6 +116,7 @@ function selectedInput() {
 }
 
 function taskExample() {
+  if (state.agentTokenId === 269224) return {price: 750, budgetUsd: 1000, levels: 5, spanPct: 2};
   const value = structuredClone(examples[state.skillId]);
   if (state.skillId === "health_factor" && state.owner) value.address = state.owner;
   return value;
@@ -166,8 +172,24 @@ function extractJobId(receipt) {
   return Number(BigInt(log.topics[1]));
 }
 
+async function registerServerFollowup(jobId) {
+  if (!byId('serverFollowup')?.checked) return;
+  try {
+    let credential = JSON.parse(localStorage.getItem('safehire-workspace-v1') || 'null');
+    if (!credential) {
+      credential = await api('/api/workspace/spaces', {method:'POST', body:'{}'});
+      localStorage.setItem('safehire-workspace-v1', JSON.stringify(credential));
+    }
+    await api(`/api/workspace/spaces/${credential.space_id}/watches`, {
+      method:'POST', headers:{Authorization:`Bearer ${credential.token}`},
+      body:JSON.stringify({kind:'order', job_id:jobId, notify_provider:true, consent:true})
+    });
+  } catch (error) { toast(`订单已在链上；服务器跟进未保存：${error.message}。请保留订单号。`, true); }
+}
+
 function persistJob() {
   if (!state.jobId) return;
+  void registerServerFollowup(state.jobId);
   const record = {
     job_id: state.jobId,
     skill_id: state.skillId,
@@ -176,6 +198,10 @@ function persistJob() {
     saved_at: new Date().toISOString(),
   };
   localStorage.setItem(STORAGE_KEY, taskJSON.stringify(record));
+  try {
+    const jobs = JSON.parse(localStorage.getItem('safehire-my-jobs') || '[]');
+    localStorage.setItem('safehire-my-jobs', JSON.stringify([record, ...jobs.filter(j => j.job_id !== record.job_id)].slice(0, 100)));
+  } catch (_) { /* Chain and URL remain recovery sources. */ }
   const url = new URL(location.href);
   url.searchParams.set("job_id", String(state.jobId));
   url.searchParams.set("skill_id", state.skillId);
@@ -242,11 +268,11 @@ async function readBalances() {
   byId("bnbBalance").textContent = `${(Number(bnb) / 1e18).toFixed(6)} BNB`;
   byId("uBalance").textContent = `${(Number(u) / 1e18).toFixed(4)} U`;
   const gasReady = bnb > 0n;
-  const uReady = u >= PRICE_RAW;
+  const uReady = u >= expectedPrice();
   byId("bnbBalance").parentElement.classList.toggle("ready", gasReady);
   byId("uBalance").parentElement.classList.toggle("ready", uReady);
   byId("gasReadiness").textContent = gasReady ? "Gas available" : "Needs BNB gas";
-  byId("uReadiness").textContent = uReady ? "0.10 U available" : "Insufficient for hire";
+  byId("uReadiness").textContent = uReady ? `${priceLabel()} available` : "Insufficient for hire";
   return { gasReady, uReady };
 }
 
@@ -285,6 +311,10 @@ async function loadRuntime() {
 
 async function loadQuote() {
   const params = new URLSearchParams(location.search);
+  if (params.get("job_id")) {
+    byId("quoteState").textContent = "恢复已有订单：连接钱包后读取链上记录，无需新报价";
+    return;
+  }
   const requested = params.get("skill_id") || "grid_plan";
   state.skillId = SKILLS.has(requested) ? requested : "grid_plan";
   const token = Number(params.get("agent_token_id") || 0);
@@ -302,6 +332,13 @@ async function loadQuote() {
     }
   }
   resetTask();
+  if (state.agentTokenId === 269224) {
+    const form = document.createElement('fieldset');
+    form.innerHTML = '<legend>网格计算参数（不会实际下单）</legend><label>参考价格<input id="gridPrice" type="number" min="0.00000001" step="any" value="750"></label><label>假设资金 / 美元<input id="gridBudget" type="number" min="0.01" step="any" value="1000"></label><label>每侧档数<input id="gridLevels" type="number" min="1" max="50" value="5"></label><label>半宽 / %<input id="gridSpan" type="number" min="0.01" max="99" step="any" value="2"></label><p>参考价格与资金由你提供，默认值是假设示例。服务交付价格表，不会管理订单或执行止损。</p>';
+    byId('taskInput').before(form);
+    byId('taskInput').hidden = true;
+    byId('resetTask').hidden = true;
+  }
   try {
     const payload = await api("/api/live-market/quote", {
       method: "POST",
@@ -329,11 +366,11 @@ async function connectWallet() {
     const readiness = await readBalances();
     state.fundingReady = readiness.gasReady && readiness.uReady;
     byId("prepareHire").disabled = !state.writeEnabled;
-    byId("prepareHire").textContent = "Prepare fresh signed 0.10 U hire";
+    byId("prepareHire").textContent = `Prepare fresh signed ${priceLabel()} hire`;
     byId("prepareNote").textContent = state.writeEnabled
       ? state.fundingReady
         ? "Balances are sufficient. Preparing remains read-only and verifies a fresh provider signature."
-        : "You can inspect the signed plan, but sending stays locked until this wallet has BNB gas and at least 0.10 U."
+        : "You can inspect the signed plan, but sending stays locked until this wallet has BNB gas and the quoted U amount."
       : "This deployment has external mainnet writes disabled.";
     const jobId = savedJob();
     if (jobId) await resumeJob(jobId);
@@ -504,7 +541,7 @@ async function resumeJob(jobId) {
 
     if (status.status === "OPEN") {
       if (status.open_progress?.policy_registered) setStep("register_job", "done", "Confirmed on-chain");
-      if (BigInt(status.budget_raw || 0) === PRICE_RAW) setStep("set_budget", "done", "Confirmed on-chain");
+      if (BigInt(status.budget_raw || 0) === BigInt(status.price_raw || expectedPrice())) setStep("set_budget", "done", "Confirmed on-chain");
       if (status.open_progress?.exact_allowance) setStep("approve_u", "done", "Exact allowance confirmed");
       const followup = await api("/api/live-hire/followup-plan", {
         method: "POST",
@@ -580,6 +617,17 @@ function renderDelivery(delivery) {
   byId("deliveryTitle").textContent = `Job #${delivery.job_id} · manifest matches ${short(delivery.onchain?.deliverable_hash)}`;
   byId("deliveryManifestLink").href = delivery.manifest_url;
   byId("deliveryContent").textContent = verification.content || "No content returned.";
+  if (delivery.acceptance) {
+    let box = byId('semanticAcceptance');
+    if (!box) { box = document.createElement('p'); box.id = 'semanticAcceptance'; byId('deliveryContent').before(box); }
+    box.textContent = delivery.acceptance.passed ? '计算验收通过：参数、档数、价格、数量与总金额一致。不代表盈利或实际交易。' : `计算验收未通过：${delivery.acceptance.failures.join('; ')}`;
+  }
+  if (delivery.acceptance?.passed) {
+    const grid = JSON.parse(verification.content);
+    let summary = byId('gridResultSummary');
+    if (!summary) { summary = document.createElement('div'); summary.id='gridResultSummary'; byId('deliveryContent').before(summary); }
+    summary.innerHTML = `<h3>你买到的网格计算结果</h3><p>参考价格 ${escapeHtml(grid.mark)}；假设总资金 ${escapeHtml(grid.budgetUsd)} 美元；每侧 ${escapeHtml(grid.levelsPerSide)} 档。</p><table><thead><tr><th>方向</th><th>价格</th><th>分配金额</th><th>计算数量</th></tr></thead><tbody>${[...grid.buys,...grid.sells].map(r=>`<tr><td>${r.side==='buy'?'买入':'卖出'}</td><td>${escapeHtml(r.price)}</td><td>${escapeHtml(r.sizeUsd)}</td><td>${escapeHtml(r.amount)}</td></tr>`).join('')}</tbody></table><p>这是按你提供的输入计算的价格表，未执行交易；费用、滑点、订单管理与止损不包含在这份服务中。</p>`;
+  }
   const facts = [
     ["HASH", verification.hash_matches],
     ["JOB + CHAIN", verification.job_matches && verification.chain_matches],

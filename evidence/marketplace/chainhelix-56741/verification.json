@@ -1,0 +1,118 @@
+{
+  "job_id": 56741,
+  "verified_at_unix": 1788854437.908669,
+  "status": "SUBMITTED",
+  "completed": false,
+  "budget_u": "0.5",
+  "client": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "provider": "0xb8143345687aa5a527f4f9568d508ebbc612d06d",
+  "description": {
+    "chain_id": 56,
+    "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+    "negotiated_at": 1788854254,
+    "negotiation_hash": "0xe2f527605002cebb65e5fbd8057b11e5faf0e3720a8c24c5164864a32e3bf836",
+    "price": "500000000000000000",
+    "provider_sig": "0xb9fda14b24d3d879114c3729a041de114e12eb9f348dddb959b6e743ea35817f6e995abdb936bec50ed0d241c450f79115ef43a2c2e62609cfb59eb4986843ad1b",
+    "quote_expires_at": 1788855154,
+    "task": "{\"budgetUsd\":1000,\"levels\":5,\"price\":750.0,\"spanPct\":2}",
+    "terms": {
+      "deliverables": "grid level plan with per-level sizes",
+      "quality_standards": "deterministic arithmetic, levels within the stated span"
+    },
+    "verifying_contract": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+    "version": 1
+  },
+  "signature_verification": {
+    "valid": true,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "signature_method": "eip191",
+    "negotiation_hash": "0xe2f527605002cebb65e5fbd8057b11e5faf0e3720a8c24c5164864a32e3bf836"
+  },
+  "deliverable_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56741/response",
+  "deliverable_keccak256": "0x35bcb15a95d159177472cdda43afefc56462d3e5908f5ce421df6a2fc1f36361",
+  "raw_sha256": "fd29aea2b54b3f8ca86aaa9603a82bd5c85ded0c5399b6a285a467888d033354",
+  "raw_bytes_match_chain": true,
+  "exact_task_match": true,
+  "arithmetic_passed": true,
+  "submitted_at": 1788854293,
+  "expires_at": 1789631854,
+  "submission_tx": "0x906d14f45f9c46ad4349c04d8d906dd08dcbea8960f35981a896183f30799545",
+  "submission_block": 120650302,
+  "result": {
+    "category": "grid",
+    "ok": true,
+    "mark": 750,
+    "spanPct": 2,
+    "levelsPerSide": 5,
+    "perLevelUsd": 100,
+    "budgetUsd": 1000,
+    "allocatedUsd": 1000,
+    "buys": [
+      {
+        "side": "buy",
+        "price": 747,
+        "sizeUsd": 100,
+        "amount": 0.13386881
+      },
+      {
+        "side": "buy",
+        "price": 744,
+        "sizeUsd": 100,
+        "amount": 0.1344086
+      },
+      {
+        "side": "buy",
+        "price": 741,
+        "sizeUsd": 100,
+        "amount": 0.13495277
+      },
+      {
+        "side": "buy",
+        "price": 738,
+        "sizeUsd": 100,
+        "amount": 0.13550136
+      },
+      {
+        "side": "buy",
+        "price": 735,
+        "sizeUsd": 100,
+        "amount": 0.13605442
+      }
+    ],
+    "sells": [
+      {
+        "side": "sell",
+        "price": 753,
+        "sizeUsd": 100,
+        "amount": 0.13280212
+      },
+      {
+        "side": "sell",
+        "price": 756,
+        "sizeUsd": 100,
+        "amount": 0.13227513
+      },
+      {
+        "side": "sell",
+        "price": 759,
+        "sizeUsd": 100,
+        "amount": 0.13175231
+      },
+      {
+        "side": "sell",
+        "price": 762,
+        "sizeUsd": 100,
+        "amount": 0.1312336
+      },
+      {
+        "side": "sell",
+        "price": 765,
+        "sizeUsd": 100,
+        "amount": 0.13071895
+      }
+    ],
+    "wallsSupplied": 0,
+    "levelsOnWalls": 0,
+    "note": "no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids"
+  }
+}

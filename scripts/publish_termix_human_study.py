@@ -61,6 +61,7 @@ def main() -> None:
                   'agent_limitations': 'Risk labels are not full explanations. TVL zero is an unknown-input placeholder. All outputs are deterministic previews without execution authority.'},
               'comparison_claim': 'Descriptive records only. No end-to-end speedup, superiority, profit or eligibility claim.',
               'privacy': 'Operator names removed from public copies; exact original exports retained privately.'}
+    report['provenance_review'] = json.loads((ROOT / 'config/human-study-provenance.json').read_text())
     (dest / 'report.json').write_bytes(encoded(report))
     print('Published three identity-redacted pairs; no scores invented.')
 

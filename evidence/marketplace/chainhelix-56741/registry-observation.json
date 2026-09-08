@@ -1,0 +1,13 @@
+{
+  "chain_id": 56,
+  "token_id": 269224,
+  "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+  "block_hash": "0x3abc5902bc0918ba1e8e96ae17291784044db5b8a8c43d60fcb4c23d2012464e",
+  "block_number": 120654788,
+  "block_timestamp": 1788856314,
+  "calldata": "0x003395090000000000000000000000000000000000000000000000000000000000041ba8",
+  "return_data": "0x000000000000000000000000b8143345687aa5a527f4f9568d508ebbc612d06d",
+  "agent_wallet": "0xb8143345687aa5a527f4f9568d508ebbc612d06d",
+  "method": "getAgentWallet(uint256)",
+  "source": "BSC eth_call at canonical block hash; no registration transaction claimed"
+}

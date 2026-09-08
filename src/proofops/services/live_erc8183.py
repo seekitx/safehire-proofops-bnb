@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import ipaddress
 import json
+import os
 import re
 import socket
 import time
@@ -22,6 +23,7 @@ from proofops.integrations.erc8183_quote import (
     canonical_json,
     verify_job_description,
 )
+from proofops.services import reviewed_grid
 from proofops.services.live_agent_market import (
     DEFAULT_A2A_ENDPOINT,
     request_live_agent_quote,
@@ -49,8 +51,8 @@ MAX_JOB_LIFETIME_SECONDS = 8 * 24 * 60 * 60 + 30 * 60
 MIN_DELIVERY_SECONDS = 120
 EXPIRY_BUFFER_SECONDS = 30 * 60
 MANIFEST_MAX_BYTES = 1_000_000
-LOG_SCAN_WINDOW = 10_000
-LOG_SCAN_WINDOWS = 30
+LOG_SCAN_WINDOW = 1_000
+LOG_SCAN_WINDOWS = 300
 JOB_INITIALISED_TOPIC = f"0x{keccak(text='JobInitialised(uint256,bytes32,uint64,bytes)').hex()}"
 JOB_COMPLETED_TOPIC = f"0x{keccak(text='JobCompleted(uint256,address,bytes32)').hex()}"
 TRANSFER_TOPIC = f"0x{keccak(text='Transfer(address,address,uint256)').hex()}"
@@ -199,7 +201,7 @@ def validate_task_input(skill_id: str, raw: Any) -> dict[str, Any]:
 async def _rpc(method: str, params: list[Any]) -> Any:
     async with httpx.AsyncClient(timeout=20) as client:
         response = await client.post(
-            BSC_MAINNET_RPC,
+            os.getenv('SAFEHIRE_BSC_LOG_RPC', 'https://bsc-rpc.publicnode.com') if method == 'eth_getLogs' else BSC_MAINNET_RPC,
             json={"jsonrpc": "2.0", "id": method, "method": method, "params": params},
         )
         response.raise_for_status()
@@ -233,7 +235,7 @@ def _arena_binding(raw: Any, skill_id: str, *, require_fresh: bool = False) -> d
     return task.to_dict()
 
 
-def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
+def _parse_task_spec(description: Mapping[str, Any], *, provider: str = "") -> dict[str, Any]:
     if description.get("version") != 1:
         raise ValueError("job does not contain the supported signed description version")
     raw_task = description.get("task")
@@ -243,6 +245,11 @@ def _parse_task_spec(description: Mapping[str, Any]) -> dict[str, Any]:
         task = json.loads(raw_task)
     except json.JSONDecodeError as exc:
         raise ValueError("signed job task is not valid JSON") from exc
+    if provider.lower() == reviewed_grid.WALLET and isinstance(task, dict) and 'schema_version' not in task:
+        normalized = reviewed_grid.inputs(task)
+        return {'schema_version': 'chainhelix-grid/1', 'service': 'grid_plan',
+                'erc8004_token_id': reviewed_grid.TOKEN_ID, 'task_input': normalized,
+                'request_nonce': normalized.get('request_nonce'), 'arena_binding_supported': False}
     if not isinstance(task, dict) or task.get("schema_version") != "safehire-external-hire-v2":
         raise ValueError("job was not created by the hardened SafeHire hire flow")
     skill_id = str(task.get("service", ""))
@@ -279,7 +286,7 @@ async def _verify_anchored_description(
         expected_chain_id=CHAIN_ID,
         expected_verifying_contract=COMMERCE,
         expected_payment_token=U_TOKEN,
-        expected_price_raw=PRICE_RAW,
+        expected_price_raw=reviewed_grid.PRICE if provider.lower() == reviewed_grid.WALLET else PRICE_RAW,
         rpc_url=BSC_MAINNET_RPC,
         rpc_call=_rpc,
         require_current_quote=require_current_quote,
@@ -310,7 +317,8 @@ async def prepare_live_hire(
         if canonical_json(supplied) != canonical_json(normalized_input):
             raise ValueError("Arena hire inputs must exactly match the frozen task inputs")
     else:
-        normalized_input = validate_task_input(skill_id, task_input)
+        normalized_input = (reviewed_grid.inputs(task_input) if agent_token_id == reviewed_grid.TOKEN_ID
+                            else validate_task_input(skill_id, task_input))
     quote_payload = await request_live_agent_quote(
         project_root,
         skill_id=skill_id,
@@ -381,7 +389,7 @@ async def prepare_live_hire(
             "valid_until": quote_expires_at,
         },
         "safety": {
-            "mainnet_value_at_risk": "0.10 U plus BNB gas",
+            "mainnet_value_at_risk": f"{quote.get('price_display')} plus BNB gas",
             "exact_allowance": True,
             "unlimited_approval": False,
             "automatic_transaction": False,
@@ -451,12 +459,19 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
     if not isinstance(description, dict):
         raise TypeError("job description is not an object")
     provider = to_checksum_address(fields[2])
-    task_spec = _parse_task_spec(description)
+    task_spec = _parse_task_spec(description, provider=provider)
     description_verification = await _verify_anchored_description(
         # Quote expiry gates new funding, not review of an already funded job.
         description, provider=provider, require_current_quote=status_value == 0
     )
+    signed_price = int(description['price'])
+    if status_value != 0 and int(fields[5]) != signed_price:
+        raise ValueError('Onchain budget does not match signed price')
+    if to_checksum_address(fields[3]) != ROUTER:
+        raise ValueError('Unexpected job evaluator')
     result: dict[str, Any] = {
+        'price_raw': str(signed_price),
+        'price_u': str(Decimal(signed_price) / Decimal(10**18)),
         "chain_id": CHAIN_ID,
         "job_id": int(fields[0]),
         "client": to_checksum_address(fields[1]),
@@ -492,6 +507,7 @@ async def live_job_status(*, job_id: int) -> dict[str, Any]:
     }
     if status_value == 0:
         result["open_progress"] = await _open_job_progress(result["client"], job_id)
+        result['open_progress']['exact_allowance'] = int(result['open_progress']['allowance_raw']) == signed_price
     if status_value != 2:
         return result
 
@@ -577,8 +593,10 @@ async def live_followup_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
     registered_policy = _address(progress["registered_policy"], field="registered policy")
     if registered_policy not in {ZERO_ADDRESS, POLICY}:
         raise ValueError("job is already bound to an unexpected policy")
+    price_raw = int(status["description"]["price"])
+    price_u = str(Decimal(price_raw) / Decimal(10**18))
     budget = int(status["budget_raw"])
-    if budget not in {0, PRICE_RAW}:
+    if budget not in {0, price_raw}:
         raise ValueError("job already has an unexpected budget")
     allowance = int(progress["allowance_raw"])
 
@@ -599,24 +617,24 @@ async def live_followup_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
         transactions.append(
             {
                 "step": "set_budget",
-                "label": "Set exact 0.10 U budget",
+                "label": f"Set exact {price_u} U budget",
                 "to": COMMERCE,
                 "data": _call_data(
                     "setBudget(uint256,uint256,bytes)",
                     ["uint256", "uint256", "bytes"],
-                    [job_id, PRICE_RAW, b""],
+                    [job_id, price_raw, b""],
                 ),
                 "value": "0x0",
             }
         )
-    if allowance != PRICE_RAW:
+    if allowance != price_raw:
         transactions.append(
             {
                 "step": "approve_u",
-                "label": "Approve exactly 0.10 U",
+                "label": f"Approve exactly {price_u} U",
                 "to": U_TOKEN,
                 "data": _call_data(
-                    "approve(address,uint256)", ["address", "uint256"], [COMMERCE, PRICE_RAW]
+                    "approve(address,uint256)", ["address", "uint256"], [COMMERCE, price_raw]
                 ),
                 "value": "0x0",
             }
@@ -624,12 +642,12 @@ async def live_followup_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
     transactions.append(
         {
             "step": "fund_job",
-            "label": "Fund 0.10 U escrow",
+            "label": f"Fund {price_u} U escrow",
             "to": COMMERCE,
             "data": _call_data(
                 "fund(uint256,uint256,bytes)",
                 ["uint256", "uint256", "bytes"],
-                [job_id, PRICE_RAW, b""],
+                [job_id, price_raw, b""],
             ),
             "value": "0x0",
         }
@@ -639,7 +657,7 @@ async def live_followup_plan(*, buyer: str, job_id: int) -> dict[str, Any]:
         "job_id": job_id,
         "task_spec": status["task_spec"],
         "description_verification": status["description_verification"],
-        "price_raw": str(PRICE_RAW),
+        "price_raw": str(price_raw),
         "payment_token": U_TOKEN,
         "commerce_address": COMMERCE,
         "resume_safe": True,
@@ -665,8 +683,8 @@ async def notify_live_agent(project_root: Path, *, job_id: int) -> dict[str, Any
         }
     if status["status"] != "FUNDED":
         raise ValueError(f"job #{job_id} must be funded before Agent notification")
-    if status["budget_raw"] != str(PRICE_RAW):
-        raise ValueError("funded job budget is not exactly 0.10 U")
+    if status["budget_raw"] != str(status["description"]["price"]):
+        raise ValueError("funded job budget differs from signed price")
     task_spec = status["task_spec"]
     assert isinstance(task_spec, dict)
     skill_id = str(task_spec["service"])
@@ -911,7 +929,10 @@ async def live_delivery(
         manifest, job_id=job_id, expected_hash=str(status["deliverable_hash"])
     )
     terms = status["description"].get("terms")
+    quality = (reviewed_grid.acceptance(status['task_spec']['task_input'], verification['content'])
+               if status['task_spec']['erc8004_token_id'] == reviewed_grid.TOKEN_ID else None)
     return {
+        'acceptance': quality,
         "schema_version": "1.0",
         "evidence_mode": "live",
         "chain_id": CHAIN_ID,
@@ -1040,7 +1061,7 @@ async def _verified_payment(settlement_tx_hash: str, *, provider: str) -> int | 
             and str(topics[2]).lower() == _topic_address(provider).lower()
         ):
             amount = int(str(raw.get("data", "0x0")), 16)
-            if 0 < amount <= PRICE_RAW:
+            if 0 < amount <= (reviewed_grid.PRICE if provider.lower() == reviewed_grid.WALLET else PRICE_RAW):
                 return amount
     return None
 
@@ -1099,7 +1120,7 @@ async def build_verified_receipt(*, job_id: int) -> dict[str, Any]:
         "paid": True,
         "payment_token": U_TOKEN,
         "payment_raw": str(payment_raw),
-        "quoted_price_raw": str(PRICE_RAW),
+        "quoted_price_raw": str(reviewed_grid.PRICE if str(status["provider"]).lower() == reviewed_grid.WALLET else PRICE_RAW),
         "provider_payment_verified": True,
         "evidence_boundary": (
             "This dossier was rebuilt from BSC Mainnet state, the signed on-chain job description, "

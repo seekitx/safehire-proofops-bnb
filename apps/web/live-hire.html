@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/assets/live-hire.css" />
 </head>
 <body>
-  <header class="nav shell">
+  <header class="nav shell"><a href="/workspace">我的订单与监控</a>
     <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>LIVE HIRE</small></a>
     <div class="network-pill"><span class="dot" id="networkDot"></span><span id="networkLabel">BSC Mainnet · wallet disconnected</span></div>
   </header>
@@ -19,11 +19,11 @@
       <div>
         <div class="eyebrow">REAL EXTERNAL AGENT · ERC-8183</div>
         <h1>The quote now has<br/><span>a finish line.</span></h1>
-        <p>Choose the task, verify the exact 0.10 U terms, fund escrow one wallet action at a time, inspect the delivery, then settle or refund.</p>
+        <p>Choose the task, verify the exact signed price and terms, fund escrow one wallet action at a time, inspect the delivery, then settle or refund.</p>
       </div>
       <aside class="risk-ticket">
         <small>MAXIMUM SERVICE PAYMENT</small>
-        <strong>0.10 U</strong>
+        <strong>Signed price</strong>
         <span>plus BNB network gas</span>
         <p>No unlimited allowance. No background signing. No automatic settlement.</p>
       </aside>
@@ -31,7 +31,7 @@
 
     <section class="truth-strip">
       <strong>REAL MAINNET VALUE</strong>
-      <p>This page is production-capable. Do not continue unless the connected wallet intentionally holds BNB gas and at least 0.10 U.</p>
+      <p>This page is production-capable. Do not continue unless the connected wallet intentionally holds BNB gas and the quoted U amount.</p>
       <a href="/proof">Review prior testnet proof ↗</a>
     </section>
 
@@ -50,7 +50,7 @@
         <p class="field-note" id="escrowTiming">Delivery time and escrow release time are different. The current dispute window will be read from chain when preparing the job; funds can remain locked for days after delivery.</p>
         <div class="task-head"><strong>Task input</strong><button id="resetTask" type="button">Reset reviewed example</button></div>
         <ul class="needs" id="taskNeeds"></ul>
-        <textarea id="taskInput" rows="14" spellcheck="false" aria-label="External Agent task JSON"></textarea>
+        <label class="check"><input type="checkbox" id="serverFollowup">同意服务器保存此订单并持续读取状态；付款后可通知原供应商，最多三次，不会再次付款。记录只对持有工作台凭证的人开放。</label><textarea id="taskInput" rows="14" spellcheck="false" aria-label="External Agent task JSON"></textarea>
         <p class="field-note">The task is written into the public job description. Do not include passwords, private keys or personal secrets.</p>
       </article>
 
@@ -58,7 +58,7 @@
         <div class="card-heading"><div><small>02 · BUYER</small><h2>Wallet readiness</h2></div><button class="button secondary compact" id="connectWallet" type="button">Connect wallet</button></div>
         <div class="wallet-address"><small>CONNECTED BUYER</small><strong id="buyerAddress">—</strong></div>
         <div class="balance-grid">
-          <div><small>U BALANCE</small><strong id="uBalance">—</strong><span id="uReadiness">Needs 0.10 U</span></div>
+          <div><small>U BALANCE</small><strong id="uBalance">—</strong><span id="uReadiness">Needs quoted U</span></div>
           <div><small>BNB GAS</small><strong id="bnbBalance">—</strong><span id="gasReadiness">Needs BNB</span></div>
         </div>
         <label class="risk-confirm"><input id="riskConfirm" type="checkbox"/><span>I understand this is BSC Mainnet and each confirmed wallet transaction can spend real assets.</span></label>
@@ -73,8 +73,8 @@
       <ol class="live-steps">
         <li data-step="create_job"><span>01</span><div><strong>Create job</strong><small>Waiting</small></div></li>
         <li data-step="register_job"><span>02</span><div><strong>Bind policy</strong><small>Waiting</small></div></li>
-        <li data-step="set_budget"><span>03</span><div><strong>Fix 0.10 U budget</strong><small>Waiting</small></div></li>
-        <li data-step="approve_u"><span>04</span><div><strong>Approve exactly 0.10 U</strong><small>Waiting</small></div></li>
+        <li data-step="set_budget"><span>03</span><div><strong>Fix signed budget</strong><small>Waiting</small></div></li>
+        <li data-step="approve_u"><span>04</span><div><strong>Approve exact signed amount</strong><small>Waiting</small></div></li>
         <li data-step="fund_job"><span>05</span><div><strong>Fund escrow</strong><small>Waiting</small></div></li>
         <li data-step="agent_delivery"><span>06</span><div><strong>External delivery</strong><small>Waiting</small></div></li>
         <li data-step="settle_job"><span>07</span><div><strong>Review, dispute or settle</strong><small>Waiting</small></div></li>

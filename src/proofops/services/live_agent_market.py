@@ -427,6 +427,17 @@ async def request_live_agent_quote(
         request_nonce=nonce,
         arena_task=arena_task,
     )
+    if int(selected['token_id']) == 269224:
+        from proofops.services.reviewed_grid import inputs
+        if arena_task is not None:
+            raise ValueError('ChainHelix requires its own grid task; do not reinterpret Arena inputs')
+        normalized = inputs(task_input if task_input is not None else {'price': 750, 'budgetUsd': 1000, 'levels': 5, 'spanPct': 2})
+        normalized['request_nonce'] = nonce
+        task_spec = {'schema_version': 'chainhelix-grid/1', 'service': 'grid_plan',
+                     'erc8004_token_id': 269224, 'task_input': normalized, 'request_nonce': nonce}
+        expected_request = {'task_description': canonical_json(normalized), 'terms': {
+            'deliverables': 'grid level plan with per-level sizes',
+            'quality_standards': 'deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim'}}
     if quote_format == "bnbagent-sdk-v1":
         # The reviewed chain transaction always uses SafeHire's fixed router and
         # policy. Do not rely on unsigned SDK evaluator metadata.

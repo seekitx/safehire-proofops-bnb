@@ -257,13 +257,34 @@ class DebateRequest(BaseModel):
     fixture_labeling: bool = True
 
 
+import os
+
+from proofops.workspace.routes import make_router as make_workspace_router
+from proofops.workspace.store import Journal
+from proofops.workspace.worker import run as run_followup
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+workspace_journal = Journal(Path(os.getenv('SAFEHIRE_FOLLOWUP_DB', str(PROJECT_ROOT / '.data/followup.sqlite3'))))
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     application = await build_application(Settings())
     app.state.application = application
+    followup_task = None
+    if os.getenv('SAFEHIRE_FOLLOWUP_ENABLED', 'false').lower() == 'true':
+        import asyncio
+        followup_task = asyncio.create_task(run_followup(workspace_journal, PROJECT_ROOT))
+    app.state.followup_task = followup_task
     try:
         yield
     finally:
+        if followup_task:
+            import asyncio
+            followup_task.cancel()
+            try:
+                await followup_task
+            except asyncio.CancelledError:
+                pass
         await application.close()
 
 
@@ -275,6 +296,7 @@ app = FastAPI(
 )
 app.include_router(make_router(Path(__file__).resolve().parents[2]))
 app.include_router(make_arena_router(Path(__file__).resolve().parents[2]))
+app.include_router(make_workspace_router(PROJECT_ROOT, workspace_journal))
 app.add_middleware(ArenaBoundaryMiddleware)
 settings = Settings()
 app.add_middleware(
@@ -1244,7 +1266,9 @@ async def public_termix_report() -> dict[str, Any]:
 
 @app.get("/api/evidence/termix/human-study")
 async def public_termix_human_study() -> dict[str, Any]:
-    return _public_evidence_json("evidence/termix/human-study/report.json")
+    report = _public_evidence_json("evidence/termix/human-study/report.json")
+    report['provenance_review'] = _public_evidence_json('config/human-study-provenance.json')
+    return report
 
 
 @app.get("/api/evidence/termix/human-study/{task_id}")
@@ -1440,6 +1464,11 @@ async def index() -> FileResponse:
 @app.get("/proof", include_in_schema=False)
 async def proof_page() -> FileResponse:
     return FileResponse(WEB_ROOT / "proof.html")
+
+
+@app.get("/workspace", include_in_schema=False)
+async def workspace_page() -> FileResponse:
+    return FileResponse(WEB_ROOT / "workspace.html")
 
 
 @app.get("/hire-live", include_in_schema=False)

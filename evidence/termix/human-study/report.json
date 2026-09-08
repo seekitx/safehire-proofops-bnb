@@ -102,5 +102,19 @@
     "agent_limitations": "Risk labels are not full explanations. TVL zero is an unknown-input placeholder. All outputs are deterministic previews without execution authority."
   },
   "comparison_claim": "Descriptive records only. No end-to-end speedup, superiority, profit or eligibility claim.",
-  "privacy": "Operator names removed from public copies; exact original exports retained privately."
+  "privacy": "Operator names removed from public copies; exact original exports retained privately.",
+  "provenance_review": {
+    "schema": "safehire-study-provenance-review/1",
+    "status": "needs_review",
+    "unassisted_runs_verified": false,
+    "hold_eligibility_claims": true,
+    "affected_task_ids": [
+      "live-20260908-grid",
+      "live-20260908-yield",
+      "live-20260908-health-followup"
+    ],
+    "reason": "A contemporaneous user ChatGPT conversation contained worked answers to these task prompts. This is not proof that each saved answer used AI, but self-attestation alone cannot resolve the inconsistency. Match original run timestamps and assistance before treating any affected run as an unassisted control.",
+    "raw_outputs_preserved": true,
+    "independent_review": "not_available"
+  }
 }

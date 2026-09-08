@@ -20,3 +20,8 @@ agent-studio/**/node_modules/
 agent-studio/**/dist/
 .playwright-cli/
 .DS_Store
+
+# Research belongs in docs/, not private runtime data. Keep docs visible even
+# when a developer has broad Markdown patterns in a global ignore file.
+!docs/
+!docs/**
