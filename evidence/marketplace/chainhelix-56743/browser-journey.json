@@ -1,0 +1,316 @@
+{
+  "schema_version": "2.0",
+  "verification_status": "browser_activity_draft",
+  "evidence_mode": "live",
+  "chain_id": 56,
+  "skill_id": "grid_plan",
+  "erc8004_token_id": 269224,
+  "agent": {
+    "name": "ChainHelix — Grid calculation",
+    "operator": "ChainHelix",
+    "category": "grid_trading",
+    "skill_id": "grid_plan",
+    "erc8004_token_id": 269224,
+    "registration_url": "https://8004scan.io/agents/bsc/269224",
+    "agent_card_url": "https://agents.chainhelix.io/gridtrader/.well-known/agent-card.json",
+    "a2a_endpoint": "https://agents.chainhelix.io/gridtrader/",
+    "requires_arena": false
+  },
+  "quote": {
+    "accepted": true,
+    "service": "grid_plan",
+    "chain_id": 56,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "price": "500000000000000000",
+    "price_display": "0.50 U",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788866332,
+    "deliverables": "grid level plan with per-level sizes",
+    "quality_standards": "deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.",
+    "success_criteria": []
+  },
+  "quote_verification": {
+    "valid": true,
+    "chain_id": 56,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "price_raw": "500000000000000000",
+    "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+    "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+    "estimated_completion_seconds": 600,
+    "quote_expires_at": 1788866332,
+    "signature_method": "eip191",
+    "request_hash": "0x5e0edeffff107392ade80a98fc59f9bb859babb5d86de597995485f90717bf33",
+    "response_hash": "0x8891b25490451c6a21699e14ac2107ed12effa1f42d646959fb758dbf50b1a02",
+    "negotiation_hash": "0x4379f99507e76be77d36d91f458c946cf0ecf31c0d506e4ddf9574023bde1f78",
+    "job_description": "{\"chain_id\":56,\"currency\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\",\"negotiated_at\":1788865432,\"negotiation_hash\":\"0x4379f99507e76be77d36d91f458c946cf0ecf31c0d506e4ddf9574023bde1f78\",\"price\":\"500000000000000000\",\"provider_sig\":\"0x90d6bc8416a51e76a38746d69fd7a90f6ca0cccc046d14042454177bdfea7e6f0d6ab0fcbd523a3799f1c2a3a5dacee64c328203ed86a5f802a0d32c31ab9eee1b\",\"quote_expires_at\":1788866332,\"task\":\"{\\\"budgetUsd\\\":1000,\\\"levels\\\":5,\\\"price\\\":750,\\\"request_nonce\\\":\\\"safehire-b3bf4047b97fdbfb36af072e5e322e28\\\",\\\"spanPct\\\":2}\",\"terms\":{\"deliverables\":\"grid level plan with per-level sizes\",\"quality_standards\":\"deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim Escrow evaluation uses SafeHire's reviewed BSC OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 through router 0x51895229e12f9876011789b04f8698af06ccd6da; no alternate evaluator is authorized.\"},\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"version\":1}"
+  },
+  "buyer": "0xe144264e2b71ec885cb10a10c6881b45fdf54f5f",
+  "job_id": 56743,
+  "task_input": {
+    "price": 750,
+    "budgetUsd": 1000,
+    "spanPct": 2,
+    "levels": 5
+  },
+  "transactions": [
+    {
+      "step": "create_job",
+      "tx_hash": "0x96d1da8f2e3b1b3a65f92b8afce0dbb1ddca240d6937a0e32ab81a3f4b2ccb02",
+      "block_number": 120675134
+    },
+    {
+      "step": "register_job",
+      "tx_hash": "0x60671d8080ca1aefc32c47131324dfddb27af3789c741f5e01e8c79096d1ee06",
+      "block_number": 120675148
+    },
+    {
+      "step": "set_budget",
+      "tx_hash": "0x7f4f0543cad38e3bb5b52cf2cf23caab362e438599858952cc85d0fac9153bd4",
+      "block_number": 120675166
+    },
+    {
+      "step": "approve_u",
+      "tx_hash": "0x571ddf496cf9ed9426e3b055aa9b9553216727652289defa04da7f3252c9bdfc",
+      "block_number": 120675203
+    },
+    {
+      "step": "fund_job",
+      "tx_hash": "0x3950eb164c8dfc0f75edd06e83cea50d40e93c16c02a313fdd3fecd1a8abbbb7",
+      "block_number": 120675222
+    }
+  ],
+  "journey": {
+    "schema": "safehire-hire-journey/1",
+    "started_at": "2026-09-08T10:57:00.559Z",
+    "job_id": 56743,
+    "agent_token_id": 269224,
+    "events": [
+      {
+        "stage": "page_opened",
+        "at": "2026-09-08T10:57:00.559Z"
+      },
+      {
+        "stage": "prepare_requested",
+        "at": "2026-09-08T11:01:19.306Z"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:01:21.928Z"
+      },
+      {
+        "stage": "prepare_requested",
+        "at": "2026-09-08T11:03:49.568Z"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:03:52.193Z"
+      },
+      {
+        "stage": "transaction_confirmed",
+        "at": "2026-09-08T11:04:33.204Z",
+        "step": "create_job",
+        "tx_hash": "0x96d1da8f2e3b1b3a65f92b8afce0dbb1ddca240d6937a0e32ab81a3f4b2ccb02",
+        "gas_used_raw": "0xe63a1",
+        "effective_gas_price_raw": "0xa445390"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:04:33.709Z"
+      },
+      {
+        "stage": "transaction_confirmed",
+        "at": "2026-09-08T11:04:42.283Z",
+        "step": "register_job",
+        "tx_hash": "0x60671d8080ca1aefc32c47131324dfddb27af3789c741f5e01e8c79096d1ee06",
+        "gas_used_raw": "0x28c60",
+        "effective_gas_price_raw": "0xbaae870"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:04:42.283Z"
+      },
+      {
+        "stage": "transaction_confirmed",
+        "at": "2026-09-08T11:04:50.433Z",
+        "step": "set_budget",
+        "tx_hash": "0x7f4f0543cad38e3bb5b52cf2cf23caab362e438599858952cc85d0fac9153bd4",
+        "gas_used_raw": "0x177a2",
+        "effective_gas_price_raw": "0x8f5c5ea"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:04:50.434Z"
+      },
+      {
+        "stage": "transaction_confirmed",
+        "at": "2026-09-08T11:05:07.301Z",
+        "step": "approve_u",
+        "tx_hash": "0x571ddf496cf9ed9426e3b055aa9b9553216727652289defa04da7f3252c9bdfc",
+        "gas_used_raw": "0xa8a1",
+        "effective_gas_price_raw": "0x56bbcb2"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:05:07.301Z"
+      },
+      {
+        "stage": "transaction_confirmed",
+        "at": "2026-09-08T11:05:15.933Z",
+        "step": "fund_job",
+        "tx_hash": "0x3950eb164c8dfc0f75edd06e83cea50d40e93c16c02a313fdd3fecd1a8abbbb7",
+        "gas_used_raw": "0x1a341",
+        "effective_gas_price_raw": "0x8d9ee20"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:05:15.934Z"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:05:28.520Z"
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:05:59.370Z"
+      },
+      {
+        "stage": "delivery_checked",
+        "at": "2026-09-08T11:06:11.523Z",
+        "job_id": 56743,
+        "arithmetic_acceptance": true
+      },
+      {
+        "stage": "receipt_viewed",
+        "at": "2026-09-08T11:06:11.523Z"
+      }
+    ],
+    "timing_basis": "client_reported_wall_clock",
+    "coverage": "hire_page_to_delivery",
+    "independent_verification": false
+  },
+  "agent_notification": {
+    "job_id": 56743,
+    "skill_id": "grid_plan",
+    "erc8004_token_id": 269224,
+    "operator": "ChainHelix",
+    "endpoint": "https://agents.chainhelix.io/gridtrader/",
+    "status": "accepted",
+    "provider_acknowledgement_only": true,
+    "delivery_started_verified": false,
+    "notified_at": "2026-09-08T11:06:00.270976+00:00",
+    "agent_response": {
+      "kind": "message",
+      "role": "agent",
+      "messageId": "d08f4eb3-57e1-4573-82bc-a994658a171d",
+      "parts": [
+        {
+          "kind": "data",
+          "data": {
+            "status": "accepted",
+            "job_id": 56743,
+            "note": "delivery started; poll the chain (SUBMITTED / get_deliverable_url) for the result"
+          }
+        }
+      ],
+      "contextId": "bbf8be7b-3c5d-4539-bad4-f57c6bb4e224",
+      "taskId": "44cc056e-a75c-436a-a222-001da396d083"
+    },
+    "next_action": "wait_for_onchain_submission_then_review",
+    "transaction_sent": false
+  },
+  "delivery": {
+    "acceptance": {
+      "schema": "safehire-grid-acceptance/1",
+      "passed": true,
+      "failures": [],
+      "checks": [
+        "task parameters",
+        "sides and level count",
+        "prices",
+        "sizes",
+        "quantities",
+        "total budget"
+      ],
+      "human_quality_review": "pending",
+      "trade_executed": false,
+      "boundary": "Arithmetic against signed caller inputs only. No live-price, fees, profit, order placement or stop-loss verification."
+    },
+    "schema_version": "1.0",
+    "evidence_mode": "live",
+    "chain_id": 56,
+    "job_id": 56743,
+    "provider": "0xB8143345687aA5A527f4f9568D508EBbC612d06D",
+    "task_spec": {
+      "schema_version": "chainhelix-grid/1",
+      "service": "grid_plan",
+      "erc8004_token_id": 269224,
+      "task_input": {
+        "price": 750,
+        "budgetUsd": 1000,
+        "spanPct": 2,
+        "levels": 5,
+        "request_nonce": "safehire-b3bf4047b97fdbfb36af072e5e322e28"
+      },
+      "request_nonce": "safehire-b3bf4047b97fdbfb36af072e5e322e28",
+      "arena_binding_supported": false
+    },
+    "success_criteria": [],
+    "onchain": {
+      "deliverable_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56743/response",
+      "deliverable_hash": "0x0aaf233c0a35d501f3d2343b76a634101193d9763d57522518ee7d2f293344ee",
+      "submitted_at": 1788865563,
+      "block_number": 120675335,
+      "transaction_hash": "0x7959d1eabce11be788978e5f52d00ca6cf8f43fce641b083e13004b2eaddcdb9"
+    },
+    "manifest_url": "https://agents.chainhelix.io/gridtrader/erc8183/job/56743/response",
+    "manifest": {
+      "chain_id": 56,
+      "contracts": {
+        "commerce": "0xEa4DAa3100A767e86FDed867729ae7446476EBA6",
+        "policy": "0x9C01845705b3078Aa2e8cfF7520a6376FD766dE5",
+        "router": "0x51895229E12F9876011789B04f8698af06cCD6DA"
+      },
+      "job_id": 56743,
+      "metadata": {
+        "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+        "generator": "gridtrader",
+        "job_id": 56743
+      },
+      "response": {
+        "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+        "content_type": "text/plain"
+      },
+      "version": 1
+    },
+    "verification": {
+      "hash_matches": true,
+      "job_matches": true,
+      "chain_matches": true,
+      "contracts_match": true,
+      "provider_submit_authorized_by_contract": true,
+      "human_success_criteria_review_required": true,
+      "valid": true,
+      "computed_hash": "0x0aaf233c0a35d501f3d2343b76a634101193d9763d57522518ee7d2f293344ee",
+      "content": "{\"category\":\"grid\",\"ok\":true,\"mark\":750,\"spanPct\":2,\"levelsPerSide\":5,\"perLevelUsd\":100,\"budgetUsd\":1000,\"allocatedUsd\":1000,\"buys\":[{\"side\":\"buy\",\"price\":747,\"sizeUsd\":100,\"amount\":0.13386881},{\"side\":\"buy\",\"price\":744,\"sizeUsd\":100,\"amount\":0.1344086},{\"side\":\"buy\",\"price\":741,\"sizeUsd\":100,\"amount\":0.13495277},{\"side\":\"buy\",\"price\":738,\"sizeUsd\":100,\"amount\":0.13550136},{\"side\":\"buy\",\"price\":735,\"sizeUsd\":100,\"amount\":0.13605442}],\"sells\":[{\"side\":\"sell\",\"price\":753,\"sizeUsd\":100,\"amount\":0.13280212},{\"side\":\"sell\",\"price\":756,\"sizeUsd\":100,\"amount\":0.13227513},{\"side\":\"sell\",\"price\":759,\"sizeUsd\":100,\"amount\":0.13175231},{\"side\":\"sell\",\"price\":762,\"sizeUsd\":100,\"amount\":0.1312336},{\"side\":\"sell\",\"price\":765,\"sizeUsd\":100,\"amount\":0.13071895}],\"wallsSupplied\":0,\"levelsOnWalls\":0,\"note\":\"no wall map supplied; levels are spacing-only; supply walls[] for placement-aware grids\"}",
+      "content_type": "text/plain",
+      "metadata": {
+        "built_with": "https://github.com/bnb-chain/bnbagent-studio",
+        "generator": "gridtrader",
+        "job_id": 56743
+      }
+    },
+    "settlement": {
+      "can_settle": false,
+      "can_dispute": true,
+      "review_window_closed": false,
+      "seconds_until_settle": 604792,
+      "policy_verdict": "UNDECIDED",
+      "disputed": false
+    },
+    "evidence_boundary": "SafeHire verified the retrieved manifest against the on-chain deliverable hash, job, chain and contract trio. A human still decides whether the content satisfies the signed success criteria before settle or dispute."
+  },
+  "observed_at": "2026-09-08T11:06:11.523Z",
+  "boundary": "This browser activity draft is not the server-verified paid-delivery dossier. Use the verified download after completion."
+}

@@ -1,0 +1,9 @@
+{
+  "job_id": 56743,
+  "server_observation_local": "2026-09-08 19:09:39 Asia/Shanghai",
+  "provider_delivery_status": "Bark accepted, 1 attempt",
+  "owner_confirmation": "已收到 SafeHire 交付提醒",
+  "confirmed_in": "owner conversation, 2026-09-08",
+  "independent_audit": false,
+  "private_credentials_included": false
+}

@@ -10,14 +10,19 @@
   "agent_card_url": "https://safehire.eyesonchain.xyz/.well-known/agent-card.json",
   "termix_report_url": "https://safehire.eyesonchain.xyz/api/evidence/termix/report",
   "pancakeswap_evidence_url": "https://github.com/seekitx/safehire-proofops-bnb/blob/main/evidence/pancakeswap/live-benefit-report.json",
-  "demo_video_url": "",
-  "demo_video_seconds": null,
+  "demo_video_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/safehire-demo.mp4",
+  "demo_video_seconds": 139,
   "networks": [
     "BSC Mainnet",
     "BSC Testnet"
   ],
   "evidence_mode": "live",
   "winner_readiness": "conditional_manual_proof_gates",
-  "submission_status": "ready_for_owner_review_not_submitted",
-  "termix_human_study_url": "https://safehire.eyesonchain.xyz/api/evidence/termix/human-study"
+  "submission_status": "prepared_awaiting_official_confirmation",
+  "termix_human_study_url": "https://safehire.eyesonchain.xyz/api/evidence/termix/human-study",
+  "demo_page_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html",
+  "latest_in_product_job": 56743,
+  "latest_in_product_job_status": "SUBMITTED",
+  "owner_feedback": "Worth the price; AI-transcribed owner statement, not independent review",
+  "phone_alert": "Bark accepted; owner confirmed actual receipt"
 }

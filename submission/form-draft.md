@@ -1,4 +1,6 @@
-# Build the Era 官方表单草稿（未提交）
+# Build the Era 历史表单草稿（2026-08-31，已被替代）
+
+> 2026-09-08 最新内容见 `submission/submission.json` 和 `docs/IN_PRODUCT_DELIVERY_AND_SUBMISSION_2026-09-08.zh-CN.md`。以下旧稿不用于当前提交。
 
 > 这个文件只是事先写好的项目文案。姓名、邮箱、Telegram、X、国家/时区、团队、领奖钱包和条款接受状态必须在最后提交前由参赛者本人核对。
 

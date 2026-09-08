@@ -16,9 +16,9 @@ Discover → Compare proof → Quote → Limit authority → Hire
 
 ## Judge in 90 seconds
 
-Current delivery gaps, acceptance evidence and the final demo script are tracked in
-[the September 6 execution board](docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md).
-Hosting migration does not close paid-delivery or human-research gates.
+Latest real in-product purchase: **BSC mainnet Job #56743, 0.50 U, delivered and verified; settlement pending.**
+[Watch the demo and inspect the evidence](https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html).
+The project owner reported “我感觉值” (worth the price); this is AI-transcribed owner feedback, not independent review.
 
 1. [**Marketplace — discover four live ERC-8004 categories**](https://safehire.eyesonchain.xyz)
 2. [**Decision desk — compare job-specific evidence**](https://safehire.eyesonchain.xyz/decision)
@@ -66,7 +66,7 @@ The LLM is advisory. Deterministic controls remain authoritative:
 
 | Criterion | Current state | Reviewable evidence | Remaining proof |
 |---|---|---|---|
-| Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | new in-product purchase, useful delivery and user assessment |
+| Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | broader user validation and final mainnet settlement (Job #56743 delivered; owner value feedback recorded) |
 | Data Quality | Conditional | current A2A probe, 8004scan signals, source/time labels, raw hashes | independent blind review and paid outcomes |
 | Agent Diversity | Conditional | all four category routes; execution depth remains conditional | equally useful four-category service depth; second independent same-task supplier is an enhancement |
 | TermiX | Provenance review required | three recorded pairs, original outputs and timings preserved | verify no-AI provenance, independent review and full workflow timing |
@@ -108,7 +108,7 @@ Primary evidence:
 
 ## Manual gates that code cannot complete honestly
 
-1. Have a real user complete a new in-product purchase and assess usefulness; paid ChainHelix Job #56741 already has verified submitted delivery, but not final settlement.
+1. Expand beyond owner validation: Job #56743 now proves an in-product paid purchase and verified calculation delivery, with owner value feedback. Final mainnet settlement and independent user quality validation remain pending.
 2. Resolve the no-AI provenance hold on the three recorded comparisons; independent review remains unavailable.
 3. Obtain a second independently operated, compatible same-task signed offer and useful paid delivery; separate operator identities alone are insufficient.
 4. Use non-sleeping hosting during judging and publish a 2–3 minute single-path demo.
