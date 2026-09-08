@@ -1,0 +1,25 @@
+{
+  "evidence_mode": "development_verification_not_user_study",
+  "python_tests": {
+    "passed": 393,
+    "coverage_percent": 78.76
+  },
+  "ruff": "passed",
+  "mypy": "104 source files passed",
+  "javascript_syntax": "workspace, benchmark, live-hire passed",
+  "static_security": "passed",
+  "browser_checks": [
+    "create private test workspace",
+    "default grid action submission and negative-cost result",
+    "pause and resume retains action result",
+    "fresh ChainHelix sample quote and unavailable alternative disabled",
+    "new page restores manual draft, original start and unchecked attestation with needs-review label"
+  ],
+  "not_verified": [
+    "actual transaction signing or broadcasting",
+    "full LP rebalance or grid execution",
+    "new paid service delivery",
+    "independent human quality review",
+    "mobile viewport"
+  ]
+}

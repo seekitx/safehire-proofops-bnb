@@ -53,10 +53,27 @@ class CompareRequest(BaseModel):
     consent: StrictBool
 
 
+class ActionRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid', allow_inf_nan=False)
+    consent: StrictBool
+    collateral_drop_pct: float = Field(default=20, ge=0, le=90)
+    debt_rise_pct: float = Field(default=10, ge=0, le=200)
+    half_width_ticks: StrictInt = Field(default=600, ge=1, le=100000)
+    simulate_lp_exit: StrictBool = False
+    slippage_bps: StrictInt = Field(default=50, ge=0, le=500)
+    levels: StrictInt = Field(default=10, ge=2, le=50)
+    capital: float = Field(default=1000, gt=0, le=1000000)
+    gas_per_order: float = Field(default=0.2, ge=0, le=1000)
+    transfer_tax_bps: StrictInt = Field(default=0, ge=0, le=1000)
+    venue: Literal['venus-core-usdt','venus-core-usdc'] = 'venus-core-usdt'
+    amount: str | None = Field(default=None, pattern=r'^\d{1,7}(?:\.\d{1,18})?$')
+
+
 def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) -> APIRouter:
     router = APIRouter(prefix='/api/workspace', tags=['Private orders and read-only monitoring'])
     active = enabled if enabled is not None else os.getenv('SAFEHIRE_FOLLOWUP_ENABLED', 'false').lower() == 'true'
     quote_slots = asyncio.Semaphore(2)
+    action_slots = asyncio.Semaphore(2)
 
     def auth(space: str, authorization: str | None) -> None:
         if not active:
@@ -146,18 +163,59 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
             db.execute('INSERT INTO events(watch,at,kind,data) VALUES(?,?,?,?)', (watch, time.time(), 'user_feedback', json.dumps(body.model_dump() | {'independent_review': False, 'wallet_ownership_verified': False})))
         return {'saved': True, 'independent_review': False}
 
+    @router.post('/spaces/{space}/watches/{watch}/resume')
+    def resume(space: str, watch: str, authorization: str | None = Header(default=None)) -> dict[str, bool]:
+        auth(space, authorization)
+        try:
+            journal.resume(space,watch)
+        except LookupError as exc:
+            raise HTTPException(404,str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(409,str(exc)) from exc
+        return {'resumed':True,'chain_deadline_changed':False}
+
+    @router.post('/spaces/{space}/watches/{watch}/action-plan')
+    async def action_plan(space: str, watch: str, body: ActionRequest, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        auth(space,authorization)
+        if not body.consent:
+            raise HTTPException(422,'Consent to public source reads and private plan storage required')
+        if action_slots.locked():
+            raise HTTPException(429,'Action preparation busy')
+        from proofops.workspace.actions import prepare_action, token_amount
+        try:
+            row=journal.watch(space,watch)
+            if body.amount is not None:
+                token_amount(body.amount)
+            if sum(e['kind']=='action_plan' for e in row['events']) >= 20:
+                raise HTTPException(429,'Action preparation limit reached')
+            async with action_slots:
+                async with asyncio.timeout(65):
+                    result=await prepare_action(row,body.model_dump(exclude={'consent'}))
+            journal.save_action(space,watch,result)
+            return result
+        except LookupError as exc:
+            raise HTTPException(404,str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422,str(exc)) from exc
+        except (httpx.HTTPError, TimeoutError) as exc:
+            raise HTTPException(503,'Live source or simulation unavailable; no action was sent') from exc
+
     @router.get('/services')
     def services() -> dict[str, Any]:
+        from proofops.workspace.supply import status
+        probes=journal.provider_probes()
         rows = []
         for a in _load_catalog(root)['agents']:
             rows.append({'token_id': a['token_id'], 'name': a['name'], 'category': a['category'],
-                         'skill_id': a['skill_id'], 'operator': a.get('operator', 'Brain On BNB AI'),
+                         'skill_id': a['skill_id'], 'operator': a.get('operator', a.get('provider', {}).get('operator', 'Brain On BNB AI')),
                          'description': a['description'], 'scope': a.get('scope', 'analysis_only'),
                          'pause': new_hire_pause(root, a['token_id']),
+                         'availability': status(probes.get(a['token_id'])),
                          'quote_price_is_live': False, 'price_raw': a.get('price_raw'),
                          'submitted_evidence': a.get('verified_submitted_job_ids', []),
                          'completion_rate': None, 'sample_size_note': 'No success-rate estimate from a single order',
                          'hire_url': f"/hire-live?skill_id={a['skill_id']}&agent_token_id={a['token_id']}"})
+        rows.sort(key=lambda r:(not r['availability']['can_request_quote'],not bool(r['submitted_evidence']),r['token_id']))
         return {'services': rows, 'evidence_boundary': 'Listings describe reviewed scope; a current valid quote is required before purchase. Operators are grouped, never counted as independent agents.'}
 
     @router.post('/compare-grid')

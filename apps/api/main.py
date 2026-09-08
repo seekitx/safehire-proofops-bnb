@@ -271,9 +271,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     application = await build_application(Settings())
     app.state.application = application
     followup_task = None
+    supply_task = None
     if os.getenv('SAFEHIRE_FOLLOWUP_ENABLED', 'false').lower() == 'true':
         import asyncio
         followup_task = asyncio.create_task(run_followup(workspace_journal, PROJECT_ROOT))
+        from proofops.workspace.supply import run as run_supply
+        supply_task = asyncio.create_task(run_supply(PROJECT_ROOT, workspace_journal))
     app.state.followup_task = followup_task
     try:
         yield
@@ -283,6 +286,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             followup_task.cancel()
             try:
                 await followup_task
+            except asyncio.CancelledError:
+                pass
+        if supply_task:
+            supply_task.cancel()
+            try:
+                await supply_task
             except asyncio.CancelledError:
                 pass
         await application.close()
@@ -1468,7 +1477,7 @@ async def proof_page() -> FileResponse:
 
 @app.get("/workspace", include_in_schema=False)
 async def workspace_page() -> FileResponse:
-    return FileResponse(WEB_ROOT / "workspace.html")
+    return FileResponse(WEB_ROOT / "workspace.html", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/hire-live", include_in_schema=False)

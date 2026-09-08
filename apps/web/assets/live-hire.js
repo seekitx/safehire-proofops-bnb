@@ -394,6 +394,7 @@ function updateReceipt(title = "Job activity") {
     job_id: state.jobId,
     task_input: state.plan?.task_input,
     transactions: state.results,
+    journey: journeyEvent("receipt_viewed"),
     agent_notification: state.notifyResult,
     delivery: state.delivery,
     observed_at: new Date().toISOString(),
@@ -406,6 +407,7 @@ function updateReceipt(title = "Job activity") {
 }
 
 async function prepareHire() {
+  journeyEvent("prepare_requested");
   if (!state.owner || !state.quotePayload || !state.writeEnabled) return;
   if (state.quotePayload.agent?.requires_arena && !state.arenaTask) {
     return toast('This LP service requires a frozen LP range task. Open Arena, select LP ranges and carry the saved task here.', true);
@@ -480,9 +482,14 @@ async function sendNext() {
       tx_hash: txHash,
       block_number: Number.parseInt(receipt.blockNumber, 16),
     });
+    journeyEvent("transaction_confirmed",{step:transaction.step,tx_hash:txHash,gas_used_raw:receipt.gasUsed,effective_gas_price_raw:receipt.effectiveGasPrice});
     setStep(transaction.step, "done", `Confirmed · ${short(txHash)}`);
     if (transaction.step === "create_job") {
       state.jobId = extractJobId(receipt);
+      try {
+        const pending=JSON.parse(localStorage.getItem('safehire-hire-journey-v1:draft')||'null');
+        if(pending){pending.job_id=state.jobId;localStorage.setItem('safehire-hire-journey-v1:'+state.jobId,JSON.stringify(pending));localStorage.removeItem('safehire-hire-journey-v1:draft');}
+      } catch (_) { /* Never block chain recovery on browser storage. */ }
       persistJob();
       byId("jobBadge").textContent = `JOB #${state.jobId}`;
       const followup = await api("/api/live-hire/followup-plan", {
@@ -645,6 +652,7 @@ async function inspectDelivery() {
   if (!state.jobId) return;
   const delivery = await api(`/api/live-hire/delivery/${state.jobId}`);
   renderDelivery(delivery);
+  journeyEvent("delivery_checked",{job_id:state.jobId,arithmetic_acceptance:delivery.acceptance?.passed??null});
   const settlement = delivery.settlement || {};
   if (settlement.can_dispute) {
     byId("disputeJob").disabled = false;
@@ -811,3 +819,16 @@ if (window.ethereum?.on) {
 Promise.all([loadRuntime(), loadQuote()]).catch((error) => {
   toast(`Live hire initialization failed: ${error.message}`, true);
 });
+
+// Client timestamps are an audit aid, not trusted chain time or an efficiency claim.
+function journeyEvent(stage, detail = {}) {
+  try {
+    const job=state.jobId||Number(new URLSearchParams(location.search).get('job_id'))||null;
+    const key='safehire-hire-journey-v1:'+String(job||'draft');
+    let value=JSON.parse(localStorage.getItem(key)||'null');
+    if(!value || (value.job_id && value.job_id!==job) || (!job && (value.agent_token_id!==state.agentTokenId || Date.now()-Date.parse(value.started_at)>86400000))) value={schema:'safehire-hire-journey/1',started_at:new Date().toISOString(),job_id:job,agent_token_id:state.agentTokenId,events:[],timing_basis:'client_reported_wall_clock',coverage:job?'recovered_order_partial':'hire_page_to_delivery',independent_verification:false};
+    value.events.push({stage,at:new Date().toISOString(),...detail});value.events=value.events.slice(-100);
+    localStorage.setItem(key,JSON.stringify(value));return value;
+  } catch (_) { return {recording_unavailable:true}; }
+}
+journeyEvent('page_opened');

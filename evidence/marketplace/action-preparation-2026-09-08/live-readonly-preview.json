@@ -1,0 +1,854 @@
+{
+  "evidence_mode": "live_readonly_development_preview",
+  "boundary": "Public chain reads and eth_call only; generated before final review refinements. Not a trade, user adoption or final candidate certification.",
+  "results": {
+    "yield": {
+      "schema": "safehire-action-preparation/1",
+      "kind": "yield",
+      "prepared_at": "2026-09-08T09:24:59.988265+00:00",
+      "assumptions": {
+        "collateral_drop_pct": 20,
+        "debt_rise_pct": 10,
+        "half_width_ticks": 600,
+        "simulate_lp_exit": true,
+        "slippage_bps": 50,
+        "levels": 10,
+        "capital": 1000,
+        "gas_per_order": 0.2,
+        "transfer_tax_bps": 0,
+        "venue": "venus-core-usdt",
+        "amount": null
+      },
+      "trade_executed": false,
+      "wallet_authorized": false,
+      "ready_to_send": false,
+      "drafts": [],
+      "blockers": [
+        "Individual withdrawal and wallet balances not verified",
+        "Stablecoin conversion quote, fees and approvals not prepared"
+      ],
+      "steps": [
+        "核对自己的可退出余额和抵押约束",
+        "取得实际换币报价与总成本",
+        "重新比较不操作收益",
+        "本人确认退出、换币和存入",
+        "读取前后余额并核验回执"
+      ],
+      "observation": {
+        "schema_version": "safehire-venus-observation/1",
+        "chain_id": 56,
+        "block_number": 120661850,
+        "block_hash": "0xbcbae44cdf043eaebd05b3f5449bcab77a1c3dd96ad060be8316d74b7a314d66",
+        "block_timestamp": 1788859494,
+        "observed_at": "2026-09-08T09:25:00.460880+00:00",
+        "account": null,
+        "markets": [
+          {
+            "venue_id": "venus-core-usdt",
+            "vtoken": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "underlying": "0x55d398326f99059ff775485246999027b3197955",
+            "underlying_decimals": 18,
+            "supply_rate_per_block_raw": "400330707",
+            "projected_supply_apy_pct": "2.84513199",
+            "accrual_block_number": 120661849
+          },
+          {
+            "venue_id": "venus-core-usdc",
+            "vtoken": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+            "underlying": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+            "underlying_decimals": 18,
+            "supply_rate_per_block_raw": "288300027",
+            "projected_supply_apy_pct": "2.04089790",
+            "accrual_block_number": 120661228
+          }
+        ],
+        "raw_reads": [
+          {
+            "to": "0x55d398326f99059ff775485246999027b3197955",
+            "function": "decimals()",
+            "calldata": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          },
+          {
+            "to": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+            "function": "decimals()",
+            "calldata": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          },
+          {
+            "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+            "function": "comptroller()",
+            "calldata": "0x5fe3b567",
+            "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+          },
+          {
+            "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+            "function": "accrualBlockNumber()",
+            "calldata": "0x6c540baf",
+            "result": "0x00000000000000000000000000000000000000000000000000000000073124ec"
+          },
+          {
+            "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+            "function": "underlying()",
+            "calldata": "0x6f307dc3",
+            "result": "0x0000000000000000000000008ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+          },
+          {
+            "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+            "function": "supplyRatePerBlock()",
+            "calldata": "0xae9d70b0",
+            "result": "0x00000000000000000000000000000000000000000000000000000000112f1bfb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "comptroller()",
+            "calldata": "0x5fe3b567",
+            "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "accrualBlockNumber()",
+            "calldata": "0x6c540baf",
+            "result": "0x0000000000000000000000000000000000000000000000000000000007312759"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "underlying()",
+            "calldata": "0x6f307dc3",
+            "result": "0x00000000000000000000000055d398326f99059ff775485246999027b3197955"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "supplyRatePerBlock()",
+            "calldata": "0xae9d70b0",
+            "result": "0x0000000000000000000000000000000000000000000000000000000017dc8fd300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "annualization": {
+          "method": "daily_compounding_constant_spot_rate_365_days",
+          "window_blocks": 1200,
+          "window_seconds": 540,
+          "window_start_block": 120660650,
+          "window_start_hash": "0x55321863cf64cbcf53db392d34e9d822575636a56534c75d3592fb69335a02c9",
+          "rewards_included": false,
+          "forecast_not_guarantee": true
+        },
+        "scope": "Two reviewed Venus core markets only; NOT a complete account portfolio",
+        "financial_inputs_authenticated": false,
+        "settlement_authorized": false,
+        "trust_boundary": "Single trusted RPC observation, not a consensus proof. Stored balances and rate inputs may lag interest accrual. No USD price, withdrawal capacity, gas, tax, complete debt or liquidation safety certified. Token depeg and conversion risks are not priced.",
+        "observation_hash": "1f0115e82114e974794ed78616e60c1ab812dec40da37ac038309dfd8a7ea8d2"
+      },
+      "capacity": {
+        "markets": [
+          {
+            "venue_id": "venus-core-usdt",
+            "cash_token_units": "60358563.777007656368654772",
+            "supply_room_token_units": "405301283.305847104460496437",
+            "supply_cap_raw": "600000000000000000000000000",
+            "mint_paused": false,
+            "redeem_paused": false,
+            "account_withdrawal_verified": false
+          },
+          {
+            "venue_id": "venus-core-usdc",
+            "cash_token_units": "21152133.325585067386528156",
+            "supply_room_token_units": "128964707.469411115998499112",
+            "supply_cap_raw": "180000000000000000000000000",
+            "mint_paused": false,
+            "redeem_paused": false,
+            "account_withdrawal_verified": false
+          }
+        ],
+        "block_number": 120661850,
+        "block_hash": "0xbcbae44cdf043eaebd05b3f5449bcab77a1c3dd96ad060be8316d74b7a314d66",
+        "raw_reads": [
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0x425fad58"
+            },
+            "function": "protocolPaused()",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0xe85a2960000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc02550000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "function": "actionPaused(address,uint8)",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+              "data": "0x8f840ddd"
+            },
+            "function": "totalReserves()",
+            "result": "0x00000000000000000000000000000000000000000000000d4df6ebd2340b52a0"
+          },
+          {
+            "transaction": {
+              "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+              "data": "0x3b1d21a2"
+            },
+            "function": "getCash()",
+            "result": "0x00000000000000000000000000000000000000000031ed6c4c7b53d8f248c9b400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+              "data": "0x47bd3718"
+            },
+            "function": "totalBorrows()",
+            "result": "0x0000000000000000000000000000000000000000006f1faf9637d067e6236ab7"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0x02c3bcbb000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc0255"
+            },
+            "function": "supplyCaps(address)",
+            "result": "0x000000000000000000000000000000000000000001f04ef12cb04cf158000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0xe85a2960000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc02550000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "function": "actionPaused(address,uint8)",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+              "data": "0x3b1d21a2"
+            },
+            "function": "getCash()",
+            "result": "0x000000000000000000000000000000000000000000117f2371f99e3528b2e19c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+              "data": "0x47bd3718"
+            },
+            "function": "totalBorrows()",
+            "result": "0x00000000000000000000000000000000000000000018b8034b59e527d21d0251"
+          },
+          {
+            "transaction": {
+              "to": "0xeca88125a5adbe82614ffc12d0db554e2e2867c8",
+              "data": "0x8f840ddd"
+            },
+            "function": "totalReserves()",
+            "result": "0x000000000000000000000000000000000000000000000001fce081462931b515"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0xe85a2960000000000000000000000000eca88125a5adbe82614ffc12d0db554e2e2867c80000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "function": "actionPaused(address,uint8)",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0x02c3bcbb000000000000000000000000eca88125a5adbe82614ffc12d0db554e2e2867c8"
+            },
+            "function": "supplyCaps(address)",
+            "result": "0x00000000000000000000000000000000000000000094e47b8d68171534000000"
+          },
+          {
+            "transaction": {
+              "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+              "data": "0xe85a2960000000000000000000000000eca88125a5adbe82614ffc12d0db554e2e2867c80000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "function": "actionPaused(address,uint8)",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "boundary": "Current protocol cash and supply headroom, not a reserved allocation. Core cap zero means no supply. Individual collateral constraints and transfer fees still apply."
+      },
+      "metrics": {
+        "alternatives": [
+          {
+            "venue": "venus-core-usdt",
+            "apy_pct": "2.8451319900",
+            "projected_net_usd": "23.08476698651028737111899000",
+            "increment_vs_hold_usd": "0E-26"
+          },
+          {
+            "venue": "venus-core-usdc",
+            "apy_pct": "2.040897900",
+            "projected_net_usd": "15.61941694458535392076637000",
+            "increment_vs_hold_usd": "-7.46535004192493345035262000"
+          }
+        ],
+        "best_under_assumptions": "venus-core-usdt",
+        "triggered": false,
+        "current_venue": "venus-core-usdt",
+        "capacity": null,
+        "exit_liquidity": null,
+        "withdrawal_delay": null,
+        "migration_ready": false,
+        "trade_executed": false,
+        "boundary": "Hypothetical capital, horizon and migration cost; constant APY and stablecoin parity assumptions. Capacity and exits are unknown; do not migrate automatically."
+      },
+      "summary": "保留现有去处更合适",
+      "break_even_days_linear_estimate": null,
+      "boundary": "Fresh public observations plus explicit caller assumptions. Drafts are not signed, broadcast, complete strategy execution, or profit evidence. Re-read after any prerequisite; drafts expire with the snapshot.",
+      "valid_until": 1788859560,
+      "plan_hash": "5f15653fc476029fa890e8a36a726ceced4400618a2f4613156f41588b6fb1c8"
+    },
+    "lp": {
+      "schema": "safehire-action-preparation/1",
+      "kind": "lp",
+      "prepared_at": "2026-09-08T09:25:00.712645+00:00",
+      "assumptions": {
+        "collateral_drop_pct": 20,
+        "debt_rise_pct": 10,
+        "half_width_ticks": 600,
+        "simulate_lp_exit": true,
+        "slippage_bps": 50,
+        "levels": 10,
+        "capital": 1000,
+        "gas_per_order": 0.2,
+        "transfer_tax_bps": 0,
+        "venue": "venus-core-usdt",
+        "amount": null
+      },
+      "trade_executed": false,
+      "wallet_authorized": false,
+      "ready_to_send": false,
+      "drafts": [
+        {
+          "label": "移出原仓位流动性并领取到原持有人；这一步尚未新建仓位",
+          "chain_id": 56,
+          "from": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b",
+          "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+          "data": "0xac9650d8000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000000a40c49ccbe00000000000000000000000000000000000000000000000000000000006faf33000000000000000000000000000000000000000000000000048a3dec2bed7469000000000000000000000000000000000000000000000000088f4c1cd92c10cd0000000000000000000000000000000000000000000000000001395f711905eb000000000000000000000000000000000000000000000000000000006a9fd6c5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084fc6f786500000000000000000000000000000000000000000000000000000000006faf3300000000000000000000000020f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000",
+          "value": "0x0",
+          "ready_to_send": false,
+          "requires": [
+            "Wallet owner consent",
+            "Fresh simulation after prerequisites",
+            "Explicit wallet signature"
+          ]
+        }
+      ],
+      "blockers": [
+        "Target mint and any inventory-balancing swap require fresh quotes after withdrawal",
+        "Wallet ownership consent and total gas cost are not verified"
+      ],
+      "steps": [
+        "核对原仓位与目标区间",
+        "先模拟移出流动性并领取到原持有人",
+        "按实际到账余额取得换币与新仓位报价",
+        "本人确认精确授权及新建仓位",
+        "核查新仓位、剩余资产和费用"
+      ],
+      "observation": {
+        "schema_version": "safehire-lp-observation/1",
+        "chain_id": 56,
+        "block_number": 120661851,
+        "block_hash": "0xd3c0b1250bdca0bd3ab7294eadfcb7c449f077831902fad3e19638103e19b48e",
+        "block_timestamp": 1788859494,
+        "observed_at": "2026-09-08T09:25:01.101167+00:00",
+        "position_id": 7319347,
+        "owner": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b",
+        "manager": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+        "factory": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+        "pool": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+        "token0": "0x55d398326f99059ff775485246999027b3197955",
+        "token1": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+        "fee": 500,
+        "current_tick": -66260,
+        "lower_tick": -66850,
+        "upper_tick": -64830,
+        "tick_spacing": 10,
+        "liquidity_raw": "327142007496340585",
+        "token0_decimals": 18,
+        "token1_decimals": 18,
+        "in_range": true,
+        "raw_reads": [
+          {
+            "to": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+            "function": "getPool(address,address,uint24)",
+            "calldata": "0x1698ee8200000000000000000000000055d398326f99059ff775485246999027b3197955000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000000000000000001f4",
+            "result": "0x00000000000000000000000036696169c63e42cd08ce11f5deebbcebae652050"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "token0()",
+            "calldata": "0x0dfe1681",
+            "result": "0x00000000000000000000000055d398326f99059ff775485246999027b3197955"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "slot0()",
+            "calldata": "0x3850c7bd",
+            "result": "0x000000000000000000000000000000000000000009525b42a41a05ad7696b600fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffefd2c00000000000000000000000000000000000000000000000000000000000001f000000000000000000000000000000000000000000000000000000000000003840000000000000000000000000000000000000000000000000000000000000384000000000000000000000000000000000000000000000000000000000d480d480000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "factory()",
+            "calldata": "0xc45a0155",
+            "result": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "tickSpacing()",
+            "calldata": "0xd0c93a7c",
+            "result": "0x000000000000000000000000000000000000000000000000000000000000000a"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "token1()",
+            "calldata": "0xd21220a7",
+            "result": "0x000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "fee()",
+            "calldata": "0xddca3f43",
+            "result": "0x00000000000000000000000000000000000000000000000000000000000001f4"
+          },
+          {
+            "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+            "function": "ownerOf(uint256)",
+            "calldata": "0x6352211e00000000000000000000000000000000000000000000000000000000006faf33",
+            "result": "0x00000000000000000000000020f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b"
+          },
+          {
+            "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+            "function": "positions(uint256)",
+            "calldata": "0x99fbab8800000000000000000000000000000000000000000000000000000000006faf33",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055d398326f99059ff775485246999027b3197955000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000000000000000001f4fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffefadeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02c2000000000000000000000000000000000000000000000000048a3dec2bed746900000000000000000000000000000000826bc0606821e7b13a7e00d31e98c89d000000000000000000000000000000000042c687f1a5961e01ad3ae4446911b700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+            "function": "factory()",
+            "calldata": "0xc45a0155",
+            "result": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+          },
+          {
+            "to": "0x55d398326f99059ff775485246999027b3197955",
+            "function": "decimals()",
+            "calldata": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          },
+          {
+            "to": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+            "function": "decimals()",
+            "calldata": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          }
+        ],
+        "ownership_by_caller_verified": false,
+        "financial_inputs_authenticated": false,
+        "settlement_authorized": false,
+        "trust_boundary": "Single trusted RPC observation. Owner is public chain data, not caller authentication. No gas, slippage, profit, fee income or permission to rebalance is certified.",
+        "observation_hash": "54f6da293e2315a96bad45c96a0a09f9a7fedfe4e29a10cb885b6e6a321e1427"
+      },
+      "summary": "仓位仍在区间内，先核对调整是否值得",
+      "metrics": {
+        "old_inventory": {
+          "token0": "0.61991703315116912328816612755374699875269999985923447245295",
+          "token1": "0.0003462590688150636069950360211303036606330617797056685234098",
+          "basis": "fixed_liquidity_theoretical_inventory_not_mint_quote"
+        },
+        "new_inventory_same_liquidity": {
+          "token0": "0.265511741030610522070933615448932331763138799873873310069791",
+          "token1": "0.000352040286361156617112500153683860422108275699343703805192603",
+          "basis": "fixed_liquidity_theoretical_inventory_not_mint_quote"
+        },
+        "target_lower_tick": -66860,
+        "target_upper_tick": -65660,
+        "inventory_delta": {
+          "token0": "-0.3544052921205586012172325121",
+          "token1": "0.000005781217546093010117464132554"
+        }
+      },
+      "simulation": {
+        "passed": true,
+        "method": "eth_call",
+        "deadline": 1788860101,
+        "principal_minimum_raw": [
+          "616795360759386317",
+          "344557058852331"
+        ],
+        "collect_raw": [
+          "621862987926574394",
+          "348858634169431"
+        ],
+        "transaction_sent": false
+      },
+      "preflight_reads": [
+        {
+          "transaction": {
+            "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+            "data": "0x0c49ccbe00000000000000000000000000000000000000000000000000000000006faf33000000000000000000000000000000000000000000000000048a3dec2bed746900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006a9fd6c5",
+            "from": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b"
+          },
+          "function": "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))",
+          "result": "0x000000000000000000000000000000000000000000000000089a4f116a58069900000000000000000000000000000000000000000000000000013af2931d0217"
+        },
+        {
+          "transaction": {
+            "to": "0x46a15b0b27311cedf172ab29e4f4766fbe7f4364",
+            "data": "0xac9650d8000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000000a40c49ccbe00000000000000000000000000000000000000000000000000000000006faf33000000000000000000000000000000000000000000000000048a3dec2bed7469000000000000000000000000000000000000000000000000088f4c1cd92c10cd0000000000000000000000000000000000000000000000000001395f711905eb000000000000000000000000000000000000000000000000000000006a9fd6c5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084fc6f786500000000000000000000000000000000000000000000000000000000006faf3300000000000000000000000020f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000",
+            "from": "0x20f1ca5d1e5a3ee94c29dbf95e6bf6cea6a8d64b"
+          },
+          "function": "multicall(bytes[])",
+          "result": "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000089a4f116a58069900000000000000000000000000000000000000000000000000013af2931d0217000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000008a14d17be53953a00000000000000000000000000000000000000000000000000013d48faf76c57"
+        }
+      ],
+      "boundary": "Fresh public observations plus explicit caller assumptions. Drafts are not signed, broadcast, complete strategy execution, or profit evidence. Re-read after any prerequisite; drafts expire with the snapshot.",
+      "valid_until": 1788859561,
+      "plan_hash": "3ab2c09d27aecb2331a6be330f2b20cc82ce688379e2a52a2571fb6bcd6a8c0d"
+    },
+    "health": {
+      "schema": "safehire-action-preparation/1",
+      "kind": "health",
+      "prepared_at": "2026-09-08T09:25:01.211381+00:00",
+      "assumptions": {
+        "collateral_drop_pct": 20,
+        "debt_rise_pct": 10,
+        "half_width_ticks": 600,
+        "simulate_lp_exit": true,
+        "slippage_bps": 50,
+        "levels": 10,
+        "capital": 1000,
+        "gas_per_order": 0.2,
+        "transfer_tax_bps": 0,
+        "venue": "venus-core-usdt",
+        "amount": null
+      },
+      "trade_executed": false,
+      "wallet_authorized": false,
+      "ready_to_send": false,
+      "drafts": [],
+      "blockers": [
+        "Choose an actual debt token and amount before preparing repayment calldata"
+      ],
+      "steps": [
+        "确认这是自己可操作的账户",
+        "选择实际债务资产和外部偿还金额",
+        "核查余额与精确授权",
+        "本人签名偿还",
+        "重新读取健康系数，不能只看交易成功"
+      ],
+      "observation": {
+        "schema_version": "safehire-venus-health/1",
+        "chain_id": 56,
+        "account": "0xd319e1F8e987cf78333cEA853F455366640929cF",
+        "block_number": 120661853,
+        "block_hash": "0xc4d4d0a8a4d24652fa8effda94062ae6d835d16084ef28afb5b37ca05b2437c5",
+        "block_timestamp": 1788859495,
+        "observed_at": "2026-09-08T09:25:01.599427+00:00",
+        "markets": [
+          {
+            "market": "0xf841cb62c19fcd4ff5cd0aab5939f3140baac3ea",
+            "supplied_usd": "7076843.968970916683102168371",
+            "borrowed_usd": "0",
+            "liquidation_threshold": "0.75"
+          },
+          {
+            "market": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "supplied_usd": "0",
+            "borrowed_usd": "2360391.405182785786176545727",
+            "liquidation_threshold": "0.8"
+          }
+        ],
+        "collateral_usd": "7076843.968970916683102168371",
+        "debt_usd": "2360391.405182785786176545727",
+        "weighted_collateral_usd": "5307632.976728187512326626278",
+        "health_factor": "2.248624090510603681056500656",
+        "status": "no_shortfall",
+        "protocol_net_liquidity_usd": "2947241.571545401726150081",
+        "cross_check_difference_usd": "4.49E-19",
+        "raw_reads": [
+          {
+            "to": "0x6592b5de802159f3e74b2486b091d11a8256ab8a",
+            "function": "getUnderlyingPrice(address)",
+            "calldata": "0xfc57d4df000000000000000000000000f841cb62c19fcd4ff5cd0aab5939f3140baac3ea",
+            "result": "0x0000000000000000000000000000000000000000000010a6a0a6cb7228050acf"
+          },
+          {
+            "to": "0x6592b5de802159f3e74b2486b091d11a8256ab8a",
+            "function": "getUnderlyingPrice(address)",
+            "calldata": "0xfc57d4df000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc0255",
+            "result": "0x0000000000000000000000000000000000000000000000000ddfa5da75f54000"
+          },
+          {
+            "to": "0xf841cb62c19fcd4ff5cd0aab5939f3140baac3ea",
+            "function": "comptroller()",
+            "calldata": "0x5fe3b567",
+            "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+          },
+          {
+            "to": "0xf841cb62c19fcd4ff5cd0aab5939f3140baac3ea",
+            "function": "getAccountSnapshot(address)",
+            "calldata": "0xc37f68e2000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000021818420a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000205529358312e8bb4c38d8dd"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "mintedVAIs(address)",
+            "calldata": "0x2bc7e29e000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "getAccountLiquidity(address)",
+            "calldata": "0x5ec88c79000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002701a4925f57623e925c10000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "userPoolId(address)",
+            "calldata": "0x73769099000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "oracle()",
+            "calldata": "0x7dc0d1d0",
+            "result": "0x0000000000000000000000006592b5de802159f3e74b2486b091d11a8256ab8a"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "markets(address)",
+            "calldata": "0x8e8f294b000000000000000000000000f841cb62c19fcd4ff5cd0aab5939f3140baac3ea",
+            "result": "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000a688906bd8b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a688906bd8b00000000000000000000000000000000000000000000000000000f43fc2c04ee000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "markets(address)",
+            "calldata": "0x8e8f294b000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc0255",
+            "result": "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000b1a2bc2ec50000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000b1a2bc2ec5000000000000000000000000000000000000000000000000000000f43fc2c04ee000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "to": "0xfd36e2c2a6789db23113685031d7f16329158384",
+            "function": "getAssetsIn(address)",
+            "calldata": "0xabfceffc000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000f841cb62c19fcd4ff5cd0aab5939f3140baac3ea000000000000000000000000fd5840cd36d94d7229439859c0112a4185bc0255"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "comptroller()",
+            "calldata": "0x5fe3b567",
+            "result": "0x000000000000000000000000fd36e2c2a6789db23113685031d7f16329158384"
+          },
+          {
+            "to": "0xfd5840cd36d94d7229439859c0112a4185bc0255",
+            "function": "getAccountSnapshot(address)",
+            "calldata": "0xc37f68e2000000000000000000000000d319e1f8e987cf78333cea853f455366640929cf",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f3fb791de9ee53409d1d000000000000000000000000000000000000000000db0a260281e0d242d2f39600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "trade_executed": false,
+        "settlement_authorized": false,
+        "boundary": "Venus core entered markets at one block, cross-checked against getAccountLiquidity. Stored interest and oracle prices can lag. Other pools and protocols are excluded. This is a point-in-time observation, not continuous protection or proof of account ownership.",
+        "observation_hash": "146c826a08b391df101c79f953c694558d1bf3899a8f5d012b477a80a07f5981"
+      },
+      "metrics": {
+        "current_health_factor": "2.248624090510603681056500656",
+        "stressed_health_factor": "1.635362974916802677132000477",
+        "required_external_repay_usd": "0.00",
+        "target": 1.5,
+        "collateral_drop_pct": 20,
+        "debt_price_rise_pct": 10,
+        "assumptions": "Uniform caller-selected price shocks; externally funded repayment. No probability or guarantee."
+      },
+      "summary": "已计算压力情景和偿还准备条件",
+      "boundary": "Fresh public observations plus explicit caller assumptions. Drafts are not signed, broadcast, complete strategy execution, or profit evidence. Re-read after any prerequisite; drafts expire with the snapshot.",
+      "valid_until": 1788859561,
+      "plan_hash": "e7106d40102ee0d62a3ccb21742a438ae29ea3268c8d4b3a5f97874c2d2475d8"
+    },
+    "grid": {
+      "schema": "safehire-action-preparation/1",
+      "kind": "grid",
+      "prepared_at": "2026-09-08T09:25:01.599921+00:00",
+      "assumptions": {
+        "collateral_drop_pct": 20,
+        "debt_rise_pct": 10,
+        "half_width_ticks": 600,
+        "simulate_lp_exit": true,
+        "slippage_bps": 50,
+        "levels": 10,
+        "capital": 1000,
+        "gas_per_order": 0.2,
+        "transfer_tax_bps": 0,
+        "venue": "venus-core-usdt",
+        "amount": null
+      },
+      "trade_executed": false,
+      "wallet_authorized": false,
+      "ready_to_send": false,
+      "drafts": [],
+      "blockers": [
+        "No reviewed automated grid order executor",
+        "Actual per-order quotes, wallet inventory and gas still need checking"
+      ],
+      "steps": [
+        "检查参考市场价与范围",
+        "检查每档金额和双边费用",
+        "取得真实订单报价与执行授权",
+        "跟踪实际成交与库存",
+        "越界时停止新订单，撤销已挂订单需要执行器确认"
+      ],
+      "observation": {
+        "chain_id": 56,
+        "block_number": 120661853,
+        "block_hash": "0xc4d4d0a8a4d24652fa8effda94062ae6d835d16084ef28afb5b37ca05b2437c5",
+        "observed_at": "2026-09-08T09:25:01.845673+00:00",
+        "pool": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+        "pair": "WBNB/USDT",
+        "price_usdt_per_wbnb": "754.2046727900390500730064319",
+        "raw_reads": [
+          {
+            "to": "0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865",
+            "function": "getPool(address,address,uint24)",
+            "data": "0x1698ee8200000000000000000000000055d398326f99059ff775485246999027b3197955000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000000000000000001f4",
+            "result": "0x00000000000000000000000036696169c63e42cd08ce11f5deebbcebae652050"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "token0()",
+            "data": "0x0dfe1681",
+            "result": "0x00000000000000000000000055d398326f99059ff775485246999027b3197955"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "slot0()",
+            "data": "0x3850c7bd",
+            "result": "0x000000000000000000000000000000000000000009525b42a41a05ad7696b600fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffefd2c00000000000000000000000000000000000000000000000000000000000001f000000000000000000000000000000000000000000000000000000000000003840000000000000000000000000000000000000000000000000000000000000384000000000000000000000000000000000000000000000000000000000d480d480000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "factory()",
+            "data": "0xc45a0155",
+            "result": "0x0000000000000000000000000bfbcf9fa4f9c56b0f40a671ad40e0805a091865"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "token1()",
+            "data": "0xd21220a7",
+            "result": "0x000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+          },
+          {
+            "to": "0x36696169c63e42cd08ce11f5deebbcebae652050",
+            "function": "fee()",
+            "data": "0xddca3f43",
+            "result": "0x00000000000000000000000000000000000000000000000000000000000001f4"
+          },
+          {
+            "to": "0x55d398326f99059ff775485246999027b3197955",
+            "function": "decimals()",
+            "data": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          },
+          {
+            "to": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+            "function": "decimals()",
+            "data": "0x313ce567",
+            "result": "0x0000000000000000000000000000000000000000000000000000000000000012"
+          }
+        ],
+        "trade_executed": false,
+        "boundary": "Spot price in one fixed pool, not USD fair value, TWAP, oracle or executable quote. USDT may depeg; no trade or automatic stop loss.",
+        "observation_hash": "8a29022aace9fdd993a76043882e31db291a544b04e1df2f786fdde534066981"
+      },
+      "metrics": {
+        "prices": [
+          700.0,
+          710.4632033827028,
+          721.0828048011596,
+          731.8611420045943,
+          742.8005876855817,
+          753.9035500023608,
+          765.1724731089556,
+          776.6098376932194,
+          788.2181615229223,
+          800.0
+        ],
+        "capital_per_level_usd": 100.0,
+        "net_adjacent_cycle_usd": -0.015591992029846952,
+        "cycle_cost_usd": 1.5103353324159594,
+        "break_even_ratio": 1.0151050779286073,
+        "cycle_model": "one_fully_filled_adjacent_cycle",
+        "fills_observed": 0,
+        "inventory_and_gap_risk_included": false
+      },
+      "summary": "假设成本下单次价差不足，应停止这份计划",
+      "fee_source": "Reviewed fixed PancakeSwap pool fee 500 / 1e6 = 5 bps per swap",
+      "plan_levels": [
+        {
+          "index": 1,
+          "price_usdt": 700.0,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 2,
+          "price_usdt": 710.4632033827028,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 3,
+          "price_usdt": 721.0828048011596,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 4,
+          "price_usdt": 731.8611420045943,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 5,
+          "price_usdt": 742.8005876855817,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 6,
+          "price_usdt": 753.9035500023608,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 7,
+          "price_usdt": 765.1724731089556,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 8,
+          "price_usdt": 776.6098376932194,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 9,
+          "price_usdt": 788.2181615229223,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        },
+        {
+          "index": 10,
+          "price_usdt": 800.0,
+          "allocated_usd": 100.0,
+          "state": "unsubmitted_plan"
+        }
+      ],
+      "boundary": "Fresh public observations plus explicit caller assumptions. Drafts are not signed, broadcast, complete strategy execution, or profit evidence. Re-read after any prerequisite; drafts expire with the snapshot.",
+      "valid_until": 1788859561,
+      "plan_hash": "eb034620900b7201f2b8b38339bbf8a577bea9e9a8ae4c9e3bf7cfe5ffdebe58"
+    }
+  }
+}

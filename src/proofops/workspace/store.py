@@ -140,3 +140,44 @@ class Journal:
             # Explicit retention bound; downloadable evidence states the limit.
             db.execute('DELETE FROM events WHERE watch=? AND seq NOT IN (SELECT seq FROM events WHERE watch=? ORDER BY seq DESC LIMIT 300)', (watch, watch))
             db.execute('COMMIT')
+
+    def watch(self, space: str, watch: str) -> dict[str, Any]:
+        rows = self.list(space)
+        row = next((r for r in rows if r['id'] == watch), None)
+        if row is None:
+            raise LookupError('Watch not found')
+        return row
+
+    def resume(self, space: str, watch: str) -> None:
+        now = time.time()
+        with self.db() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT kind,state FROM watches WHERE id=? AND space=?', (watch, space)).fetchone()
+            if not row:
+                raise LookupError('Watch not found')
+            if row['kind'] == 'order' and row['state'] in {'completed', 'rejected'}:
+                raise ValueError('Terminal order cannot be resumed')
+            ttl = 864000 if row['kind'] == 'order' else 86400
+            db.execute('UPDATE watches SET active=1,expires=?,due=? WHERE id=?', (now+ttl, now, watch))
+            db.execute("INSERT INTO events(watch,at,kind,data) VALUES(?,?,'resumed',?)", (watch, now, json.dumps({'expires':now+ttl,'chain_deadline_changed':False})))
+            db.execute('COMMIT')
+
+    def save_action(self, space: str, watch: str, value: dict[str, Any]) -> None:
+        with self.db() as db:
+            db.execute('BEGIN IMMEDIATE')
+            if not db.execute('SELECT 1 FROM watches WHERE id=? AND space=?', (watch, space)).fetchone():
+                raise LookupError('Watch not found')
+            if db.execute("SELECT count(*) FROM events WHERE watch=? AND kind='action_plan'", (watch,)).fetchone()[0] >= 20:
+                raise ValueError('Action preparation limit reached for this watch')
+            db.execute("INSERT INTO events(watch,at,kind,data) VALUES(?,?,'action_plan',?)", (watch,time.time(),json.dumps(value,allow_nan=False)))
+            db.execute('COMMIT')
+
+    def save_provider_probe(self, token: int, value: dict[str, Any]) -> None:
+        with self.db() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS provider_probes(token INTEGER PRIMARY KEY,data TEXT)')
+            db.execute('INSERT INTO provider_probes VALUES(?,?) ON CONFLICT(token) DO UPDATE SET data=excluded.data', (token,json.dumps(value,allow_nan=False)))
+
+    def provider_probes(self) -> dict[int, dict[str, Any]]:
+        with self.db() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS provider_probes(token INTEGER PRIMARY KEY,data TEXT)')
+            return {r['token']:json.loads(r['data']) for r in db.execute('SELECT token,data FROM provider_probes')}

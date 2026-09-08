@@ -79,7 +79,7 @@ a fabricated green status.
 
 ## Current live and on-chain evidence
 
-- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. No automatic trading or external push.
+- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. Includes fresh supplier quote probes and four-category action preparation with bounded unsigned drafts and read-only simulation. No automatic trading or external push. See [scope and security review](docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md).
 - ChainHelix #269224 delivered paid mainnet Job #56741 (0.5 U). Signed task, raw manifest and grid arithmetic were independently checked on GreenCloud. This was purchased on the supplier site; it is submitted delivery, not final settlement or a newly measured SafeHire purchase.
 
 - Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,

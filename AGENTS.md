@@ -193,3 +193,7 @@ and authenticated identity only through the pending gates in the V2 construction
 New runtime: `src/proofops/workspace/`, `/workspace`, `SAFEHIRE_FOLLOWUP_ENABLED`, persistent `SAFEHIRE_FOLLOWUP_DB`. Read `docs/SERVICE_WORKSPACE_RELEASE_2026-09-08.zh-CN.md` before changes. Follow-up never signs or pays. Alerts are private in-app records, not phone delivery. Keep ChainHelix 0.5 U scoped to reviewed #269224/wallet; preserve legacy 0.1 U jobs. Job #56741 has a verified SUBMITTED calculation delivery from the supplier purchase page, not final settlement or proof of the new in-app purchase journey.
 
 All research reports belong in tracked `docs/` or `docs/research/`, never in ignored runtime data. Preserve private raw identity and recovery credentials. `config/human-study-provenance.json` holds eligibility claims pending review of AI-assistance provenance; do not drop this hold during report regeneration.
+
+## 2026-09-08 action preparation overlay
+
+Read `docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md` for scoped unsigned drafts, fresh supply probes and security review. Action preparation never broadcasts; LP exit simulation is not a full rebalance. Preserve manual-study provenance holds and recovered-run timing labels.

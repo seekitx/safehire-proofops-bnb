@@ -8,6 +8,8 @@ let agentRaw = null;
 let manualRaw = null;
 let packet = null;
 let toastTimer = null;
+let recoveredTiming = false;
+const draftKey = 'safehire-manual-draft-v1';
 const uiTest = new URLSearchParams(location.search).get('ui_test') === '1';
 if (uiTest) byId('manualAttestation').parentElement.lastChild.textContent = '这是自动化页面检查，不作为真人实验。';
 window.addEventListener('beforeunload', event => {
@@ -90,6 +92,7 @@ function startTimer() {
   byId("timerState").textContent = "RUNNING";
   timerHandle = setInterval(renderTimer, 100);
   renderTimer();
+  saveManualDraft();
 }
 
 function finishManual(assisted = false) {
@@ -101,16 +104,19 @@ function finishManual(assisted = false) {
   const duration = elapsedSeconds();
   clearInterval(timerHandle);
   renderTimer();
+  try { localStorage.removeItem(draftKey); } catch (_) {}
   const finishedAt = new Date();
   const record = {
     schema_version: "safehire-termix-manual-v2",
-    evidence_mode: uiTest ? "ui_verification_not_human" : assisted ? "assisted_practice_not_control" : "human_timed_manual_run",
+    evidence_mode: uiTest ? "ui_verification_not_human" : assisted ? "assisted_practice_not_control" : recoveredTiming ? "recovered_manual_run_needs_review" : "human_timed_manual_run",
     task_id: task.task_id,
     task_snapshot: task,
     operator: byId("operatorName").value.trim(),
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     duration_seconds: Number(duration.toFixed(3)),
+    timing_recovered: recoveredTiming,
+    timing_basis: recoveredTiming ? "browser_wall_clock_including_closed_time_needs_review" : "browser_monotonic_clock",
     tools_used: byId("manualTools").value.trim(),
     cost: { amount: cost, currency: byId("manualCurrency").value.trim() || "USD" },
     output: answer,
@@ -238,4 +244,24 @@ if ([...byId('taskSelect').options].some(option => option.value === requestedTas
   byId('taskSelect').disabled = true;
 }
 renderScores();
-loadTask().catch((error) => toast(error.message, true));
+loadTask().then(restoreManualDraft).catch((error) => toast(error.message, true));
+
+function saveManualDraft() {
+  if (!startedAt || byId('finishManual').disabled) return;
+  try { localStorage.setItem(draftKey,JSON.stringify({task,started_at:startedAt.toISOString(),operator:byId('operatorName').value,output:byId('manualOutput').value,tools:byId('manualTools').value,cost:byId('manualCost').value,currency:byId('manualCurrency').value})); }
+  catch (_) { toast('浏览器无法保存草稿，请及时下载记录。',true); }
+}
+function restoreManualDraft() {
+  try {
+    const raw=localStorage.getItem(draftKey);if(!raw||raw.length>1000000)return;
+    const saved=JSON.parse(raw), start=Date.parse(saved.started_at);
+    if (saved.task?.task_id!==task?.task_id || !Number.isFinite(start) || start>Date.now() || Date.now()-start>86400000) return;
+    task=saved.task;byId('operatorName').value=saved.operator;startTimer();
+    startedAt=new Date(start);startedClock=performance.now()-(Date.now()-start);recoveredTiming=true;
+    for(const [id,name] of [['manualOutput','output'],['manualTools','tools'],['manualCost','cost'],['manualCurrency','currency']])byId(id).value=saved[name]||'';
+    byId('manualAttestation').checked=false;byId('timerState').textContent='已恢复，计时待复核';renderTimer();
+    toast('已恢复草稿，关闭页面的时间也计入；这轮记录会标为待复核，不自动计入正式对照。');
+  } catch (_) { toast('草稿无法恢复，原始下载文件不受影响。',true); }
+}
+for(const id of ['manualOutput','manualTools','manualCost','manualCurrency'])byId(id).addEventListener('input',saveManualDraft);
+setInterval(saveManualDraft,5000);
