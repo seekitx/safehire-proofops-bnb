@@ -1280,6 +1280,10 @@ async def public_termix_report() -> dict[str, Any]:
     )
     if not report:
         raise HTTPException(status_code=404, detail="TermiX live report is not published yet")
+    report['provenance_review'] = _optional_public_evidence_json('config/human-study-provenance.json') or {'status': 'unknown', 'hold_eligibility_claims': True}
+    report['report_role'] = 'archived_automated_baseline'
+    report['eligibility_supported_by_this_report'] = False
+    report['current_notice'] = 'Historical automated baseline, not verified unassisted human controls or proof of paid marketplace advantage. Original outputs are preserved; see the human-study endpoint for current recorded pairs and provenance review.'
     return report
 
 

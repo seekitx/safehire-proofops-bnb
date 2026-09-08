@@ -61,3 +61,10 @@ ChainHelix 三个服务是同一运营方，不能说是三家独立供应商。
 - [BNB 官方比赛规则](https://www.bnbchain.org/en/hackathons/smart-money-era?tab=tracks)：四类同等深度；TermiX 三项真实同题任务，通过市场雇佣与不使用代理比较。独立盲评、第二独立供应商是增强可信度的目标，不另称官方硬门槛。
 - [Bark 官方推送接口](https://github.com/Finb/bark-server/blob/master/docs/API_V2.md)：固定 `/push` 接口与设备 Key。设备 Key 不公开或提交仓库。
 - [ChainHelix 借贷卡片](https://agents.chainhelix.io/healthmon/.well-known/agent-card.json)、[收益卡片](https://agents.chainhelix.io/yieldopt/.well-known/agent-card.json)：参数和自述能力；实际签名另经核验，能力自述不作为执行证据。
+
+## 发布复核与追加修复
+
+- 候选 206cfd3 的 323 个打包文件与本地一致，三组远程检查通过。已在绿云正式上线，工作台监控与通知进程运行；两个新增服务再次通过正式安装包的签名报价、固定价格和任务恢复检查，旧 #56741 哈希与算术验收通过。
+- 追加修复：明确选择新服务时不再自动恢复浏览器缓存中的旧订单；只有显式订单链接或不指定服务的恢复入口才恢复旧单。测试覆盖新旧服务、有效与无效订单号。
+- 提交门禁不再把自动化零秒对照或待核查人工作业标为 TermiX 通过；旧报告公开接口增加“历史自动化基线”及来源核查说明，不修改原始输出。此修复不能代替真实新试验。
+- 手机绑定页面已在宿主机 Chrome 打开。设备验证、实际站内付款、供应商新交付、用户评价、重新开展合格人工对照和正式提交仍需逐项配合，未宣称完成。

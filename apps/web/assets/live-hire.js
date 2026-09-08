@@ -274,7 +274,9 @@ function persistJob() {
 function savedJob() {
   const params = new URLSearchParams(location.search);
   const queryJob = Number(params.get("job_id") || 0);
-  if (Number.isSafeInteger(queryJob) && queryJob > 0) return queryJob;
+  if (params.has('job_id')) return Number.isSafeInteger(queryJob) && queryJob > 0 ? queryJob : null;
+  // An explicit service link is a new purchase, even when the browser remembers an old job.
+  if (params.has('agent_token_id') || params.has('skill_id')) return null;
   try {
     const record = taskJSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     return Number.isSafeInteger(record?.job_id) && record.job_id > 0 ? record.job_id : null;

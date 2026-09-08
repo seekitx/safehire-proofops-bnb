@@ -296,6 +296,10 @@ class SubmissionValidator:
         report = _read_json(path)
         tasks = report.get("tasks") if report else None
         categories = set(report.get("categories", [])) if report else set()
+        provenance = _read_json(self._root / 'config/human-study-provenance.json') or {}
+        controls_reviewed = (provenance.get('status') == 'verified'
+                             and provenance.get('unassisted_runs_verified') is True
+                             and provenance.get('hold_eligibility_claims') is False)
         valid_hashes = False
         if isinstance(tasks, list) and tasks:
             valid_hashes = all(
@@ -304,6 +308,8 @@ class SubmissionValidator:
                 and isinstance(task.get("manual"), dict)
                 and re.fullmatch(r"[a-f0-9]{64}", str(task["agent"].get("output_sha256", "")))
                 and re.fullmatch(r"[a-f0-9]{64}", str(task["manual"].get("output_sha256", "")))
+                and isinstance(task['manual'].get('duration_seconds'), (int, float))
+                and task['manual']['duration_seconds'] > 0
                 for task in tasks
             )
         ready = bool(
@@ -312,16 +318,17 @@ class SubmissionValidator:
             and isinstance(tasks, list)
             and len(tasks) >= 3
             and valid_hashes
+            and controls_reviewed
             and categories.intersection({"rebalancing", "grid_trading", "health_factor_monitoring"})
         )
         return GateCheck(
             "termix_live_advantage_report",
             ready,
             "P1",
-            "Live TermiX report with raw-output hashes is present"
+            "Reviewed comparison report structure is present; marketplace hiring and prize eligibility still require verification"
             if ready
-            else "Live TermiX report is missing, fixture-only, or has fewer than three valid tasks",
-            "Run real same-prompt agent/manual tasks and build the strict TermiX report.",
+            else "TermiX controls are unverified, on provenance hold, automated, or incomplete; saved reports do not establish eligibility",
+            "Preserve originals; verify three unassisted controls, identical inputs, marketplace hiring, time, cost and quality before claiming advantage.",
         )
 
     def _check_long_lived_runtime(self) -> GateCheck:
