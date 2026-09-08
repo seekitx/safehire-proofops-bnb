@@ -722,6 +722,8 @@ async def notify_live_agent(project_root: Path, *, job_id: int) -> dict[str, Any
         "operator": route.get("operator"),
         "endpoint": endpoint,
         "status": "accepted",
+        "provider_acknowledgement_only": True,
+        "delivery_started_verified": False,
         "notified_at": datetime.now(UTC).isoformat(),
         "agent_response": payload.get("result"),
         "next_action": "wait_for_onchain_submission_then_review",

@@ -331,6 +331,8 @@ async def test_notify_is_idempotent_and_routes_by_signed_agent_identity(
     notification = await live_erc8183.notify_live_agent(tmp_path, job_id=77)
     assert notification["status"] == "accepted"
     assert notification["erc8004_token_id"] == 42
+    assert notification["provider_acknowledgement_only"] is True
+    assert notification["delivery_started_verified"] is False
 
 
 @pytest.mark.anyio

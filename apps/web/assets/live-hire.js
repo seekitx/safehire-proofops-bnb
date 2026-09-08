@@ -561,11 +561,11 @@ async function notifyAgent() {
       method: "POST",
       body: taskJSON.stringify({ job_id: state.jobId }),
     });
-    setStep("agent_delivery", "active", "Provider acknowledged the funded job");
+    setStep("agent_delivery", "active", "Provider received notification; work has not been verified");
     button.textContent = state.notifyResult.status === "accepted" ? "Provider notified" : state.notifyResult.status;
-    byId("nextAction").textContent = "Poll the chain for the provider's signed submission";
+    byId("nextAction").textContent = "Acknowledgement is not proof that work started. Check on-chain delivery; do not pay again.";
     updateReceipt(`Provider notification for job #${state.jobId}`);
-    toast("The provider notification was idempotent and sent no wallet transaction.");
+    toast("Notification sent without another wallet transaction. Provider execution is still unverified.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "Retry provider notification";
