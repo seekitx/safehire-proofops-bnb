@@ -18,6 +18,7 @@ dependencies = [
   "eth-account>=0.13.6,<1",
   "eth-abi>=5,<6",
   "eth-utils>=5,<6",
+  "pycryptodome>=3.23,<4",
 ]
 
 [project.optional-dependencies]

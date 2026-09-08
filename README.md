@@ -66,9 +66,9 @@ The LLM is advisory. Deterministic controls remain authoritative:
 
 | Criterion | Current state | Reviewable evidence | Remaining proof |
 |---|---|---|---|
-| Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | first paid external mainnet delivery |
+| Functionality | Conditional | live discovery/quote, `/hire-live`, full BSC Testnet Job #808 | new in-product purchase, useful delivery and user assessment |
 | Data Quality | Conditional | current A2A probe, 8004scan signals, source/time labels, raw hashes | independent blind review and paid outcomes |
-| Agent Diversity | Conditional | all four category routes; execution depth remains conditional | second independent provider |
+| Agent Diversity | Conditional | all four category routes; execution depth remains conditional | equally useful four-category service depth; second independent same-task supplier is an enhancement |
 | TermiX | Provenance review required | three recorded pairs, original outputs and timings preserved | verify no-AI provenance, independent review and full workflow timing |
 | PancakeSwap | Conditional | same-block multi-size quote and gas-aware benefit evidence | controlled real-use receipt would strengthen it |
 | Altana | Not claimed | permission architecture alone is not eligibility | live session-key transaction and in-product revoke |
@@ -79,11 +79,10 @@ a fabricated green status.
 
 ## Current live and on-chain evidence
 
-- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. Includes fresh supplier quote probes and four-category action preparation with bounded unsigned drafts and read-only simulation. No automatic trading or external push. See [scope and security review](docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md).
-- ChainHelix #269224 delivered paid mainnet Job #56741 (0.5 U). Signed task, raw manifest and grid arithmetic were independently checked on GreenCloud. This was purchased on the supplier site; it is submitted delivery, not final settlement or a newly measured SafeHire purchase.
+- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. Includes fresh supplier quote probes and four-category action preparation with bounded unsigned drafts and read-only simulation. No automatic trading. Opt-in Bark phone notifications require a device verification code; provider acceptance is not proof of human receipt. See [scope and security review](docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md).
+- ChainHelix #269224 delivered paid mainnet Job #56741 (0.5 U). Signed task, raw manifest and grid arithmetic were recomputed by SafeHire on GreenCloud. This was purchased on the supplier site; it is submitted delivery, not final settlement or a newly measured SafeHire purchase.
 
-- Four external BSC mainnet ERC-8004 skills cover rebalancing, grid trading,
-  yield optimisation and health-factor monitoring.
+- Four categories are listed, but live service depth is uneven. ChainHelix grid, lending-health and yield-allocation calculators have verified sample quotes at 0.50 U each. They share one operator and do not execute trades. The two new calculators still need first paid deliveries. LP paid supply remains unresolved.
 - Quote availability and fees depend on the supplier. New quotes for supplier #265375 are paused after funded Job #56733 produced no delivery; the hardened buyer verifies request/response hashes, chain and Commerce binding, quote expiry, and the provider's EIP-191 or ERC-1271 signature.
 - `/hire-live` anchors the exact signed JobDescription, calculates expiry from provider ETA plus the on-chain dispute window, restores an interrupted job from BSC state, verifies the retrieved delivery manifest against its on-chain hash, and exposes explicit dispute/settle/refund branches.
 - BSC Testnet Job #808 has successful create, register, budget, approve, fund,
@@ -116,7 +115,7 @@ Primary evidence:
 5. The owner must verify identity, prize wallet, contact fields and terms before
    submitting.
 
-See `docs/MANUAL_COMPLETION_GATES_2026-08-31.md`.
+See the current [delivery, supply and owner handoff](docs/SUPPLY_AND_OFFSITE_DELIVERY_2026-09-08.zh-CN.md). Older manual-gate documents are dated snapshots.
 
 ## Architecture
 

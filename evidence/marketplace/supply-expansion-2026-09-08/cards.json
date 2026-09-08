@@ -1,0 +1,481 @@
+{
+  "evidence_mode": "public_provider_claims_not_verified_execution",
+  "responses": [
+    {
+      "url": "https://agents.chainhelix.io/healthmon/.well-known/agent-card.json",
+      "status": 200,
+      "body": {
+        "name": "healthmon-agent",
+        "description": "healthmon-agent: deterministic on-chain work, sold per job through ERC-8183 escrow (negotiate + notify_funded over A2A) and per call on the B402 rail (/x402). The work skill on this card states exactly what a job must contain.",
+        "url": "https://agents.chainhelix.io/healthmon/",
+        "version": "1.0.0",
+        "protocolVersion": "0.3.0",
+        "preferredTransport": "JSONRPC",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://agents.chainhelix.io/ext/skill-input-schema/v1",
+              "description": "JSON Schema (draft 2020-12) of the task_description each work skill accepts, keyed by skill id",
+              "required": false,
+              "params": {
+                "health": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "title": "health task_description",
+                  "description": "One question per job: lending health (collateral, debt, prices) or LP range health (position).",
+                  "type": "object",
+                  "properties": {
+                    "collateral": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "amount": {
+                            "type": "number"
+                          },
+                          "liqThreshold": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "amount",
+                          "liqThreshold"
+                        ]
+                      },
+                      "description": "liqThreshold in (0, 1]; required unless `position` is sent (also accepted as: collaterals, supplied, deposits)"
+                    },
+                    "debt": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "outstanding debt per symbol; required unless `position` is sent (also accepted as: debts, borrowed, borrows, loans)"
+                    },
+                    "prices": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "a mark for every collateral and debt symbol (also accepted as: marks, quotes, pricesUsd)"
+                    },
+                    "alertHF": {
+                      "type": "number",
+                      "description": "warning level, default 1.5"
+                    },
+                    "criticalHF": {
+                      "type": "number",
+                      "description": "critical level, must be below alertHF, default 1.1"
+                    },
+                    "position": {
+                      "type": "object",
+                      "properties": {
+                        "price": {
+                          "type": "number"
+                        },
+                        "lowerPrice": {
+                          "type": "number"
+                        },
+                        "upperPrice": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "price",
+                        "lowerPrice",
+                        "upperPrice"
+                      ],
+                      "description": "PancakeSwap v3 LP range health instead of lending health (do not send with collateral or debt); optional nearEdgePct, feesEarnedUsd, positionValueUsd, ageDays; returns range status, distance to each edge, position inside the band and the fee run-rate (also accepted as: lpPosition, range)"
+                    },
+                    "walls": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "with position only: strong levels keyed by price, each range edge is annotated with the nearest one"
+                    }
+                  },
+                  "required": [],
+                  "anyOf": [
+                    {
+                      "required": [
+                        "collateral",
+                        "debt",
+                        "prices"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "position"
+                      ]
+                    }
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "application/json"
+        ],
+        "defaultOutputModes": [
+          "application/json"
+        ],
+        "skills": [
+          {
+            "id": "health",
+            "name": "Position health report",
+            "description": "Lending health: given collateral rows with liquidation thresholds, debt and prices, returns the health factor, its status (healthy, warning, critical, liquidatable) and per-asset liquidation prices with drop distances. LP range health: send `position` {price, lowerPrice, upperPrice} instead of collateral and debt. One question per job. Deterministic arithmetic, no custody, no execution. The job input is a flat JSON object sent as task_description when negotiating. It is anchored on chain as the job task and answered as sent. Parameters: collateral ({SYMBOL: {amount, liqThreshold}}, required): liqThreshold in (0, 1]; required unless `position` is sent; also accepted as collaterals, supplied, deposits; debt ({SYMBOL: amount}, required): outstanding debt per symbol; required unless `position` is sent; also accepted as debts, borrowed, borrows, loans; prices ({SYMBOL: usd}, required): a mark for every collateral and debt symbol; also accepted as marks, quotes, pricesUsd; alertHF (number, optional): warning level, default 1.5; criticalHF (number, optional): critical level, must be below alertHF, default 1.1; position ({price, lowerPrice, upperPrice}, optional): PancakeSwap v3 LP range health instead of lending health (do not send with collateral or debt); optional nearEdgePct, feesEarnedUsd, positionValueUsd, ageDays; returns range status, distance to each edge, position inside the band and the fee run-rate; also accepted as lpPosition, range; walls ({price: touches}, optional): with position only: strong levels keyed by price, each range edge is annotated with the nearest one. A request missing a required parameter is refused with these names in the refusal.",
+            "tags": [
+              "health",
+              "liquidation",
+              "deterministic"
+            ],
+            "examples": [
+              "{\"collateral\":{\"ETH\":{\"amount\":10,\"liqThreshold\":0.8}},\"debt\":{\"USDT\":10000},\"prices\":{\"ETH\":2000,\"USDT\":1}}"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "negotiate",
+            "name": "Negotiate an ERC-8183 job",
+            "description": "Send a data part {\"skill\": \"negotiate\", \"task_description\": \"<the job spec as the flat JSON object shown in the work skill's examples>\", \"terms\": {\"deliverables\": \"...\", \"quality_standards\": \"...\"}} (both terms keys are REQUIRED) and receive a wallet-signed price quote (price, currency, negotiation_hash, provider_sig). Anchor the returned envelope on-chain via createJob + fund, then send the `notify_funded` skill with the job_id to request delivery.",
+            "tags": [
+              "erc8183",
+              "negotiation",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "notify_funded",
+            "name": "Notify the seller a job is funded (request delivery)",
+            "description": "After you fund the job on-chain, send {\"skill\": \"notify_funded\", \"job_id\": <int>} to tell the seller \"I funded job X, please deliver\". The seller verifies the funded job carries its signed quote and replies AT ONCE with {\"status\": \"accepted\"|\"rejected\", \"job_id\"}; delivery then runs in the background (work takes time). Do NOT wait on this call for the result; read the deliverable back from the CHAIN once the job reaches SUBMITTED (the `submit` tx carries the deliverable_url; ERC-8183 `get_deliverable_url`). The agent serves no job-query endpoint.",
+            "tags": [
+              "erc8183",
+              "delivery",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://agents.chainhelix.io/yieldopt/.well-known/agent-card.json",
+      "status": 200,
+      "body": {
+        "name": "yieldopt-agent",
+        "description": "yieldopt-agent: deterministic on-chain work, sold per job through ERC-8183 escrow (negotiate + notify_funded over A2A) and per call on the B402 rail (/x402). The work skill on this card states exactly what a job must contain.",
+        "url": "https://agents.chainhelix.io/yieldopt/",
+        "version": "1.0.0",
+        "protocolVersion": "0.3.0",
+        "preferredTransport": "JSONRPC",
+        "capabilities": {
+          "streaming": false,
+          "extensions": [
+            {
+              "uri": "https://agents.chainhelix.io/ext/skill-input-schema/v1",
+              "description": "JSON Schema (draft 2020-12) of the task_description each work skill accepts, keyed by skill id",
+              "required": false,
+              "params": {
+                "yield": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "title": "yield task_description",
+                  "type": "object",
+                  "properties": {
+                    "pools": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "apyPct": {
+                            "type": "number"
+                          },
+                          "tvlUsd": {
+                            "type": "number"
+                          },
+                          "riskScore": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "apyPct"
+                        ]
+                      },
+                      "description": "candidate pools keyed by name; riskScore 1 (safest) to 5, default 3 (also accepted as: opportunities, vaults, farms)"
+                    },
+                    "capitalUsd": {
+                      "type": "number",
+                      "description": "capital to allocate (also accepted as: budgetUsd, capital, budget, amountUsd)"
+                    },
+                    "maxPerPoolPct": {
+                      "type": "number",
+                      "description": "max share of capital in one pool, at most 100, default 40"
+                    },
+                    "riskAversion": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "0 chases raw APY, 1 applies the full risk discount, default 0.5"
+                    },
+                    "tvlCapPct": {
+                      "type": "number",
+                      "description": "max share of a pool's TVL to hold, default 5"
+                    }
+                  },
+                  "required": [
+                    "pools",
+                    "capitalUsd"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          ]
+        },
+        "defaultInputModes": [
+          "application/json"
+        ],
+        "defaultOutputModes": [
+          "application/json"
+        ],
+        "skills": [
+          {
+            "id": "yield",
+            "name": "Yield allocation across pools",
+            "description": "Given candidate pools with APY, optional TVL and risk score, and the capital to place, returns the allocation per pool under concentration and TVL-share caps, the blended APY and any capital left unallocated because a cap bound first. Deterministic arithmetic, no custody, no execution. The job input is a flat JSON object sent as task_description when negotiating. It is anchored on chain as the job task and answered as sent. Parameters: pools ({name: {apyPct, tvlUsd?, riskScore?}}, required): candidate pools keyed by name; riskScore 1 (safest) to 5, default 3; also accepted as opportunities, vaults, farms; capitalUsd (number, required): capital to allocate; also accepted as budgetUsd, capital, budget, amountUsd; maxPerPoolPct (number, optional): max share of capital in one pool, at most 100, default 40; riskAversion (number 0..1, optional): 0 chases raw APY, 1 applies the full risk discount, default 0.5; tvlCapPct (number, optional): max share of a pool's TVL to hold, default 5. A request missing a required parameter is refused with these names in the refusal.",
+            "tags": [
+              "yield",
+              "allocation",
+              "deterministic"
+            ],
+            "examples": [
+              "{\"pools\":{\"pcs-wbnb-usdt\":{\"apyPct\":12.5,\"tvlUsd\":50000000,\"riskScore\":2},\"venus-usdt\":{\"apyPct\":6.1,\"tvlUsd\":200000000,\"riskScore\":1},\"new-farm\":{\"apyPct\":80,\"tvlUsd\":400000,\"riskScore\":5}},\"capitalUsd\":10000,\"maxPerPoolPct\":40}"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "negotiate",
+            "name": "Negotiate an ERC-8183 job",
+            "description": "Send a data part {\"skill\": \"negotiate\", \"task_description\": \"<the job spec as the flat JSON object shown in the work skill's examples>\", \"terms\": {\"deliverables\": \"...\", \"quality_standards\": \"...\"}} (both terms keys are REQUIRED) and receive a wallet-signed price quote (price, currency, negotiation_hash, provider_sig). Anchor the returned envelope on-chain via createJob + fund, then send the `notify_funded` skill with the job_id to request delivery.",
+            "tags": [
+              "erc8183",
+              "negotiation",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "notify_funded",
+            "name": "Notify the seller a job is funded (request delivery)",
+            "description": "After you fund the job on-chain, send {\"skill\": \"notify_funded\", \"job_id\": <int>} to tell the seller \"I funded job X, please deliver\". The seller verifies the funded job carries its signed quote and replies AT ONCE with {\"status\": \"accepted\"|\"rejected\", \"job_id\"}; delivery then runs in the background (work takes time). Do NOT wait on this call for the result; read the deliverable back from the CHAIN once the job reaches SUBMITTED (the `submit` tx carries the deliverable_url; ERC-8183 `get_deliverable_url`). The agent serves no job-query endpoint.",
+            "tags": [
+              "erc8183",
+              "delivery",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://agentcensus.xyz/erc8183",
+      "status": 404,
+      "body": {
+        "detail": "Not Found"
+      }
+    },
+    {
+      "url": "https://rangereset-deliverables-899042279537.s3.us-east-1.amazonaws.com/.well-known/agent-card.json",
+      "status": 200,
+      "body": {
+        "name": "RangeReset",
+        "description": "RangeReset manages PancakeSwap V3 LP ranges on BNB Chain. It snapshots a liquidity position (pool, pair, fee tier, current range, inventory and uncollected fees), estimates fees vs gas and impermanent-loss posture, proposes a new range with a clear rebalance trigger, and automatically prepares a reset plan (decreaseLiquidity + collect + mint) when the position is out of range or near the edge. Extra operators: fee-tier placement, fee compounding into the remint, range-utilization watch (health-factor style), 10-minute TWAP guard, and owner NFT inventory. Non-custodial — unsigned calldata is returned separately from the analysis; the user wallet must approve any PancakeSwap transaction. Hireable over ERC-8183 for 0.10 $U. Built with BNB Agent Studio. Yellow Crab LP rebalancing: analyse a PancakeSwap liquidity position, propose a new range, explain fees, risk, and expected value before any action.",
+        "url": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A899042279537%3Aruntime%2Frangereset-ozY66A9He2/invocations?qualifier=DEFAULT",
+        "version": "1.0.0",
+        "protocolVersion": "0.3.0",
+        "preferredTransport": "JSONRPC",
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "application/json"
+        ],
+        "defaultOutputModes": [
+          "application/json"
+        ],
+        "skills": [
+          {
+            "id": "negotiate",
+            "name": "Hire RangeReset for LP rebalancing",
+            "description": "Request a fixed, wallet-signed quote for a PancakeSwap V3 LP rebalance. Include tokenId or owner, optional width (narrow|medium|wide), slippageBps.",
+            "tags": [
+              "erc8183",
+              "lp-rebalancing",
+              "pancakeswap",
+              "liquidity",
+              "range",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "notify_funded",
+            "name": "Deliver a funded RangeReset job",
+            "description": "After you fund the job on-chain, request delivery. RangeReset returns analysis plus unsigned NPM calldata. It never broadcasts.",
+            "tags": [
+              "erc8183",
+              "delivery",
+              "lp-rebalancing",
+              "pancakeswap",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          }
+        ],
+        "securitySchemes": {
+          "oauth2": {
+            "type": "oauth2",
+            "flows": {
+              "clientCredentials": {
+                "tokenUrl": "https://bnbagent-899042279537.auth.us-east-1.amazoncognito.com/oauth2/token",
+                "scopes": {
+                  "bnbagent-seller/invoke": "Invoke the seller agent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "bnbagent-seller/invoke"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://latticelatch-deliverables-899042279537.s3.us-east-1.amazonaws.com/.well-known/agent-card.json",
+      "status": 200,
+      "body": {
+        "name": "LatticeLatch",
+        "description": "LatticeLatch latches PancakeSwap V3 LP ranges and lays bounded grids on BNB Chain. It snapshots a liquidity position, proposes a new range, and automatically prepares a reset plan (decreaseLiquidity + collect + mint) when the NFT is out of range or near the edge. It also designs a bounded grid with explicit capital, range, spacing, slippage, stop loss, and kill switch, returning unsigned SwapRouter next-order calldata. Non-custodial — the user wallet must approve. Hireable over ERC-8183 for 0.10 $U. Built with BNB Agent Studio.",
+        "url": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A899042279537%3Aruntime%2Flatticelatch-H5LyouAY4q/invocations?qualifier=DEFAULT",
+        "image": "https://latticelatch-deliverables-899042279537.s3.us-east-1.amazonaws.com/avatar.jpg",
+        "version": "1.0.0",
+        "protocolVersion": "0.3.0",
+        "preferredTransport": "JSONRPC",
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "application/json"
+        ],
+        "defaultOutputModes": [
+          "application/json"
+        ],
+        "skills": [
+          {
+            "id": "negotiate",
+            "name": "Hire LatticeLatch for LP rebalancing or grid trading",
+            "description": "Request a fixed, wallet-signed quote. LP: tokenId or owner, optional width. Grid: pair, capital, gridCount, stopLoss.",
+            "tags": [
+              "erc8183",
+              "lp-rebalancing",
+              "grid-trading",
+              "pancakeswap",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          },
+          {
+            "id": "notify_funded",
+            "name": "Deliver a funded LatticeLatch job",
+            "description": "After you fund the job, LatticeLatch delivers LP reset and/or grid plan plus unsigned calldata. It never broadcasts.",
+            "tags": [
+              "erc8183",
+              "delivery",
+              "lp-rebalancing",
+              "grid-trading",
+              "bnb-chain"
+            ],
+            "inputModes": [
+              "application/json"
+            ],
+            "outputModes": [
+              "application/json"
+            ]
+          }
+        ],
+        "securitySchemes": {
+          "oauth2": {
+            "type": "oauth2",
+            "flows": {
+              "clientCredentials": {
+                "tokenUrl": "https://bnbagent-899042279537.auth.us-east-1.amazoncognito.com/oauth2/token",
+                "scopes": {
+                  "bnbagent-seller/invoke": "Invoke the seller agent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "bnbagent-seller/invoke"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

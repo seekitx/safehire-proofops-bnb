@@ -14,7 +14,9 @@ SafeHire is a **proof-carrying BNB Chain Agent marketplace**:
 The product is not “another trading chatbot”. Its defensible innovation is the
 trust-and-settlement envelope around financial Agents.
 
-## Current truth — 2026-08-31
+## Historical snapshot — 2026-08-31
+
+Superseded where noted by the 2026-09-08 overlays and `docs/SUPPLY_AND_OFFSITE_DELIVERY_2026-09-08.zh-CN.md`.
 
 ### Implemented and reviewable
 
@@ -190,7 +192,7 @@ and authenticated identity only through the pending gates in the V2 construction
 
 ## 2026-09-08 service follow-up overlay
 
-New runtime: `src/proofops/workspace/`, `/workspace`, `SAFEHIRE_FOLLOWUP_ENABLED`, persistent `SAFEHIRE_FOLLOWUP_DB`. Read `docs/SERVICE_WORKSPACE_RELEASE_2026-09-08.zh-CN.md` before changes. Follow-up never signs or pays. Alerts are private in-app records, not phone delivery. Keep ChainHelix 0.5 U scoped to reviewed #269224/wallet; preserve legacy 0.1 U jobs. Job #56741 has a verified SUBMITTED calculation delivery from the supplier purchase page, not final settlement or proof of the new in-app purchase journey.
+New runtime: `src/proofops/workspace/`, `/workspace`, `SAFEHIRE_FOLLOWUP_ENABLED`, persistent `SAFEHIRE_FOLLOWUP_DB`. Read `docs/SERVICE_WORKSPACE_RELEASE_2026-09-08.zh-CN.md` before changes. Follow-up never signs or pays. Alerts remain private records; opt-in Bark can send generic notifications after a device code is verified. Provider acceptance is not human receipt. Keep ChainHelix 0.5 U scoped to reviewed #269224, #269226, #269228 and their explicitly pinned wallets; preserve legacy 0.1 U jobs. Job #56741 has a verified SUBMITTED calculation delivery from the supplier purchase page, not final settlement or proof of the new in-app purchase journey.
 
 All research reports belong in tracked `docs/` or `docs/research/`, never in ignored runtime data. Preserve private raw identity and recovery credentials. `config/human-study-provenance.json` holds eligibility claims pending review of AI-assistance provenance; do not drop this hold during report regeneration.
 
@@ -199,3 +201,7 @@ All research reports belong in tracked `docs/` or `docs/research/`, never in ign
 Read `docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md` for scoped unsigned drafts, fresh supply probes and security review. Action preparation never broadcasts; LP exit simulation is not a full rebalance. Preserve manual-study provenance holds and recovered-run timing labels.
 
 Build incident notes: `docs/编译踩坑记录.md`; load only for authorized builds or actual build issues. Upload must finish before Docker consumes the release directory, then compare packaged tracked-file hashes.
+
+## 2026-09-08 supplier and off-site notification overlay
+
+Read `docs/SUPPLY_AND_OFFSITE_DELIVERY_2026-09-08.zh-CN.md`. New calculators bind strict flat inputs to separate fixed registry wallets; never broaden the 0.50 U cap to an arbitrary provider. Their paid deliveries and output-quality checks remain pending. Bark destinations are encrypted with a private persistent key; never put device keys, OTPs or workspace recovery credentials into evidence or source control. Never relabel calculators as execution agents, or same-operator services as independent suppliers.

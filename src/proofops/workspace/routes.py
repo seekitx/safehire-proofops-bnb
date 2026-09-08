@@ -53,6 +53,25 @@ class CompareRequest(BaseModel):
     consent: StrictBool
 
 
+class PushBinding(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    device_key: str = Field(pattern=r'^[a-zA-Z0-9_-]{16,128}$')
+    consent: StrictBool
+
+
+class PushCode(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    code: str = Field(pattern=r'^\d{6}$')
+
+
+class CalculatorSource(BaseModel):
+    model_config = ConfigDict(extra='forbid', allow_inf_nan=False)
+    token_id: Literal[269228, 269226]
+    account: str | None = Field(default=None, pattern=r'^0x[0-9a-fA-F]{40}$')
+    capital: float = Field(default=10000, gt=0, le=1e9)
+    consent: StrictBool
+
+
 class ActionRequest(BaseModel):
     model_config = ConfigDict(extra='forbid', allow_inf_nan=False)
     consent: StrictBool
@@ -72,6 +91,8 @@ class ActionRequest(BaseModel):
 def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) -> APIRouter:
     router = APIRouter(prefix='/api/workspace', tags=['Private orders and read-only monitoring'])
     active = enabled if enabled is not None else os.getenv('SAFEHIRE_FOLLOWUP_ENABLED', 'false').lower() == 'true'
+    from proofops.workspace.notifications import Notifications
+    notifications = Notifications(journal)
     quote_slots = asyncio.Semaphore(2)
     action_slots = asyncio.Semaphore(2)
 
@@ -90,7 +111,9 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
         task = getattr(request.app.state, 'followup_task', None)
         worker_running = task is not None and not task.done()
         return {'enabled': active, 'server_followup': active and worker_running, 'worker_running': worker_running, 'check_interval_seconds': 300,
-                'monitor_duration_hours': 24, 'in_app_alerts': True, 'external_push': False,
+                'monitor_duration_hours': 24, 'in_app_alerts': True,
+                'external_push': bool(getattr(request.app.state, 'notification_task', None) and not request.app.state.notification_task.done()),
+                'external_push_channel': 'bark', 'push_requires_verified_opt_in': True,
                 'automatic_payment': False, 'automatic_trading': False, 'independent_review': False}
 
     @router.post('/spaces')
@@ -107,6 +130,36 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
         auth(space, authorization)
         return {'schema': 'safehire-service-journal/1', 'watches': journal.list(space),
                 'boundary': 'Private local journal, not immutable evidence. Chain and source observations retain separate verification. In-app unread alerts do not prove human receipt.'}
+
+    @router.get('/spaces/{space}/notifications')
+    def notification_status(space: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        auth(space, authorization)
+        return notifications.status(space)
+
+    @router.post('/spaces/{space}/notifications/bind')
+    async def notification_bind(space: str, body: PushBinding, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        auth(space, authorization)
+        if not body.consent:
+            raise HTTPException(422, '请先同意保存通知凭证并发送验证通知')
+        try:
+            return await notifications.bind(space, body.device_key)
+        except (ValueError, OSError) as exc:
+            raise HTTPException(409, '暂时无法绑定，请等待一分钟后重试或检查服务器通知配置') from exc
+
+    @router.post('/spaces/{space}/notifications/verify')
+    def notification_verify(space: str, body: PushCode, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        auth(space, authorization)
+        try:
+            notifications.verify(space, body.code)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return {'verified':True,'enabled':True,'evidence':'User returned the code sent to the device; not proof future alerts were read'}
+
+    @router.post('/spaces/{space}/notifications/unsubscribe')
+    def notification_unsubscribe(space: str, authorization: str | None = Header(default=None)) -> dict[str, bool]:
+        auth(space, authorization)
+        notifications.unsubscribe(space)
+        return {'enabled':False,'destination_erased':True}
 
     @router.post('/spaces/{space}/watches')
     def add(space: str, body: WatchRequest, authorization: str | None = Header(default=None)) -> dict[str, str]:
@@ -217,6 +270,24 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
                          'hire_url': f"/hire-live?skill_id={a['skill_id']}&agent_token_id={a['token_id']}"})
         rows.sort(key=lambda r:(not r['availability']['can_request_quote'],not bool(r['submitted_evidence']),r['token_id']))
         return {'services': rows, 'evidence_boundary': 'Listings describe reviewed scope; a current valid quote is required before purchase. Operators are grouped, never counted as independent agents.'}
+
+    @router.post('/calculator-source')
+    async def calculator_source(body: CalculatorSource) -> dict[str, Any]:
+        if not active:
+            raise HTTPException(503, 'Live sources are not enabled')
+        if not body.consent:
+            raise HTTPException(422, '请先同意读取公开链上数据')
+        if action_slots.locked():
+            raise HTTPException(429, '数据读取繁忙，请稍后再试')
+        from proofops.workspace.calculator_sources import prepare
+        try:
+            async with action_slots:
+                async with asyncio.timeout(55):
+                    return await prepare(body.token_id, body.account, body.capital)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        except (httpx.HTTPError, TimeoutError) as exc:
+            raise HTTPException(503, '实时数据暂不可用，请重试；不要用假设值冒充当前数据') from exc
 
     @router.post('/compare-grid')
     async def compare(body: CompareRequest) -> dict[str, Any]:

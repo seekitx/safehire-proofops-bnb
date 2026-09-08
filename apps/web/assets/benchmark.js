@@ -259,7 +259,7 @@ function restoreManualDraft() {
     task=saved.task;byId('operatorName').value=saved.operator;startTimer();
     startedAt=new Date(start);startedClock=performance.now()-(Date.now()-start);recoveredTiming=true;
     for(const [id,name] of [['manualOutput','output'],['manualTools','tools'],['manualCost','cost'],['manualCurrency','currency']])byId(id).value=saved[name]||'';
-    byId('manualAttestation').checked=false;byId('timerState').textContent='已恢复，计时待复核';renderTimer();
+    byId('manualAttestation').checked=false;byId('timerState').textContent='已恢复，计时待复核';renderTimer();saveManualDraft();
     toast('已恢复草稿，关闭页面的时间也计入；这轮记录会标为待复核，不自动计入正式对照。');
   } catch (_) { toast('草稿无法恢复，原始下载文件不受影响。',true); }
 }

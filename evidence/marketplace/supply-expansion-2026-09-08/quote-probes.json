@@ -1,0 +1,222 @@
+{
+  "evidence_mode": "live_read_only_quote_probe",
+  "funded": false,
+  "paid_delivery_verified": false,
+  "responses": [
+    {
+      "id": 269228,
+      "kind": "health",
+      "endpoint": "https://agents.chainhelix.io/healthmon/",
+      "sample_inputs_are_hypothetical": true,
+      "task": {
+        "collateral": {
+          "ETH": {
+            "amount": 10,
+            "liqThreshold": 0.8
+          }
+        },
+        "debt": {
+          "USDT": 10000
+        },
+        "prices": {
+          "ETH": 2000,
+          "USDT": 1
+        }
+      },
+      "checked_at": 1788862633.393245,
+      "http_status": 200,
+      "wallet": "0x91f4602760e1627007bfc16f78a74cf8b9de8da2",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "safehire-candidate-probe",
+        "result": {
+          "kind": "message",
+          "role": "agent",
+          "messageId": "b79717e6-df0c-4b78-bb04-08f3fcbc4672",
+          "parts": [
+            {
+              "kind": "data",
+              "data": {
+                "request": {
+                  "task_description": "{\"collateral\":{\"ETH\":{\"amount\":10,\"liqThreshold\":0.8}},\"debt\":{\"USDT\":10000},\"prices\":{\"ETH\":2000,\"USDT\":1}}",
+                  "terms": {
+                    "deliverables": "Complete exact requested analysis and unsigned preparation; no broadcasting",
+                    "quality_standards": "Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only",
+                    "evaluation_required": true,
+                    "evaluator_type": "uma_oov3"
+                  }
+                },
+                "request_hash": "0xef5e6d7b0cc98a993ae445c90a3b07b4acfeacee987ecb50c70c7f1d58e9a1b0",
+                "response": {
+                  "accepted": true,
+                  "terms": {
+                    "deliverables": "Complete exact requested analysis and unsigned preparation; no broadcasting",
+                    "quality_standards": "Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only",
+                    "evaluation_required": true,
+                    "evaluator_type": "uma_oov3",
+                    "price": "500000000000000000",
+                    "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666"
+                  },
+                  "estimated_completion_seconds": 600,
+                  "quote_expires_at": 1788863534,
+                  "negotiated_at": 1788862634
+                },
+                "response_hash": "0x8604dfa04375a001619e47c8f281bd2e87a4568214ff28d031a91ca60bd5f68a",
+                "negotiation_hash": "0x40c2ed768a3d1bdfac84a4ff302c0abeec333e049b50ac1f0c9f615532db5b47",
+                "provider_sig": "0xa9b4bbe0d62cfa2864c78e42fac7db9fcdc1283c80aaba8987ff6d16cb9aa65d12e4f6cddb42a351069308215774b78382a8e9324ba3285c44e9d9b4ce2bd7801c",
+                "chain_id": 56,
+                "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6"
+              }
+            }
+          ],
+          "contextId": "9a1a0529-dbdc-4937-a3a1-944455a5f793",
+          "taskId": "bac7df13-0978-4e31-bb71-76dc1701be97"
+        }
+      },
+      "verification": {
+        "valid": true,
+        "chain_id": 56,
+        "provider": "0x91f4602760e1627007bfc16f78a74cf8b9de8da2",
+        "price_raw": "500000000000000000",
+        "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+        "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+        "estimated_completion_seconds": 600,
+        "quote_expires_at": 1788863534,
+        "signature_method": "eip191",
+        "request_hash": "0xef5e6d7b0cc98a993ae445c90a3b07b4acfeacee987ecb50c70c7f1d58e9a1b0",
+        "response_hash": "0x8604dfa04375a001619e47c8f281bd2e87a4568214ff28d031a91ca60bd5f68a",
+        "negotiation_hash": "0x40c2ed768a3d1bdfac84a4ff302c0abeec333e049b50ac1f0c9f615532db5b47",
+        "job_description": "{\"chain_id\":56,\"currency\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\",\"negotiated_at\":1788862634,\"negotiation_hash\":\"0x40c2ed768a3d1bdfac84a4ff302c0abeec333e049b50ac1f0c9f615532db5b47\",\"price\":\"500000000000000000\",\"provider_sig\":\"0xa9b4bbe0d62cfa2864c78e42fac7db9fcdc1283c80aaba8987ff6d16cb9aa65d12e4f6cddb42a351069308215774b78382a8e9324ba3285c44e9d9b4ce2bd7801c\",\"quote_expires_at\":1788863534,\"task\":\"{\\\"collateral\\\":{\\\"ETH\\\":{\\\"amount\\\":10,\\\"liqThreshold\\\":0.8}},\\\"debt\\\":{\\\"USDT\\\":10000},\\\"prices\\\":{\\\"ETH\\\":2000,\\\"USDT\\\":1}}\",\"terms\":{\"deliverables\":\"Complete exact requested analysis and unsigned preparation; no broadcasting\",\"quality_standards\":\"Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only\"},\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"version\":1}"
+      }
+    },
+    {
+      "id": 269226,
+      "kind": "yield",
+      "endpoint": "https://agents.chainhelix.io/yieldopt/",
+      "sample_inputs_are_hypothetical": true,
+      "task": {
+        "pools": {
+          "venus-usdt": {
+            "apyPct": 6.1,
+            "tvlUsd": 200000000,
+            "riskScore": 1
+          },
+          "venus-usdc": {
+            "apyPct": 4.2,
+            "tvlUsd": 100000000,
+            "riskScore": 1
+          }
+        },
+        "capitalUsd": 10000,
+        "maxPerPoolPct": 60
+      },
+      "checked_at": 1788862634.328935,
+      "http_status": 200,
+      "wallet": "0xccae2da18278c663fc808fa858fd89cc34cf701f",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "safehire-candidate-probe",
+        "result": {
+          "kind": "message",
+          "role": "agent",
+          "messageId": "4670595d-65a7-4d09-b619-79f6e9758ddc",
+          "parts": [
+            {
+              "kind": "data",
+              "data": {
+                "request": {
+                  "task_description": "{\"capitalUsd\":10000,\"maxPerPoolPct\":60,\"pools\":{\"venus-usdc\":{\"apyPct\":4.2,\"riskScore\":1,\"tvlUsd\":100000000},\"venus-usdt\":{\"apyPct\":6.1,\"riskScore\":1,\"tvlUsd\":200000000}}}",
+                  "terms": {
+                    "deliverables": "Complete exact requested analysis and unsigned preparation; no broadcasting",
+                    "quality_standards": "Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only",
+                    "evaluation_required": true,
+                    "evaluator_type": "uma_oov3"
+                  }
+                },
+                "request_hash": "0xbfb9e95c8ecf399bd574eb4377fd8cd9eca4411a16b8593fae38354f0d1ea54b",
+                "response": {
+                  "accepted": true,
+                  "terms": {
+                    "deliverables": "Complete exact requested analysis and unsigned preparation; no broadcasting",
+                    "quality_standards": "Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only",
+                    "evaluation_required": true,
+                    "evaluator_type": "uma_oov3",
+                    "price": "500000000000000000",
+                    "currency": "0xcE24439F2D9C6a2289F741120FE202248B666666"
+                  },
+                  "estimated_completion_seconds": 600,
+                  "quote_expires_at": 1788863534,
+                  "negotiated_at": 1788862634
+                },
+                "response_hash": "0x8604dfa04375a001619e47c8f281bd2e87a4568214ff28d031a91ca60bd5f68a",
+                "negotiation_hash": "0x3df86d00328580e4fcb70755b94336061fdc97f3047b2ac7f4e67f2c9743057b",
+                "provider_sig": "0xce4c92703d6744887f3717c823e6b111467953118a48e5165a399df7bf4a855a6cc3bac9cd119483482a90c1ad54a3c25684206a9835f0b19616ed4735752fc61c",
+                "chain_id": 56,
+                "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6"
+              }
+            }
+          ],
+          "contextId": "7a597ab3-4b61-4c28-bf9c-d846780c7e28",
+          "taskId": "68205c3f-7bf1-4856-87df-246286080347"
+        }
+      },
+      "verification": {
+        "valid": true,
+        "chain_id": 56,
+        "provider": "0xccae2da18278c663fc808fa858fd89cc34cf701f",
+        "price_raw": "500000000000000000",
+        "payment_token": "0xce24439f2d9c6a2289f741120fe202248b666666",
+        "verifying_contract": "0xea4daa3100a767e86fded867729ae7446476eba6",
+        "estimated_completion_seconds": 600,
+        "quote_expires_at": 1788863534,
+        "signature_method": "eip191",
+        "request_hash": "0xbfb9e95c8ecf399bd574eb4377fd8cd9eca4411a16b8593fae38354f0d1ea54b",
+        "response_hash": "0x8604dfa04375a001619e47c8f281bd2e87a4568214ff28d031a91ca60bd5f68a",
+        "negotiation_hash": "0x3df86d00328580e4fcb70755b94336061fdc97f3047b2ac7f4e67f2c9743057b",
+        "job_description": "{\"chain_id\":56,\"currency\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\",\"negotiated_at\":1788862634,\"negotiation_hash\":\"0x3df86d00328580e4fcb70755b94336061fdc97f3047b2ac7f4e67f2c9743057b\",\"price\":\"500000000000000000\",\"provider_sig\":\"0xce4c92703d6744887f3717c823e6b111467953118a48e5165a399df7bf4a855a6cc3bac9cd119483482a90c1ad54a3c25684206a9835f0b19616ed4735752fc61c\",\"quote_expires_at\":1788863534,\"task\":\"{\\\"capitalUsd\\\":10000,\\\"maxPerPoolPct\\\":60,\\\"pools\\\":{\\\"venus-usdc\\\":{\\\"apyPct\\\":4.2,\\\"riskScore\\\":1,\\\"tvlUsd\\\":100000000},\\\"venus-usdt\\\":{\\\"apyPct\\\":6.1,\\\"riskScore\\\":1,\\\"tvlUsd\\\":200000000}}}\",\"terms\":{\"deliverables\":\"Complete exact requested analysis and unsigned preparation; no broadcasting\",\"quality_standards\":\"Correct inputs and arithmetic, public sources where used, disclose assumptions; SafeHire OptimisticPolicy 0x9c01845705b3078aa2e8cff7520a6376fd766de5 and router 0x51895229e12f9876011789b04f8698af06ccd6da only\"},\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"version\":1}"
+      }
+    },
+    {
+      "id": 324818,
+      "kind": "lp",
+      "endpoint": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A899042279537%3Aruntime%2Frangereset-ozY66A9He2/invocations?qualifier=DEFAULT",
+      "sample_inputs_are_hypothetical": true,
+      "task": {
+        "tokenId": 7319347,
+        "width": "medium",
+        "slippageBps": 50
+      },
+      "checked_at": 1788862634.650034,
+      "http_status": 401,
+      "wallet": "0x239b5ccc6ecffe6f3f7c939ab528d654e9570b5c",
+      "response": {
+        "jsonrpc": "2.0",
+        "error": {
+          "code": -32001,
+          "message": "Missing Authentication Token"
+        }
+      }
+    },
+    {
+      "id": 331131,
+      "kind": "lp",
+      "endpoint": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A899042279537%3Aruntime%2Flatticelatch-H5LyouAY4q/invocations?qualifier=DEFAULT",
+      "sample_inputs_are_hypothetical": true,
+      "task": {
+        "tokenId": 7319347,
+        "width": "medium",
+        "slippageBps": 50
+      },
+      "checked_at": 1788862635.260635,
+      "http_status": 401,
+      "wallet": "0x239b5ccc6ecffe6f3f7c939ab528d654e9570b5c",
+      "response": {
+        "jsonrpc": "2.0",
+        "error": {
+          "code": -32001,
+          "message": "Missing Authentication Token"
+        }
+      }
+    }
+  ]
+}

@@ -136,6 +136,8 @@ class Journal:
             raw = json.dumps(data, ensure_ascii=False, allow_nan=False)
             db.execute('UPDATE watches SET latest=?,state=?,due=?,lease=0,attempts=attempts+?,active=CASE WHEN ? THEN 0 ELSE active END WHERE id=?', (raw, state, now+interval, int(attempted), terminal, watch))
             kind = 'alert' if state in {'alert', 'error', 'acceptance_failed', 'overdue'} and row['state'] != state else 'observation'
+            if state == 'submitted' and row['state'] != state:
+                kind = 'delivery_ready'
             db.execute('INSERT INTO events(watch,at,kind,data) VALUES(?,?,?,?)', (watch, now, kind, raw))
             # Explicit retention bound; downloadable evidence states the limit.
             db.execute('DELETE FROM events WHERE watch=? AND seq NOT IN (SELECT seq FROM events WHERE watch=? ORDER BY seq DESC LIMIT 300)', (watch, watch))

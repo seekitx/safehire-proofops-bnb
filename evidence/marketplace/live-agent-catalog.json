@@ -162,9 +162,79 @@
         "source": "BSC eth_call at canonical block hash; no registration transaction claimed"
       },
       "registration_url": "https://8004scan.io/agents/bsc/269224"
+    },
+    {
+      "token_id": 269228,
+      "name": "ChainHelix — Borrowing health calculation",
+      "skill_id": "health_factor",
+      "category": "health_factor_monitoring",
+      "description": "Point-in-time lending health calculation from supplied collateral thresholds, debt and prices. Returns health factor, status and calculation details. No ongoing monitoring or repayment.",
+      "operator": "ChainHelix",
+      "scope": "calculation_only",
+      "quote_format": "bnbagent-sdk-v1",
+      "provider_address": "0x91f4602760e1627007bfc16f78a74cf8b9de8da2",
+      "price_raw": "500000000000000000",
+      "a2a_endpoint": "https://agents.chainhelix.io/healthmon/",
+      "agent_card_url": "https://agents.chainhelix.io/healthmon/.well-known/agent-card.json",
+      "registry_url": "https://8004scan.io/agents/bsc/269228",
+      "registration_url": "https://8004scan.io/agents/bsc/269228",
+      "registration_evidence": "evidence/marketplace/supply-expansion-2026-09-08/quote-probes.json",
+      "paid_delivery_verified": false,
+      "completed_jobs_claimed": 0,
+      "required_inputs": {
+        "task_input": "Strict service-specific flat inputs; sample is hypothetical. Live-source preparation is available in the purchase form."
+      },
+      "registration_observation": {
+        "chain_id": 56,
+        "token_id": 269228,
+        "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+        "block_hash": "0xd013a753abd87bf7c2fc7be17a4ecd08e4a4ed3f5cdb280a9ad977b89ccbda97",
+        "block_number": 120670174,
+        "block_timestamp": 1788863240,
+        "calldata": "0x003395090000000000000000000000000000000000000000000000000000000000041bac",
+        "return_data": "0x00000000000000000000000091f4602760e1627007bfc16f78a74cf8b9de8da2",
+        "agent_wallet": "0x91f4602760e1627007bfc16f78a74cf8b9de8da2",
+        "method": "getAgentWallet(uint256)",
+        "source": "BSC eth_call at canonical block hash; no registration transaction claimed"
+      }
+    },
+    {
+      "token_id": 269226,
+      "name": "ChainHelix — Yield allocation calculation",
+      "skill_id": "yield_plan",
+      "category": "yield_optimisation",
+      "description": "Allocation calculation from supplied pool rates, capital and concentration limits. Returns allocation, blended rate and unused capital. No withdrawal, migration or profit guarantee.",
+      "operator": "ChainHelix",
+      "scope": "calculation_only",
+      "quote_format": "bnbagent-sdk-v1",
+      "provider_address": "0xccae2da18278c663fc808fa858fd89cc34cf701f",
+      "price_raw": "500000000000000000",
+      "a2a_endpoint": "https://agents.chainhelix.io/yieldopt/",
+      "agent_card_url": "https://agents.chainhelix.io/yieldopt/.well-known/agent-card.json",
+      "registry_url": "https://8004scan.io/agents/bsc/269226",
+      "registration_url": "https://8004scan.io/agents/bsc/269226",
+      "registration_evidence": "evidence/marketplace/supply-expansion-2026-09-08/quote-probes.json",
+      "paid_delivery_verified": false,
+      "completed_jobs_claimed": 0,
+      "required_inputs": {
+        "task_input": "Strict service-specific flat inputs; sample is hypothetical. Live-source preparation is available in the purchase form."
+      },
+      "registration_observation": {
+        "chain_id": 56,
+        "token_id": 269226,
+        "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+        "block_hash": "0xd013a753abd87bf7c2fc7be17a4ecd08e4a4ed3f5cdb280a9ad977b89ccbda97",
+        "block_number": 120670174,
+        "block_timestamp": 1788863240,
+        "calldata": "0x003395090000000000000000000000000000000000000000000000000000000000041baa",
+        "return_data": "0x000000000000000000000000ccae2da18278c663fc808fa858fd89cc34cf701f",
+        "agent_wallet": "0xccae2da18278c663fc808fa858fd89cc34cf701f",
+        "method": "getAgentWallet(uint256)",
+        "source": "BSC eth_call at canonical block hash; no registration transaction claimed"
+      }
     }
   ],
-  "trust_boundary": "Registration and advertised service access are discovery evidence, not working signed quotes or useful paid delivery. Job #56733 with supplier #265375 has been funded but remains without delivery; new quotes for that supplier are paused. The refresh scope is limited to the four Brain registrations.",
+  "trust_boundary": "Listings and signed sample quotes do not prove useful paid delivery. ChainHelix services share one operator. LP supplier 265375 remains paused; Brain quotes lack complete signatures at the latest check. Each purchase requires a fresh verified quote.",
   "verification": {
     "chain_id": 56,
     "scope": "four Brain On BNB registrations only; other observations retain their dates",
@@ -177,5 +247,5 @@
       "yield_plan"
     ]
   },
-  "independence_note": "Two configured operator identities and endpoints; separate business ownership and successful paid deliveries are not verified."
+  "independence_note": "ChainHelix has three services from one operator, not three independent suppliers. Same-task dual independent supply is not proved."
 }

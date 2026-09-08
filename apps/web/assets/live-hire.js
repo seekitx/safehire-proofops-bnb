@@ -18,7 +18,7 @@ const taskJSON = {
 
 const CHAIN_ID_HEX = "0x38";
 const EXPLORER = "https://bscscan.com";
-const expectedPrice = () => BigInt(state.quotePayload?.quote?.price || (state.agentTokenId === 269224 ? '500000000000000000' : '100000000000000000'));
+const expectedPrice = () => BigInt(state.quotePayload?.quote?.price || ([269224,269226,269228].includes(state.agentTokenId) ? '500000000000000000' : '100000000000000000'));
 const priceLabel = () => `${Number(expectedPrice()) / 1e18} U`;
 const U_TOKEN = "0xcE24439F2D9C6a2289F741120FE202248B666666";
 const COMMERCE = "0xEa4DAa3100A767e86FDed867729ae7446476EBA6";
@@ -99,6 +99,17 @@ async function api(path, options = {}) {
 }
 
 function selectedInput() {
+  if ([269228,269226].includes(state.agentTokenId)) {
+    if (state.calculatorSourceRequired && !state.calculatorInput) throw new Error('实时来源尚未读取成功；请重试，或明确选择改用手填值');
+    if (state.calculatorSourceAt && Date.now()/1000-state.calculatorSourceAt>600) throw new Error('来源快照已超过 10 分钟，请重新读取');
+    if (state.calculatorInput) return structuredClone(state.calculatorInput);
+    if (state.agentTokenId === 269228 && byId('calcCollateral')) return {
+      collateral:{collateral_USD:{amount:Number(byId('calcCollateral').value),liqThreshold:Number(byId('calcThreshold').value)}},
+      debt:{debt_USD:Number(byId('calcDebt').value)},prices:{collateral_USD:1,debt_USD:1},alertHF:1.5,criticalHF:1.1};
+    if (state.agentTokenId === 269226 && byId('calcCapital')) return {
+      pools:{candidate_a:{apyPct:Number(byId('calcRateA').value)},candidate_b:{apyPct:Number(byId('calcRateB').value)}},
+      capitalUsd:Number(byId('calcCapital').value),maxPerPoolPct:60};
+  }
   if (state.agentTokenId === 269224 && byId('gridPrice')) {
     return {price: Number(byId('gridPrice').value), budgetUsd: Number(byId('gridBudget').value),
       levels: Number(byId('gridLevels').value), spanPct: Number(byId('gridSpan').value)};
@@ -115,7 +126,58 @@ function selectedInput() {
   return value;
 }
 
+function calculatorForm() {
+  const token = state.agentTokenId;
+  if (![269228, 269226].includes(token)) return;
+  const form = document.createElement('fieldset');
+  const health = token === 269228;
+  form.innerHTML = `<legend>${health ? '借贷健康计算' : '收益分配计算'} · 单次分析，不执行交易</legend>
+    ${health ? '<label>抵押品美元价值<input id="calcCollateral" type="number" min="0.01" step="any" value="20000"></label><label>加权清算阈值（0–1）<input id="calcThreshold" type="number" min="0.0001" max="1" step="any" value="0.8"></label><label>债务美元价值<input id="calcDebt" type="number" min="0.01" step="any" value="10000"></label><label>读取真实 Venus Core 账户<input id="calcAccount" placeholder="公开账户地址 0x…" maxlength="42"></label>' : '<label>计划分配资金 / 美元<input id="calcCapital" type="number" min="0.01" max="1000000000" step="any" value="10000"></label><label>候选 A 年化 / %<input id="calcRateA" type="number" min="0" max="1000" step="any" value="6.1"></label><label>候选 B 年化 / %<input id="calcRateB" type="number" min="0" max="1000" step="any" value="4.2"></label>'}
+    <p>默认值仅是假设练习。0.50 U 买一次供应商计算；不含资金迁移、交易、持续监控或收益保证。首次真实交付及内容质量尚待验证。离站提醒需要在工作台另行开启。</p>
+    <label><input id="calcSourceConsent" type="checkbox">同意读取公开链上数据；最终确认付款后，任务输入会公开写入链上。</label>
+    <button id="calcLoadSource" type="button">读取当前数据并用于本次任务</button>
+    <button id="calcUseManual" type="button">改用上方手填值</button>
+    <button id="calcDownloadSource" type="button" disabled>下载本次来源原文</button>
+    <p id="calcSourceStatus">当前使用假设手填值；尚未读取实时来源。</p><pre id="calcSourcePreview" style="white-space:pre-wrap;max-height:240px;overflow:auto"></pre>`;
+  byId('taskInput').before(form);
+  byId('taskInput').hidden = true;
+  byId('resetTask').hidden = true;
+  let source = null;
+  const reset = () => {
+    state.calculatorInput = null; state.calculatorSourceRequired = false; state.calculatorSourceAt = null; source = null;
+    byId('calcSourceStatus').textContent = '已改用手填值；这些值未获得实时来源认证。';
+    byId('calcSourcePreview').textContent = '';
+    byId('calcDownloadSource').disabled = true;
+  };
+  form.querySelectorAll('input[type="number"]').forEach(input => input.addEventListener('input', reset));
+  byId('calcAccount')?.addEventListener('input', reset);
+  byId('calcUseManual').onclick = reset;
+  byId('calcLoadSource').onclick = async () => {
+    const button = byId('calcLoadSource');
+    if (!byId('calcSourceConsent').checked) return toast('请先勾选公开数据读取说明', true);
+    button.disabled = true; reset(); state.calculatorSourceRequired = true;
+    byId('calcSourceStatus').textContent = '正在读取同一区块的数据，请稍候…';
+    try {
+      source = await api('/api/workspace/calculator-source', {method:'POST',body:JSON.stringify({
+        token_id:token, account:health ? byId('calcAccount').value.trim() : null,
+        capital:health ? 10000 : Number(byId('calcCapital').value), consent:true})});
+      state.calculatorInput = source.task_input; state.calculatorSourceAt = source.observation.block_timestamp;
+      byId('calcSourceStatus').textContent = `本次任务改用区块 ${source.observation.block_number} 的数据，读取于 ${source.observation.observed_at}。${source.boundary}`;
+      byId('calcSourcePreview').textContent = JSON.stringify(source.task_input,null,2);
+      byId('calcDownloadSource').disabled = false;
+    } catch(error) { byId('calcSourceStatus').textContent = error.message; toast(error.message,true); }
+    finally {button.disabled=false;}
+  };
+  byId('calcDownloadSource').onclick = () => {
+    if (!source) return;
+    const url=URL.createObjectURL(new Blob([JSON.stringify(source,null,2)],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;a.download=`safehire-calculator-source-${token}-${source.observation.block_number}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+}
+
 function taskExample() {
+  if (state.agentTokenId === 269228) return {collateral:{ETH:{amount:10,liqThreshold:0.8}},debt:{USDT:10000},prices:{ETH:2000,USDT:1}};
+  if (state.agentTokenId === 269226) return {pools:{example_a:{apyPct:6.1},example_b:{apyPct:4.2}},capitalUsd:10000,maxPerPoolPct:60};
   if (state.agentTokenId === 269224) return {price: 750, budgetUsd: 1000, levels: 5, spanPct: 2};
   const value = structuredClone(examples[state.skillId]);
   if (state.skillId === "health_factor" && state.owner) value.address = state.owner;
@@ -332,6 +394,7 @@ async function loadQuote() {
     }
   }
   resetTask();
+  calculatorForm();
   if (state.agentTokenId === 269224) {
     const form = document.createElement('fieldset');
     form.innerHTML = '<legend>网格计算参数（不会实际下单）</legend><label>参考价格<input id="gridPrice" type="number" min="0.00000001" step="any" value="750"></label><label>假设资金 / 美元<input id="gridBudget" type="number" min="0.01" step="any" value="1000"></label><label>每侧档数<input id="gridLevels" type="number" min="1" max="50" value="5"></label><label>半宽 / %<input id="gridSpan" type="number" min="0.01" max="99" step="any" value="2"></label><p>参考价格与资金由你提供，默认值是假设示例。服务交付价格表，不会管理订单或执行止损。</p>';
@@ -538,6 +601,7 @@ async function resumeJob(jobId) {
     state.skillId = status.task_spec.service;
     state.agentTokenId = Number(status.task_spec.erc8004_token_id);
     byId("taskInput").value = taskJSON.stringify(status.task_spec.task_input, null, 2);
+    state.calculatorInput = [269228,269226].includes(state.agentTokenId) ? status.task_spec.task_input : null;
     byId("jobBadge").textContent = `JOB #${jobId} · ${status.status}`;
     byId("resumeState").hidden = false;
     byId("resumeState").textContent =
@@ -624,6 +688,12 @@ function renderDelivery(delivery) {
   byId("deliveryTitle").textContent = `Job #${delivery.job_id} · manifest matches ${short(delivery.onchain?.deliverable_hash)}`;
   byId("deliveryManifestLink").href = delivery.manifest_url;
   byId("deliveryContent").textContent = verification.content || "No content returned.";
+  if (!delivery.acceptance) {
+    let box = byId('semanticAcceptance');
+    if (!box) { box = document.createElement('p'); box.id = 'semanticAcceptance'; byId('deliveryContent').before(box); }
+    box.textContent = '交付文件与链上记录一致，但此类结果尚未通过内容验收。请逐项核对输入、计算和用途，再决定接受或争议。';
+    byId('gridResultSummary')?.remove();
+  }
   if (delivery.acceptance) {
     let box = byId('semanticAcceptance');
     if (!box) { box = document.createElement('p'); box.id = 'semanticAcceptance'; byId('deliveryContent').before(box); }

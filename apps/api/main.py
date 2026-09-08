@@ -272,12 +272,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.application = application
     followup_task = None
     supply_task = None
+    notification_task = None
     if os.getenv('SAFEHIRE_FOLLOWUP_ENABLED', 'false').lower() == 'true':
         import asyncio
         followup_task = asyncio.create_task(run_followup(workspace_journal, PROJECT_ROOT))
         from proofops.workspace.supply import run as run_supply
         supply_task = asyncio.create_task(run_supply(PROJECT_ROOT, workspace_journal))
+        from proofops.workspace.notifications import run as run_notifications
+        notification_task = asyncio.create_task(run_notifications(workspace_journal))
     app.state.followup_task = followup_task
+    app.state.notification_task = notification_task
     try:
         yield
     finally:
@@ -292,6 +296,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             supply_task.cancel()
             try:
                 await supply_task
+            except asyncio.CancelledError:
+                pass
+        if notification_task:
+            notification_task.cancel()
+            try:
+                await notification_task
             except asyncio.CancelledError:
                 pass
         await application.close()

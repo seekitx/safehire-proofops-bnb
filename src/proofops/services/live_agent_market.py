@@ -438,6 +438,20 @@ async def request_live_agent_quote(
         expected_request = {'task_description': canonical_json(normalized), 'terms': {
             'deliverables': 'grid level plan with per-level sizes',
             'quality_standards': 'deterministic arithmetic, levels within the stated span; exact supplied inputs; no trading, custody or profit claim'}}
+    from proofops.services import reviewed_calculators
+    calculator_token = int(selected['token_id'])
+    if calculator_token in reviewed_calculators.SERVICES:
+        if arena_task is not None:
+            raise ValueError('Calculator requires its own explicit inputs; Arena conversion is not authorized')
+        if skill_id != reviewed_calculators.SERVICES[calculator_token][0]:
+            raise ValueError('Calculator category mismatch')
+        normalized = reviewed_calculators.inputs(calculator_token, task_input if task_input is not None else reviewed_calculators.sample(calculator_token))
+        normalized['request_nonce'] = nonce
+        task_spec = {'schema_version': 'chainhelix-calculator/1', 'service': skill_id,
+                     'erc8004_token_id': calculator_token, 'task_input': normalized, 'request_nonce': nonce}
+        expected_request = {'task_description': canonical_json(normalized), 'terms': {
+            'deliverables': selected['description'],
+            'quality_standards': 'Use the exact supplied inputs. Return complete readable calculation output and assumptions. One calculation only, no monitoring, transfers, trading or profit guarantee. Manual quality review required.'}}
     if quote_format == "bnbagent-sdk-v1":
         # The reviewed chain transaction always uses SafeHire's fixed router and
         # policy. Do not rely on unsigned SDK evaluator metadata.

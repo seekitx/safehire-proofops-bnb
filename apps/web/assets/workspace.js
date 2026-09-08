@@ -26,7 +26,7 @@ function showServices(category) {
   for (const kind of ['grid','lp','yield','health']) $(kind+'Form').hidden = kind !== selectedForm;
   $('scope').textContent=scopes[category];
   document.querySelectorAll('[data-category]').forEach(b=>b.classList.toggle('selected',b.dataset.category===category));
-  $('services').innerHTML=services.filter(s=>s.category===category).map(s=>`<article><span class="badge">${esc(s.operator)}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p><p class="muted">${s.token_id===269224?'审核参考价 0.5 U，实际以新签名报价为准；预计时间不等于退款时间。':'价格和预计时间须重新取得有效签名报价。'}</p><p>${s.submitted_evidence.length ? '已有提交结果：'+esc(s.submitted_evidence.join(', '))+'；不等于已结算或成功率。' : '暂无本市场已验证交付样本。'}</p>${s.availability?`<p>报价探测：${esc(({quote_verified:'样例签名报价通过',unavailable:'当前未通过报价检查',paused:'已暂停',stale:'探测过期',unchecked:'等待检查'})[s.availability.state])}${s.availability.price_display?' · '+esc(s.availability.price_display):''}${s.availability.checked_at?' · '+esc(new Date(s.availability.checked_at*1000).toLocaleString()):''}。实际输入仍须重新报价。</p>`:''}${s.pause?`<p>${esc(s.pause)}</p>`:s.availability?.can_request_quote?`<a class="action" href="${esc(s.hire_url)}">查看报价与购买条件</a>`:'<p>当前暂不可购买，请稍后刷新查看。</p>'}<p class="muted">能力：${esc(s.scope)} · 完成率：样本不足</p></article>`).join('')+`<article><h3>先检查是否适合你的任务</h3><p>查看真实数据、费用假设、验收条件和能力限制。</p><a class="action" href="/arena">打开任务分析</a></article>`;
+  $('services').innerHTML=services.filter(s=>s.category===category).map(s=>`<article><span class="badge">${esc(s.operator)}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p><p class="muted">${[269224,269226,269228].includes(s.token_id)?'审核参考价 0.5 U，实际以新签名报价为准；预计时间不等于退款时间。':'价格和预计时间须重新取得有效签名报价。'}</p><p>${s.submitted_evidence.length ? '已有提交结果：'+esc(s.submitted_evidence.join(', '))+'；不等于已结算或成功率。' : '暂无本市场已验证交付样本。'}</p>${s.availability?.failure?`<p>${esc(s.availability.failure.reason)}</p>`:''}${s.availability?`<p>报价探测：${esc(({quote_verified:'样例签名报价通过',unavailable:'当前未通过报价检查',paused:'已暂停',stale:'探测过期',unchecked:'等待检查'})[s.availability.state])}${s.availability.price_display?' · '+esc(s.availability.price_display):''}${s.availability.checked_at?' · '+esc(new Date(s.availability.checked_at*1000).toLocaleString()):''}。实际输入仍须重新报价。</p>`:''}${s.pause?`<p>${esc(s.pause)}</p>`:s.availability?.can_request_quote?`<a class="action" href="${esc(s.hire_url)}">查看报价与购买条件</a>`:'<p>当前暂不可购买，请稍后刷新查看。</p>'}<p class="muted">能力：${esc(({calculation_only:'单次计算',analysis_only:'分析建议'})[s.scope]||s.scope)} · 完成率：样本不足</p></article>`).join('')+`<article><h3>先检查是否适合你的任务</h3><p>查看真实数据、费用假设、验收条件和能力限制。</p><a class="action" href="/arena">打开任务分析</a></article>`;
 }
 function actionForm(w) {
   if (w.kind==='order') return '';
@@ -47,7 +47,9 @@ function actionResult(w) {
 }
 
 function deliveryTable(delivery) {
-  if (!delivery?.acceptance?.passed) return '';
+  if (!delivery) return '';
+  if (!delivery.acceptance && delivery.verification?.content) return `<details open><summary>查看供应商原始结果（内容待验收）</summary><p>文件哈希核验不代表结论正确。请核对任务输入、计算和实际用途；不要据此自动转账。</p><pre>${esc(delivery.verification.content)}</pre></details>`;
+  if (!delivery.acceptance?.passed) return '';
   try {
     const result=JSON.parse(delivery.verification.content);
     if (!Array.isArray(result.buys)||!Array.isArray(result.sells)) return '';
@@ -55,7 +57,7 @@ function deliveryTable(delivery) {
   } catch (_) { return ''; }
 }
 function display() {
-  $('forms').hidden=!credential; $('create').hidden=!!credential; $('backup').hidden=!credential; $('export').hidden=!credential; $('switchSpace').hidden=!credential;
+  $('notificationPanel').hidden=!credential; $('forms').hidden=!credential; $('create').hidden=!!credential; $('backup').hidden=!credential; $('export').hidden=!credential; $('switchSpace').hidden=!credential;
   $('workspaceState').textContent=credential?'私有工作台已连接。请保存恢复凭证；不要把它放进公开提交材料。':'还没有创建私有工作台。';
 }
 async function refresh() {
@@ -64,9 +66,9 @@ async function refresh() {
   try {
     current=await api('/spaces/'+credential.space_id,undefined,true);
     $('watches').innerHTML=current.watches.map(w=>{
-      const unread=w.events.filter(e=>e.kind==='alert'&&!e.read_at).length;
+      const unread=w.events.filter(e=>['alert','delivery_ready'].includes(e.kind)&&!e.read_at).length;
       const latest=w.latest; const obs=latest.observation;
-      const lastObservation=w.events.find(e=>e.kind==='observation'||e.kind==='alert');
+      const lastObservation=w.events.find(e=>e.kind==='observation'||e.kind==='alert'||e.kind==='delivery_ready');
       const stale=!!w.active && Date.now()/1000-(lastObservation?.at||w.created)>600;
       const priorDelivery=w.events.find(e=>e.data?.delivery);
       const delivery=latest.delivery||priorDelivery?.data.delivery;
@@ -77,16 +79,16 @@ async function refresh() {
     }).join('')||'<p>还没有任务。添加一个公开订单或监控对象。</p>';
   } catch(e){message(e.message);} finally{busy=false;}
 }
-$('create').onclick=async()=>{try{credential=await api('/spaces',{});localStorage.setItem(key,JSON.stringify(credential));display();await refresh();}catch(e){message(e.message);}};
+$('create').onclick=async()=>{try{credential=await api('/spaces',{});localStorage.setItem(key,JSON.stringify(credential));display();await refresh();await refreshNotifications();}catch(e){message(e.message);}};
 $('backup').onclick=()=>download('safehire-private-recovery.json',credential);
-$('restore').onchange=async e=>{try{const file=e.target.files[0];if(!file||file.size>4096)throw new Error('请选择小于 4 KB 的恢复凭证');const value=JSON.parse(await file.text());if(!/^[a-f0-9]{32}$/.test(value.space_id)||typeof value.token!=='string'||value.token.length<32||value.token.length>128)throw new Error('恢复凭证无效');credential=value;await api('/spaces/'+value.space_id,undefined,true);localStorage.setItem(key,JSON.stringify(value));display();await refresh();}catch(err){credential=null;display();message(err.message);}};
+$('restore').onchange=async e=>{try{const file=e.target.files[0];if(!file||file.size>4096)throw new Error('请选择小于 4 KB 的恢复凭证');const value=JSON.parse(await file.text());if(!/^[a-f0-9]{32}$/.test(value.space_id)||typeof value.token!=='string'||value.token.length<32||value.token.length>128)throw new Error('恢复凭证无效');credential=value;await api('/spaces/'+value.space_id,undefined,true);localStorage.setItem(key,JSON.stringify(value));display();await refresh();await refreshNotifications();}catch(err){credential=null;display();message(err.message);}};
 $('export').onclick=()=>current&&download('safehire-service-records.json',current);
 $('refresh').onclick=refresh;
 for(const kind of ['order','health','lp','grid','yield']) $(kind+'Form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target), body={kind,consent:f.has('consent')};if(kind==='order'){body.job_id=Number(f.get('job_id'));body.notify_provider=f.has('notify_provider');}if(kind==='health'){body.account=f.get('account');body.threshold=Number(f.get('threshold'));body.target=Number(f.get('target'));}if(kind==='lp')body.position_id=Number(f.get('position_id'));if(kind==='grid'){body.lower=Number(f.get('lower'));body.upper=Number(f.get('upper'));}if(kind==='yield'){for(const n of ['capital','days','cost','minimum_gain'])body[n]=Number(f.get(n));body.current_venue=f.get('current_venue');}try{await api('/spaces/'+credential.space_id+'/watches',body,true);await refresh();message('已保存。服务器会继续检查；可在此查看记录或暂停。');}catch(err){message(err.message);}};
 $('watches').onclick=async e=>{const b=e.target.closest('button');if(!b || (!b.dataset.pause && !b.dataset.ack && !b.dataset.resume && !b.dataset.planExport))return;try{if(b.dataset.planExport){const w=current.watches.find(w=>w.id===b.dataset.planExport);return download('safehire-action-preparation.json',w.events.find(e=>e.kind==='action_plan').data);}if(b.dataset.resume)await api(`/spaces/${credential.space_id}/watches/${b.dataset.resume}/resume`,{},true);if(b.dataset.pause)await api(`/spaces/${credential.space_id}/watches/${b.dataset.pause}/pause`,{},true);if(b.dataset.ack)await api(`/spaces/${credential.space_id}/watches/${b.dataset.ack}/acknowledge`,{},true);await refresh();}catch(err){message(err.message);}};
 $('compareForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const body={consent:f.has('consent')};for(const n of ['price','budgetUsd','levels','spanPct'])body[n]=Number(f.get(n));const button=e.target.querySelector('button');button.disabled=true;try{const r=await api('/compare-grid',body);$('comparison').innerHTML=r.offers.map(o=>`<p><strong>${esc(o.name)}</strong>：${o.quote?esc(o.quote.quote.price_display)+'，预计 '+esc(o.quote.quote.estimated_completion_seconds)+' 秒；签名已核验，尚未购买':esc(o.error||o.reason)}</p>`).join('');}catch(err){message(err.message);}finally{button.disabled=false;}};
 document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>showServices(b.dataset.category));
-(async()=>{display();try{const [cap,list]=await Promise.all([api('/capabilities'),api('/services')]);$('runtime').textContent=cap.server_followup?'服务器跟进运行中 · 约每 5 分钟读取 · 不自动转账':cap.enabled?'跟进进程当前不可用；请稍后刷新，暂时不要依赖监控。':'当前部署未开启服务器跟进；购买与公开证据仍可查看。';services=list.services;showServices('grid_trading');await refresh();}catch(e){message(e.message);}setInterval(refresh,30000);})();
+(async()=>{display();try{const [cap,list]=await Promise.all([api('/capabilities'),api('/services')]);$('runtime').textContent=cap.server_followup?'服务器跟进运行中 · 约每 5 分钟读取 · 不自动转账':cap.enabled?'跟进进程当前不可用；请稍后刷新，暂时不要依赖监控。':'当前部署未开启服务器跟进；购买与公开证据仍可查看。';services=list.services;showServices('grid_trading');await refresh();await refreshNotifications();}catch(e){message(e.message);}setInterval(refresh,30000);})();
 
 $('watches').addEventListener('submit', async e => {
   const form = e.target.closest('[data-feedback-form]'); if (!form) return; e.preventDefault();
@@ -109,3 +111,17 @@ $('watches').addEventListener('submit', async e=>{
 setInterval(async()=>{try{services=(await api('/services')).services;showServices(selectedCategory);}catch(_){services=services.map(s=>({...s,availability:{state:'stale',can_request_quote:false}}));showServices(selectedCategory);}},60000);
 
 $('switchSpace').onclick=()=>{credential=null;current=null;localStorage.removeItem(key);$('watches').innerHTML='';display();message('已退出本机连接，服务器记录仍保留；可用恢复文件重新连接。');};
+
+async function refreshNotifications(){
+  if(!credential)return;
+  try{const n=await api(`/spaces/${credential.space_id}/notifications`,undefined,true);
+    $('notificationState').textContent=n.enabled?'手机提醒已启用；下面区分推送服务接收与本人阅读。':n.bound?'设备已绑定，等待手机验证码确认。':'尚未绑定手机提醒。';
+    $('pushVerifyForm').hidden=!n.bound||n.verified; $('pushUnsubscribe').hidden=!n.bound;
+    const labels={pending:'等待重试或发送',sending:'发送中',accepted_by_provider:'Bark 已接收，未证明本人阅读',failed:'发送失败，已停止重试',expired:'超过发送期限',cancelled:'已取消'};
+    $('notificationLog').innerHTML=n.deliveries.map(r=>`<p>提醒 ${r.id}：${esc(labels[r.state]||r.state)} · 已尝试 ${r.attempts} 次</p>`).join('')||'<p>暂无推送记录。</p>';
+  }catch(e){$('notificationState').textContent=e.message;}
+}
+$('pushBindForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),b=e.target.querySelector('button');b.disabled=true;try{const r=await api(`/spaces/${credential.space_id}/notifications/bind`,{device_key:f.get('device_key').trim(),consent:f.has('consent')},true);e.target.reset();message(r.provider_accepted?'验证通知已交给 Bark，请查看手机并填写验证码。':'Bark 未接受验证通知，请检查设备 Key 后重试。');await refreshNotifications();}catch(err){message(err.message);}finally{b.disabled=false;}};
+$('pushVerifyForm').onsubmit=async e=>{e.preventDefault();try{await api(`/spaces/${credential.space_id}/notifications/verify`,{code:new FormData(e.target).get('code')},true);e.target.reset();await refreshNotifications();message('手机接收验证通过，已开启后续新提醒。');}catch(err){message(err.message);}};
+$('pushUnsubscribe').onclick=async()=>{try{await api(`/spaces/${credential.space_id}/notifications/unsubscribe`,{},true);await refreshNotifications();message('已关闭提醒并删除服务器上的设备凭证。');}catch(err){message(err.message);}};
+setInterval(refreshNotifications,30000);

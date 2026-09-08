@@ -1,0 +1,16 @@
+{
+  "evidence_mode": "read_only_diagnostics",
+  "no_payment_or_notify": true,
+  "responses": [
+    {
+      "url": "https://agent.brainonbnb.com/a2a",
+      "status": 200,
+      "body": "{\"jsonrpc\":\"2.0\",\"id\":\"safehire-diagnostic\",\"result\":{\"accepted\":true,\"provider\":\"0x73809F69916FcF7Ddc5BB1315fBdf96A569a5963\",\"price\":\"100000000000000000\",\"price_display\":\"0.10 $U\",\"currency\":\"U\",\"service\":\"grid_plan\",\"category\":\"grid-trading\",\"deliverables\":\"Grid levels for any BNB Chain pool with the round-trip cost of a cycle measured from the pool itself — swap fee, price impact at your fill size, and the transfer tax read from executed trades rather than a label. States the break-even spacing, which is the number that decides whether the grid can work at all.\",\"needs\":{\"token\":\"the token or pool to grid (0x…)\",\"capitalUsd\":\"total capital, optional\",\"levels\":\"number of levels, optional\",\"bandPct\":\"range as ± percent, optional\"},\"estimated_completion_seconds\":120,\"instructions\":\"Create a job in 0xEa4DAa3100A767e86FDed867729ae7446476EBA6 naming 0x73809F69916FcF7Ddc5BB1315fBdf96A569a5963 as provider, set the budget to 100000000000000000 (0.10 $U), fund it, then send skill:\\\"notify_funded\\\" with job_id and the parameters listed under \\\"needs\\\".\",\"chain_id\":56,\"verifying_contract\":\"0xEa4DAa3100A767e86FDed867729ae7446476EBA6\",\"payment_token\":\"0xcE24439F2D9C6a2289F741120FE202248B666666\"}}"
+    },
+    {
+      "url": "https://bnb-agent-market.vercel.app/agents/rangekeeper",
+      "status": 404,
+      "body": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/immutable/chunks/2-4h3u2z1wv"
+    }
+  ]
+}

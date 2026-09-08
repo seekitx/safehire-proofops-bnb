@@ -23,7 +23,7 @@ from proofops.integrations.erc8183_quote import (
     canonical_json,
     verify_job_description,
 )
-from proofops.services import reviewed_grid
+from proofops.services import reviewed_calculators, reviewed_grid
 from proofops.services.live_agent_market import (
     DEFAULT_A2A_ENDPOINT,
     request_live_agent_quote,
@@ -254,6 +254,12 @@ def _parse_task_spec(description: Mapping[str, Any], *, provider: str = "") -> d
         task = json.loads(raw_task)
     except json.JSONDecodeError as exc:
         raise ValueError("signed job task is not valid JSON") from exc
+    calculator_token = reviewed_calculators.token_for_wallet(provider)
+    if calculator_token is not None and isinstance(task, dict) and 'schema_version' not in task:
+        normalized = reviewed_calculators.inputs(calculator_token, task)
+        return {'schema_version': 'chainhelix-calculator/1', 'service': reviewed_calculators.SERVICES[calculator_token][0],
+                'erc8004_token_id': calculator_token, 'task_input': normalized,
+                'request_nonce': normalized.get('request_nonce'), 'arena_binding_supported': False}
     if provider.lower() == reviewed_grid.WALLET and isinstance(task, dict) and 'schema_version' not in task:
         normalized = reviewed_grid.inputs(task)
         return {'schema_version': 'chainhelix-grid/1', 'service': 'grid_plan',
@@ -286,6 +292,12 @@ def _parse_task_spec(description: Mapping[str, Any], *, provider: str = "") -> d
     }
 
 
+def _reviewed_price(provider: str) -> int:
+    if provider.lower() == reviewed_grid.WALLET or reviewed_calculators.token_for_wallet(provider) is not None:
+        return reviewed_grid.PRICE
+    return PRICE_RAW
+
+
 async def _verify_anchored_description(
     description: Mapping[str, Any], *, provider: str, require_current_quote: bool = True
 ) -> dict[str, Any]:
@@ -295,7 +307,7 @@ async def _verify_anchored_description(
         expected_chain_id=CHAIN_ID,
         expected_verifying_contract=COMMERCE,
         expected_payment_token=U_TOKEN,
-        expected_price_raw=reviewed_grid.PRICE if provider.lower() == reviewed_grid.WALLET else PRICE_RAW,
+        expected_price_raw=_reviewed_price(provider),
         rpc_url=BSC_MAINNET_RPC,
         rpc_call=_rpc,
         require_current_quote=require_current_quote,
@@ -327,6 +339,7 @@ async def prepare_live_hire(
             raise ValueError("Arena hire inputs must exactly match the frozen task inputs")
     else:
         normalized_input = (reviewed_grid.inputs(task_input) if agent_token_id == reviewed_grid.TOKEN_ID
+                            else reviewed_calculators.inputs(agent_token_id, task_input) if agent_token_id in reviewed_calculators.SERVICES
                             else validate_task_input(skill_id, task_input))
     quote_payload = await request_live_agent_quote(
         project_root,
@@ -1096,7 +1109,7 @@ async def _verified_payment(settlement_tx_hash: str, *, provider: str) -> int | 
             and str(topics[2]).lower() == _topic_address(provider).lower()
         ):
             amount = int(str(raw.get("data", "0x0")), 16)
-            if 0 < amount <= (reviewed_grid.PRICE if provider.lower() == reviewed_grid.WALLET else PRICE_RAW):
+            if 0 < amount <= (_reviewed_price(provider)):
                 return amount
     return None
 
@@ -1155,7 +1168,7 @@ async def build_verified_receipt(*, job_id: int) -> dict[str, Any]:
         "paid": True,
         "payment_token": U_TOKEN,
         "payment_raw": str(payment_raw),
-        "quoted_price_raw": str(reviewed_grid.PRICE if str(status["provider"]).lower() == reviewed_grid.WALLET else PRICE_RAW),
+        "quoted_price_raw": str(_reviewed_price(str(status["provider"]))),
         "provider_payment_verified": True,
         "evidence_boundary": (
             "This dossier was rebuilt from BSC Mainnet state, the signed on-chain job description, "
