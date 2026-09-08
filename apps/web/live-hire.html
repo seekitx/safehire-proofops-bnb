@@ -7,9 +7,10 @@
   <title>SafeHire · Live ERC-8183 hire</title>
   <link rel="stylesheet" href="/assets/styles.css" />
   <link rel="stylesheet" href="/assets/live-hire.css" />
+<link rel="stylesheet" href="/assets/product-design.css">
 </head>
 <body>
-  <header class="nav shell"><a href="/workspace">我的订单与监控</a>
+  <header class="nav shell"><a href="/workspace">My orders & monitoring</a>
     <a class="brand" href="/"><span class="mark">S</span><span>SafeHire</span><small>LIVE HIRE</small></a>
     <div class="network-pill"><span class="dot" id="networkDot"></span><span id="networkLabel">BSC Mainnet · wallet disconnected</span></div>
   </header>
@@ -50,7 +51,7 @@
         <p class="field-note" id="escrowTiming">Delivery time and escrow release time are different. The current dispute window will be read from chain when preparing the job; funds can remain locked for days after delivery.</p>
         <div class="task-head"><strong>Task input</strong><button id="resetTask" type="button">Reset reviewed example</button></div>
         <ul class="needs" id="taskNeeds"></ul>
-        <label class="check"><input type="checkbox" id="serverFollowup">同意服务器保存此订单并持续读取状态；付款后可通知原供应商，最多三次，不会再次付款。记录只对持有工作台凭证的人开放。</label><textarea id="taskInput" rows="14" spellcheck="false" aria-label="External Agent task JSON"></textarea>
+        <label class="check"><input type="checkbox" id="serverFollowup">I agree to save this order and monitor its public status. After payment, the server may notify the original provider up to three times, without paying again. Records are private to workspace credential holders.</label><textarea id="taskInput" rows="14" spellcheck="false" aria-label="External Agent task JSON"></textarea>
         <p class="field-note">The task is written into the public job description. Do not include passwords, private keys or personal secrets.</p>
       </article>
 

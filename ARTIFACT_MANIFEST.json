@@ -1,7 +1,7 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T11:55:05.352687+00:00",
-  "file_count_excluding_manifest": 407,
+  "generated_at_utc": "2026-09-08T13:19:52.741010+00:00",
+  "file_count_excluding_manifest": 418,
   "files": [
     {
       "path": ".dockerignore",
@@ -245,13 +245,13 @@
     },
     {
       "path": "apps/web/arena.html",
-      "bytes": 11758,
-      "sha256": "e6c207e8aafb284ca989653851fbd0b06eff468b4f876a538c992fef244081e5"
+      "bytes": 11816,
+      "sha256": "ec4dbbf5a2237a918f47c62779c8e616c340287bfa74b33eadff2908e480ad75"
     },
     {
       "path": "apps/web/assets/app.js",
-      "bytes": 20916,
-      "sha256": "30cc19d80b62e56a68ba3d09e56e27a0a5cb3d3828d819747b6c61a50517025e"
+      "bytes": 20923,
+      "sha256": "e890e9159c6ad816cd72c5fcb6e1a4743ebf62c4e6bdde9ba911f7d2b927fd03"
     },
     {
       "path": "apps/web/assets/arena.css",
@@ -264,14 +264,19 @@
       "sha256": "a24664e4dbbf4875d82279e45b43f5e34d7fe3a738c577da15416bbb50170968"
     },
     {
+      "path": "apps/web/assets/benchmark-briefs.en.json",
+      "bytes": 3922,
+      "sha256": "0641312197ff52db71725761b17353a14faf910cd2cc6bff20470a731912a7a5"
+    },
+    {
       "path": "apps/web/assets/benchmark.css",
       "bytes": 3613,
       "sha256": "049cdb4b35b57673b3b63d8f296f330813347ad4e384c9770dd5849217119011"
     },
     {
       "path": "apps/web/assets/benchmark.js",
-      "bytes": 14065,
-      "sha256": "76ecd2998eb8771c8225936adfdcbcb7ddde28de9ac965d128c16001a37a4a83"
+      "bytes": 14583,
+      "sha256": "374f82c49995267f636b0ab53c2ad6254f1c55ecaf11c3b61d43df74567a4c16"
     },
     {
       "path": "apps/web/assets/decision.css",
@@ -300,8 +305,8 @@
     },
     {
       "path": "apps/web/assets/hire-agent.js",
-      "bytes": 14334,
-      "sha256": "7e7633988b31c77ef02badf5d133c453a960cb722eaa021dd4bc9eb8901c6ae6"
+      "bytes": 14348,
+      "sha256": "f9834f5dd2746345ae79a0a6ac65644cabe43df341512c0306b5abab3ae5d7f4"
     },
     {
       "path": "apps/web/assets/judge-scorecard.css",
@@ -310,13 +315,13 @@
     },
     {
       "path": "apps/web/assets/judge-scorecard.html",
-      "bytes": 4253,
-      "sha256": "32821052145e52730c2b7b37244b0c0936ff234bab5f2e1cb43ad4b962d716f5"
+      "bytes": 4311,
+      "sha256": "c4df4644b1e1af4ea62e1ab59301c7306c4993dcb41fb53445c81d5d8d52f5ea"
     },
     {
       "path": "apps/web/assets/judge-scorecard.js",
-      "bytes": 7063,
-      "sha256": "e612b7d431ca873b6aa27de3eb8154140aa91bf9d6e2e810577c93943580a3a2"
+      "bytes": 7070,
+      "sha256": "e2850066ff415f116e82f8ee3cb36e4f1b36e01c4df164104279b806899636bf"
     },
     {
       "path": "apps/web/assets/live-hire.css",
@@ -325,8 +330,8 @@
     },
     {
       "path": "apps/web/assets/live-hire.js",
-      "bytes": 44756,
-      "sha256": "7880f4e938ae51f4f0e3eafa7902a135d7df03ea22ea47ef39fd352fa327378e"
+      "bytes": 45050,
+      "sha256": "404b4c5c6304a3f7021ad7f1c754dc9b5c3ada6a298b2fa230d2a1d673134ee2"
     },
     {
       "path": "apps/web/assets/live-market.css",
@@ -335,8 +340,13 @@
     },
     {
       "path": "apps/web/assets/live-market.js",
-      "bytes": 10813,
-      "sha256": "a5c7e93e9a57474057b141f351b8e2e2d4cf024b5a1b9ef9a2e41244edcfea67"
+      "bytes": 10820,
+      "sha256": "ad05615ac2af8f67ce0a112d18e91b8487dce3b22cae21cf237f3b4a2336a8db"
+    },
+    {
+      "path": "apps/web/assets/product-design.css",
+      "bytes": 11003,
+      "sha256": "29ade8d73139e1d0a699d83a07ff3ba32022195e8144aa41e76c278765d65600"
     },
     {
       "path": "apps/web/assets/proof-nav.css",
@@ -355,8 +365,8 @@
     },
     {
       "path": "apps/web/assets/proof.js",
-      "bytes": 11717,
-      "sha256": "29ccd3536017e87a8253170d1492c14bd286cc3e1e5f02b7ae7df5d6b72a67cf"
+      "bytes": 11772,
+      "sha256": "19b54348b4e5935ebaaec9258242067a3f1c97bdf1ace012b600dd931a46b6b9"
     },
     {
       "path": "apps/web/assets/styles.css",
@@ -379,9 +389,14 @@
       "sha256": "f645838b698f4d570a7ebe783959141d9e17e08c6c8d2fe03488f65fb8d5e69f"
     },
     {
+      "path": "apps/web/assets/submission-2026-09-08/evidence-design.css",
+      "bytes": 2696,
+      "sha256": "46be03404acaae11d06253dd8becb692bbff429e43d2a0c6b4c7c28b1972c1b8"
+    },
+    {
       "path": "apps/web/assets/submission-2026-09-08/index.html",
-      "bytes": 6890,
-      "sha256": "0c51b665f4dc68d829c1d8b3694c4d9ef47394aa1a4b51a1cc4575cabfbf4bf7"
+      "bytes": 6388,
+      "sha256": "b782bdca58b28025fd7f175b214fb0b47381648df59764b965997da66f2dc471"
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/notification-evidence.json",
@@ -420,53 +435,53 @@
     },
     {
       "path": "apps/web/assets/workspace.css",
-      "bytes": 2795,
-      "sha256": "7e7d06d57ae0ff3765de44f0516ce5764209f206311e5ebc746d01787d8e91b6"
+      "bytes": 7957,
+      "sha256": "65777bb9b1f297df9d93267e9f08f14a9df5138a3264892dcdece818ffc6a804"
     },
     {
       "path": "apps/web/assets/workspace.js",
-      "bytes": 22655,
-      "sha256": "0ae8405abce647dd302f1601a72b7472d69ba118f9cc365a2488794281fdf108"
+      "bytes": 23989,
+      "sha256": "fd19d5c3fe4516d3b564f32324eddb8cff0419631c2d622a401208ab146913e1"
     },
     {
       "path": "apps/web/benchmark.html",
-      "bytes": 6584,
-      "sha256": "8367f24f272a14114d78f0829b10ce58df18e14071b7e6b16a76bfa16cacf48d"
+      "bytes": 6740,
+      "sha256": "2d8ceaa84b1416e1ee8fb1b0e1d2883581dd2f3af53ec9b610442535085ba6e9"
     },
     {
       "path": "apps/web/decision.html",
-      "bytes": 5035,
-      "sha256": "c8f058ebcd973526d524ee4c8879e3db5935cb2b768b7efae7e000e1954cf779"
+      "bytes": 5093,
+      "sha256": "4fcb2b0ce720b9f0ec90d13b50c61a2cb57c90b5a35fd3f627430a94c91eacb8"
     },
     {
       "path": "apps/web/deploy-testnet.html",
-      "bytes": 3240,
-      "sha256": "8e8c278b93b20570b5b55b343e574b231b6a7c6c4a4fff0ca43608be51e4b02c"
+      "bytes": 3298,
+      "sha256": "9c757796bed2beb96a417aecadb36c8f0cfd376bd087ba86fc89cd594ad123d4"
     },
     {
       "path": "apps/web/hire-agent.html",
-      "bytes": 3883,
-      "sha256": "1bf1a76b279c507858f3ee7979231e9af3148196c53b760338ab460f226a0baa"
+      "bytes": 3941,
+      "sha256": "01c27b34d5aa9f0d1ee6f72a6414c4d00762dbbc72978debb2970d56165fc146"
     },
     {
       "path": "apps/web/index.html",
-      "bytes": 13157,
-      "sha256": "b725ec70e823c3693995305d6510ddbf94dd469d5d8ed9e56e312e3b80b8afa3"
+      "bytes": 13200,
+      "sha256": "6845a00c95420ef39c55036860544d66872cc558385052bbcd33be37373bbc18"
     },
     {
       "path": "apps/web/live-hire.html",
-      "bytes": 7810,
-      "sha256": "46842b10c60fb094b5f6de9e25ff6f46f7ff4745d9e2c64357638bc69ed79e3e"
+      "bytes": 7908,
+      "sha256": "402c6e9f7900f0264137a41db20a817c367046a563511cf1a3a6ce465f6855d4"
     },
     {
       "path": "apps/web/proof.html",
-      "bytes": 7476,
-      "sha256": "b55325dacc7869ee1475c5d2402183d4a85bb62f4c0181005108b9c738b71d57"
+      "bytes": 7534,
+      "sha256": "3cd337a9301ebdce61f9d1a34bd3f40a7fda859e74bd3aef386dd6e4593171a6"
     },
     {
       "path": "apps/web/workspace.html",
-      "bytes": 7433,
-      "sha256": "72b3729c7665b83d17a19c6a0f941f1a2729b8c4dbe3fd1654d840fcd7205106"
+      "bytes": 9286,
+      "sha256": "f8025e81f323fbca59e76b7c0f14e4cb2342f91e4ca6f96a55b52cffbbcc4ff4"
     },
     {
       "path": "config/agents.json",
@@ -547,6 +562,36 @@
       "path": "deployments/bsc-testnet.json",
       "bytes": 2084,
       "sha256": "d3cd91c636fd2379a664004d7248bfff776f5d683c2f292a63e882d26a890c69"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/README.md",
+      "bytes": 1187,
+      "sha256": "3501ca62cddf7b45466b120732e024cb845ef2cabc85c32550f42139c9cfd0ee"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/Service workspace.html",
+      "bytes": 25125,
+      "sha256": "30a18ae0f5f8c6161a114a85e82241012deeaa4d9b152f1f1b4c83219b7d9523"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/_d_meta.json",
+      "bytes": 393,
+      "sha256": "9a5d2cb0c370cf17262a9aaf53cf7c0c06d541ac8328b0dd41b1e22c0cca0bf8"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/product-design.css",
+      "bytes": 11003,
+      "sha256": "29ade8d73139e1d0a699d83a07ff3ba32022195e8144aa41e76c278765d65600"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/workspace-desktop.png",
+      "bytes": 137666,
+      "sha256": "a1c7c3b6b55059524323efffee46f9034ed0041c4b5cb1d800122c847e9cd7b3"
+    },
+    {
+      "path": "designs/safehire-marketplace-refresh/workspace.css",
+      "bytes": 7957,
+      "sha256": "65777bb9b1f297df9d93267e9f08f14a9df5138a3264892dcdece818ffc6a804"
     },
     {
       "path": "docker-compose.yml",
@@ -652,6 +697,11 @@
       "path": "docs/DEMO_VOICE_AND_CAPTIONS_2026-09-08.zh-CN.md",
       "bytes": 1335,
       "sha256": "d3c7f3761fcc69d72f6c730b0d2ef74c934480aa773d982dced0e722289b411e"
+    },
+    {
+      "path": "docs/ENGLISH_REDESIGN_2026-09-08.zh-CN.md",
+      "bytes": 1994,
+      "sha256": "164f5388239f4cf2333f539729fec8583c52b13e25508b367625ed17bd634ba4"
     },
     {
       "path": "docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md",
@@ -1384,6 +1434,11 @@
       "sha256": "e26fb3a950dcac051f448393069bd43b1dd27d28bab26f9edbec81c5c67c04ba"
     },
     {
+      "path": "scripts/refresh_demo_visuals.cjs",
+      "bytes": 4663,
+      "sha256": "84407304456c85c26d40125eff5843b60042cadd1cb1a56ace9ceecd0b2e0ffd"
+    },
+    {
       "path": "scripts/refresh_live_agent_catalog.py",
       "bytes": 4262,
       "sha256": "f3ee1788839a2f1492f8295c26adb38eac226421de6ff0a79a3598f949132ec1"
@@ -1775,13 +1830,13 @@
     },
     {
       "path": "src/proofops/workspace/actions.py",
-      "bytes": 17758,
-      "sha256": "272aeaacd73869957d72fbad52831917c61784772ab4647dbd7c7853151a0d3b"
+      "bytes": 18384,
+      "sha256": "3a41175415f2b65904c833d0915fec1ac2f97bf2b2cc06ae1b3a0e53097896a6"
     },
     {
       "path": "src/proofops/workspace/calculator_sources.py",
-      "bytes": 2356,
-      "sha256": "fb8f602c1f614ec87c1055d7b136af43d859d9b7029609b0c782ee274dabd896"
+      "bytes": 2476,
+      "sha256": "e335504d38b9a967ca3c8567e4481c89298897754917827f657cca5a73fbd876"
     },
     {
       "path": "src/proofops/workspace/market.py",
@@ -1790,13 +1845,13 @@
     },
     {
       "path": "src/proofops/workspace/notifications.py",
-      "bytes": 9494,
-      "sha256": "27c447f7edac1c1d9b8cbac19c75b32aecc3030b33114d624dc0845fd5509e43"
+      "bytes": 9568,
+      "sha256": "74972b0ab09059a9b07945b29e6cf738303dc76198a9e8eff5d9169c8e241da0"
     },
     {
       "path": "src/proofops/workspace/routes.py",
-      "bytes": 16570,
-      "sha256": "190f9d0ea946aaf0690879441bfaf6481e2fccc3c4c852e7b208e39762b34d73"
+      "bytes": 16634,
+      "sha256": "7d3e86591946fee482fd48c0d4b1e0317fd510a7c7bcb03f27b20a049112dde5"
     },
     {
       "path": "src/proofops/workspace/store.py",
@@ -1805,8 +1860,8 @@
     },
     {
       "path": "src/proofops/workspace/supply.py",
-      "bytes": 4032,
-      "sha256": "98ef295324c9099483cdf22e721fb5e8a6ced80723d6e249a9f055da87e292e1"
+      "bytes": 4151,
+      "sha256": "989a53a90173804d26f80e509169a32216351a9e3f671945b2cdca329b6c2b8b"
     },
     {
       "path": "src/proofops/workspace/worker.py",
@@ -2030,8 +2085,8 @@
     },
     {
       "path": "tests/test_workspace_notifications.py",
-      "bytes": 5947,
-      "sha256": "a5dcc3a5b82ed3a58a0b758adf90e98f19477ed402f45c8002433a0d17346b29"
+      "bytes": 5954,
+      "sha256": "3dbada6ca252dca8c5a704922cf7ff064837b970b9d9c9a26fd7cf24ecf464ee"
     },
     {
       "path": "tests/test_workspace_services.py",

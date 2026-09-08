@@ -24,7 +24,7 @@ def test_encrypted_binding_verification_and_unsubscribe(tmp_path, monkeypatch):
     with journal.db() as db:row=dict(db.execute('SELECT * FROM push_channels').fetchone())
     assert n.unseal(space,row['secret'])==secret
     with pytest.raises(ValueError):n.unseal('different-space',row['secret'])
-    code=sent[0][2].split('验证码：')[1][:6]
+    code=sent[0][2].split('Verification code: ')[1][:6]
     n.verify(space,code)
     assert n.status(space)['verified'] and n.status(space)['enabled']
     n.unsubscribe(space)

@@ -32,20 +32,20 @@ def status(value: dict[str, Any] | None, *, now: float | None = None) -> dict[st
 def failure_details(exc: Exception) -> dict[str, str]:
     message=str(exc).lower()
     if isinstance(exc,(TimeoutError,httpx.TimeoutException)):
-        code,reason='timeout','供应商未在期限内响应'
+        code,reason='timeout','The provider did not respond before the deadline.'
     elif isinstance(exc,httpx.HTTPStatusError):
-        code,reason='http_'+str(exc.response.status_code),'供应商接口暂不可用，HTTP '+str(exc.response.status_code)
+        code,reason='http_'+str(exc.response.status_code),'Provider endpoint unavailable. HTTP '+str(exc.response.status_code)
     elif 'complete signed' in message:
-        code,reason='signed_envelope_missing','供应商未返回完整签名报价，普通报价不能用于付款'
+        code,reason='signed_envelope_missing','The provider returned no complete signed quote. An unsigned quote cannot authorize payment.'
     elif 'expir' in message:
-        code,reason='quote_expired','报价已过期，需要供应商重新签发'
+        code,reason='quote_expired','The quote has expired. The provider must issue a new one.'
     elif any(s in message for s in ['wallet','signer','signature','provider']):
-        code,reason='identity_or_signature_mismatch','供应商身份或签名未通过核验'
+        code,reason='identity_or_signature_mismatch','Provider identity or signature verification failed.'
     elif any(s in message for s in ['price','currency','token','chain','contract']):
-        code,reason='commercial_terms_mismatch','费用、币种、链或合约与审核范围不一致'
+        code,reason='commercial_terms_mismatch','Price, currency, chain or contracts differ from the reviewed scope.'
     else:
-        code,reason='response_contract_mismatch','返回内容不符合当前接入协议，暂不可付款'
-    return {'code':code,'reason':reason,'action':'修复或重新验证接入；不能跳过签名校验'}
+        code,reason='response_contract_mismatch','The response does not match the integration contract. Payment is unavailable.'
+    return {'code':code,'reason':reason,'action':'Repair or revalidate the integration. Signature checks cannot be bypassed.'}
 
 
 async def probe(root: Path, journal: Journal) -> None:

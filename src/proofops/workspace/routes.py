@@ -140,11 +140,11 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
     async def notification_bind(space: str, body: PushBinding, authorization: str | None = Header(default=None)) -> dict[str, Any]:
         auth(space, authorization)
         if not body.consent:
-            raise HTTPException(422, '请先同意保存通知凭证并发送验证通知')
+            raise HTTPException(422, 'First consent to storing the notification credential and sending a verification.')
         try:
             return await notifications.bind(space, body.device_key)
         except (ValueError, OSError) as exc:
-            raise HTTPException(409, '暂时无法绑定，请等待一分钟后重试或检查服务器通知配置') from exc
+            raise HTTPException(409, 'Unable to bind now. Wait one minute and retry, or check the server notification configuration.') from exc
 
     @router.post('/spaces/{space}/notifications/verify')
     def notification_verify(space: str, body: PushCode, authorization: str | None = Header(default=None)) -> dict[str, Any]:
@@ -276,9 +276,9 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
         if not active:
             raise HTTPException(503, 'Live sources are not enabled')
         if not body.consent:
-            raise HTTPException(422, '请先同意读取公开链上数据')
+            raise HTTPException(422, 'First consent to reading public chain data.')
         if action_slots.locked():
-            raise HTTPException(429, '数据读取繁忙，请稍后再试')
+            raise HTTPException(429, 'Data reads are busy. Try again shortly.')
         from proofops.workspace.calculator_sources import prepare
         try:
             async with action_slots:
@@ -287,7 +287,7 @@ def make_router(root: Path, journal: Journal, *, enabled: bool | None = None) ->
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
         except (httpx.HTTPError, TimeoutError) as exc:
-            raise HTTPException(503, '实时数据暂不可用，请重试；不要用假设值冒充当前数据') from exc
+            raise HTTPException(503, 'Live data is unavailable. Retry; do not present assumptions as current observations.') from exc
 
     @router.post('/compare-grid')
     async def compare(body: CompareRequest) -> dict[str, Any]:

@@ -151,7 +151,7 @@ async function loadScorecard() {
   document.querySelector("#winnerBoundary").textContent =
     scorecard.readiness?.headline || scorecard.honesty_boundary || "No readiness boundary was generated.";
   document.querySelector("#observedAt").textContent =
-    `Self-audit generated ${new Date(scorecard.generated_at).toLocaleString()}`;
+    `Self-audit generated ${new Date(scorecard.generated_at).toLocaleString('en-US')}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {

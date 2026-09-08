@@ -11,7 +11,7 @@ from proofops.services.reviewed_calculators import inputs
 async def prepare(token: int, account: str | None, capital: float) -> dict[str, Any]:
     if token == 269228:
         if not account:
-            raise ValueError('请输入要检查的公开 Venus Core 账户地址')
+            raise ValueError('Enter the public Venus Core account address to check.')
         observation = await observe_health(account)
         collateral = {}; debt = {}; prices = {}
         for index, market in enumerate(observation['markets']):
@@ -25,13 +25,13 @@ async def prepare(token: int, account: str | None, capital: float) -> dict[str, 
                 debt[name] = borrowed
                 prices[name] = 1
         if not debt or not collateral:
-            raise ValueError('该账户没有可比较的抵押与债务；不要为不适用的计算付款')
+            raise ValueError('This account has no comparable collateral and debt. Do not pay for an inapplicable calculation.')
         task = inputs(token, {'collateral': collateral, 'debt': debt, 'prices': prices})
-        boundary = '各市场转换为美元计价份额，单价 1 仅用于复算健康系数；不是代币真实单价，不能把供应商逐资产清算价格当作代币卖出价。快照之后价格、利息和参数可能变化。'
+        boundary = 'Markets are converted to dollar-denominated shares with unit price 1 solely to reproduce the health factor. This is not a real token price; provider per-asset liquidation prices are not token sell prices. Prices, interest and parameters can change after this snapshot.'
     else:
         observation = await observe_venus()
         task = inputs(token, {'pools': {r['venue_id']: {'apyPct': float(r['projected_supply_apy_pct'])}
                                        for r in observation['markets']}, 'capitalUsd': capital, 'maxPerPoolPct': 60})
-        boundary = '只读取 Venus Core USDT/USDC 当前利率。资金和 60% 集中度上限是你的假设；未取得容量或独立风险评分，未传入 TVL，供应商默认风险分不是事实认证。未计迁移费用、退出限制、奖励与脱锚风险。'
+        boundary = 'Only current Venus Core USDT/USDC rates are read. Budget and the 60% concentration cap are your assumptions. Capacity and independent risk scores are unavailable; TVL is not provided and provider default risk scores are not verified facts. Migration fees, exit limits, rewards and depeg risk are excluded.'
     return {'task_input': task, 'observation': observation, 'boundary': boundary,
             'scope': 'point_in_time_calculation', 'paid': False, 'trade_executed': False}

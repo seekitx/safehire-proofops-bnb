@@ -141,7 +141,7 @@ async function connectWallet() {
     byId("connectHireWallet").textContent = short(state.owner);
     byId("hireNetwork").textContent = "BSC Testnet · ready";
     byId("hireDot").className = "dot ok";
-    byId("quoteStatus").textContent = `Verified · 0.1 U · expires ${new Date(state.initial.quote_expires_at * 1000).toLocaleTimeString()}`;
+    byId("quoteStatus").textContent = `Verified · 0.1 U · expires ${new Date(state.initial.quote_expires_at * 1000).toLocaleTimeString('en-US')}`;
     const next = nextTransaction();
     setStep(next.step, "active", "Ready for wallet confirmation");
     byId("nextAction").textContent = next.label;
@@ -234,7 +234,7 @@ async function checkDelivery() {
     } else if (status.status === "SUBMITTED" && status.seconds_until_settle > 0) {
       state.settleTransaction = null;
       byId("settleJob").disabled = true;
-      const settleAt = new Date(status.settle_after * 1000).toLocaleTimeString();
+      const settleAt = new Date(status.settle_after * 1000).toLocaleTimeString('en-US');
       const waitMinutes = Math.max(1, Math.ceil(status.seconds_until_settle / 60));
       setStep("settle_job", "active", `Safety review window ends at ${settleAt}`);
       byId("hireResultText").textContent = `Agent submitted on-chain. The 15-minute safety review window is still open; settlement unlocks at ${settleAt}.`;

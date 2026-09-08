@@ -81,13 +81,13 @@ async function loadProof() {
     ? new Date(runtime.historical_trial.expires_at)
     : null;
   const historicalNote = historicalExpiry instanceof Date && Number.isFinite(historicalExpiry.getTime())
-    ? ` The original BNB Agent Studio signing trial is preserved as historical evidence and expired ${historicalExpiry.toLocaleString()}.`
+    ? ` The original BNB Agent Studio signing trial is preserved as historical evidence and expired ${historicalExpiry.toLocaleString('en-US')}.`
     : "";
   byId("runtimeStatus").textContent = runtimeExpired
     ? "EXPIRED"
     : String(runtime.status).toLowerCase() === "running" ? "LIVE" : String(runtime.status).toUpperCase();
   byId("runtimeExpiry").textContent = runtimeExpired
-    ? `This public runtime expired ${runtimeExpiresAt.toLocaleString()}.${historicalNote}`
+    ? `This public runtime expired ${runtimeExpiresAt.toLocaleString('en-US')}.${historicalNote}`
     : `The public Agent Card, deterministic preview and zero-cost sponsored analysis run on ${String(runtime.provider || "durable hosting").toUpperCase()} without a trial expiry. They never sign or move funds.${historicalNote}`;
   byId("runtimeCard").classList.toggle("danger", runtimeExpired);
   byId("agentCardLink").href = safeHttpsUrl(proof.agent_studio.endpoint);
@@ -178,7 +178,7 @@ async function loadHumanStudy() {
   const titles = {'live-20260908-grid': 'Grid price plan', 'live-20260908-yield': 'Venus yield comparison', 'live-20260908-health-followup': 'Lending account follow-up'};
   const container = byId('humanStudyRows');
   const hold = document.createElement('p');
-  hold.textContent = '来源待复核：另有 AI 代算对话涉及这些题目，须核对原始计时与辅助情况。不能默认这三组是有效无 AI 对照；原始答案不变，资格暂不作结论。';
+  hold.textContent = 'Provenance review required: related conversations contain AI-assisted answers to these prompts. Match original timing and assistance before treating these as unaided controls. Raw answers remain unchanged; eligibility is unresolved.';
   container.before(hold);
   container.replaceChildren();
   for (const row of report.pairs) {

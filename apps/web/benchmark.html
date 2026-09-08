@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,6 +7,7 @@
   <title>SafeHire · Evidence lab</title>
   <link rel="stylesheet" href="/assets/styles.css" />
   <link rel="stylesheet" href="/assets/benchmark.css" />
+<link rel="stylesheet" href="/assets/product-design.css">
 </head>
 <body>
   <header class="nav shell">
@@ -17,36 +18,36 @@
   <main class="benchmark-shell shell">
     <section class="benchmark-hero">
       <div class="eyebrow">TERMIX · HUMAN-VERIFIABLE COMPARISON</div>
-      <h1>三项真实对照。<br/><span>亲手完成，保存原始记录。</span></h1>
-      <p>先填写姓名，点击开始后阅读题目。可用计算器；不要使用 AI。计算和写答案都计入时间。完成后下载记录，再进行下一项。</p>
-      <div class="truth-row"><strong>LOCAL ONLY</strong><span>作答会尝试自动保存草稿，完成后请下载记录。刷新或重开后的计时会标为待复核，不自动计入正式对照。</span></div>
+      <h1>Three real comparisons.<br/><span>Do the work. Keep the evidence.</span></h1>
+      <p>Enter your name, then start the timer to reveal the task. A calculator is allowed; AI is not. Reading, calculations and writing all count. Download each record before starting the next task.</p>
+      <div class="truth-row"><strong>LOCAL ONLY</strong><span>Drafts are saved when possible. Download the finished record. Timing recovered after a refresh or reopening requires review and does not automatically qualify as a control.</span></div>
     </section>
 
     <section class="lab-card" id="manualLab">
-      <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>不用代理，亲自完成同一任务。</h2></div><span id="timerState">NOT STARTED</span></div>
+      <div class="lab-head"><div><small>01 · MANUAL CONTROL</small><h2>Complete the same task without an agent.</h2></div><span id="timerState">NOT STARTED</span></div>
       <div class="field-grid">
         <label>Task<select id="taskSelect">
-          <option value="live-20260908-health-followup">④ 新借贷任务（替代练习）</option>
-          <option value="live-20260908-health">① 真实借贷账户检查</option>
-          <option value="live-20260908-grid">② 真实价格的网格计划</option>
-          <option value="live-20260908-yield">③ 真实利率的收益比较</option>
+          <option value="live-20260908-health-followup">04 / New lending task (replacement practice)</option>
+          <option value="live-20260908-health">01 / Real lending account check</option>
+          <option value="live-20260908-grid">02 / Grid plan using an observed price</option>
+          <option value="live-20260908-yield">03 / Yield comparison using observed rates</option>
           <option value="pancakeswap-grid-route">PancakeSwap grid route</option>
           <option value="pancakeswap-lp-rebalance">PancakeSwap LP rebalance</option>
           <option value="venus-stablecoin-yield">Venus stablecoin yield</option>
           <option value="venus-health-factor-response">Venus health factor response</option>
         </select></label>
-        <label>实际操作人<input id="operatorName" placeholder="填写姓名或公开昵称" /></label>
+        <label>Participant<input id="operatorName" placeholder="Your name or public alias" /></label>
       </div>
-      <div class="task-brief"><small>开始计时后显示题目</small><pre id="taskBrief">Loading…</pre></div>
-      <div class="timer-strip"><strong id="elapsedTime">00:00.0</strong><span>阅读、计算和写答案都计时，中途不能暂停。</span></div>
-      <label>完整答案（写出计算过程、结论和限制）<textarea id="manualOutput" rows="13" disabled placeholder="开始后可以写答案；不确定的地方如实写明。"></textarea></label>
+      <div class="task-brief"><small>Start the timer to reveal the task</small><pre id="taskBrief">Loading…</pre></div>
+      <div class="timer-strip"><strong id="elapsedTime">00:00.0</strong><span>Reading, calculations and writing are timed. The timer cannot be paused.</span></div>
+      <label>Complete answer: calculations, conclusion and limitations<textarea id="manualOutput" rows="13" disabled placeholder="Write your answer after starting. State any uncertainty clearly."></textarea></label>
       <div class="cost-row">
-        <label>实际花费<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
-        <label>币种<input id="manualCurrency" value="USD" maxlength="12" /></label>
+        <label>Actual cost<input id="manualCost" type="number" min="0" step="0.0001" value="0" /></label>
+        <label>Currency<input id="manualCurrency" value="USD" maxlength="12" /></label>
       </div>
-      <label>实际使用的工具<input id="manualTools" placeholder="例如：系统计算器、Venus 官网；如实列出" /></label><label><input id="manualAttestation" type="checkbox" /> 我亲自完成了本次操作，未使用 AI 或市场代理，并保留完整答案。</label>
-      <div class="lab-actions"><button class="button" id="startTimer" type="button">开始计时</button><button class="button secondary" id="finishManual" type="button" disabled>结束并下载记录</button><button class="button secondary" id="finishPractice" type="button" disabled>结束并保存为辅助练习</button></div>
-      <p>如果本轮使用过 AI 或只想保留未完成的尝试，请选择“辅助练习”；它不会计入无 AI 正式对照。</p>
+      <label>Tools actually used<input id="manualTools" placeholder="For example: system calculator, Venus website. List all tools used." /></label><label><input id="manualAttestation" type="checkbox" /> I completed this task myself, without AI or a marketplace agent, and preserved the full answer.</label>
+      <div class="lab-actions"><button class="button" id="startTimer" type="button">Start timer</button><button class="button secondary" id="finishManual" type="button" disabled>Finish & download record</button><button class="button secondary" id="finishPractice" type="button" disabled>Finish as assisted practice</button></div>
+      <p>Used AI or keeping an unfinished attempt? Save it as assisted practice. It will not count as an unaided control.</p>
     </section>
 
     <section class="lab-card">

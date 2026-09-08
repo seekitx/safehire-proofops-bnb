@@ -83,7 +83,7 @@ function escapeHtml(value) {
 
 function unixTime(value) {
   const parsed = Number(value || 0);
-  return parsed > 0 ? new Date(parsed * 1000).toLocaleString() : "—";
+  return parsed > 0 ? new Date(parsed * 1000).toLocaleString('en-US') : "—";
 }
 
 async function api(path, options = {}) {
@@ -100,8 +100,8 @@ async function api(path, options = {}) {
 
 function selectedInput() {
   if ([269228,269226].includes(state.agentTokenId)) {
-    if (state.calculatorSourceRequired && !state.calculatorInput) throw new Error('实时来源尚未读取成功；请重试，或明确选择改用手填值');
-    if (state.calculatorSourceAt && Date.now()/1000-state.calculatorSourceAt>600) throw new Error('来源快照已超过 10 分钟，请重新读取');
+    if (state.calculatorSourceRequired && !state.calculatorInput) throw new Error('Live data could not be loaded. Retry or explicitly switch to manual inputs.');
+    if (state.calculatorSourceAt && Date.now()/1000-state.calculatorSourceAt>600) throw new Error('This snapshot is over ten minutes old. Load a fresh snapshot.');
     if (state.calculatorInput) return structuredClone(state.calculatorInput);
     if (state.agentTokenId === 269228 && byId('calcCollateral')) return {
       collateral:{collateral_USD:{amount:Number(byId('calcCollateral').value),liqThreshold:Number(byId('calcThreshold').value)}},
@@ -131,21 +131,21 @@ function calculatorForm() {
   if (![269228, 269226].includes(token)) return;
   const form = document.createElement('fieldset');
   const health = token === 269228;
-  form.innerHTML = `<legend>${health ? '借贷健康计算' : '收益分配计算'} · 单次分析，不执行交易</legend>
-    ${health ? '<label>抵押品美元价值<input id="calcCollateral" type="number" min="0.01" step="any" value="20000"></label><label>加权清算阈值（0–1）<input id="calcThreshold" type="number" min="0.0001" max="1" step="any" value="0.8"></label><label>债务美元价值<input id="calcDebt" type="number" min="0.01" step="any" value="10000"></label><label>读取真实 Venus Core 账户<input id="calcAccount" placeholder="公开账户地址 0x…" maxlength="42"></label>' : '<label>计划分配资金 / 美元<input id="calcCapital" type="number" min="0.01" max="1000000000" step="any" value="10000"></label><label>候选 A 年化 / %<input id="calcRateA" type="number" min="0" max="1000" step="any" value="6.1"></label><label>候选 B 年化 / %<input id="calcRateB" type="number" min="0" max="1000" step="any" value="4.2"></label>'}
-    <p>默认值仅是假设练习。0.50 U 买一次供应商计算；不含资金迁移、交易、持续监控或收益保证。首次真实交付及内容质量尚待验证。离站提醒需要在工作台另行开启。</p>
-    <label><input id="calcSourceConsent" type="checkbox">同意读取公开链上数据；最终确认付款后，任务输入会公开写入链上。</label>
-    <button id="calcLoadSource" type="button">读取当前数据并用于本次任务</button>
-    <button id="calcUseManual" type="button">改用上方手填值</button>
-    <button id="calcDownloadSource" type="button" disabled>下载本次来源原文</button>
-    <p id="calcSourceStatus">当前使用假设手填值；尚未读取实时来源。</p><pre id="calcSourcePreview" style="white-space:pre-wrap;max-height:240px;overflow:auto"></pre>`;
+  form.innerHTML = `<legend>${health ? 'Lending health calculation' : 'Yield allocation calculation'} · One-time analysis, no trade execution</legend>
+    ${health ? '<label>Collateral value / USD<input id="calcCollateral" type="number" min="0.01" step="any" value="20000"></label><label>Weighted liquidation threshold (0–1)<input id="calcThreshold" type="number" min="0.0001" max="1" step="any" value="0.8"></label><label>Debt value / USD<input id="calcDebt" type="number" min="0.01" step="any" value="10000"></label><label>Read a public Venus Core account<input id="calcAccount" placeholder="Public account address 0x…" maxlength="42"></label>' : '<label>Proposed allocation / USD<input id="calcCapital" type="number" min="0.01" max="1000000000" step="any" value="10000"></label><label>Candidate A annual rate / %<input id="calcRateA" type="number" min="0" max="1000" step="any" value="6.1"></label><label>Candidate B annual rate / %<input id="calcRateB" type="number" min="0" max="1000" step="any" value="4.2"></label>'}
+    <p>Defaults are hypothetical examples. 0.50 U buys one calculation, not migration, trading, continuous monitoring or guaranteed returns. First paid delivery and content quality remain unverified for this service. Enable off-site alerts separately in your workspace.</p>
+    <label><input id="calcSourceConsent" type="checkbox">I agree to read public chain data. If I later confirm payment, the task inputs will be written publicly on chain.</label>
+    <button id="calcLoadSource" type="button">Use a fresh data snapshot</button>
+    <button id="calcUseManual" type="button">Use manual inputs above</button>
+    <button id="calcDownloadSource" type="button" disabled>Download source snapshot</button>
+    <p id="calcSourceStatus">Using hypothetical manual inputs. No live source has been loaded.</p><pre id="calcSourcePreview" style="white-space:pre-wrap;max-height:240px;overflow:auto"></pre>`;
   byId('taskInput').before(form);
   byId('taskInput').hidden = true;
   byId('resetTask').hidden = true;
   let source = null;
   const reset = () => {
     state.calculatorInput = null; state.calculatorSourceRequired = false; state.calculatorSourceAt = null; source = null;
-    byId('calcSourceStatus').textContent = '已改用手填值；这些值未获得实时来源认证。';
+    byId('calcSourceStatus').textContent = 'Switched to manual inputs. These values are not verified by a live source.';
     byId('calcSourcePreview').textContent = '';
     byId('calcDownloadSource').disabled = true;
   };
@@ -154,15 +154,15 @@ function calculatorForm() {
   byId('calcUseManual').onclick = reset;
   byId('calcLoadSource').onclick = async () => {
     const button = byId('calcLoadSource');
-    if (!byId('calcSourceConsent').checked) return toast('请先勾选公开数据读取说明', true);
+    if (!byId('calcSourceConsent').checked) return toast('First confirm consent to read public data.', true);
     button.disabled = true; reset(); state.calculatorSourceRequired = true;
-    byId('calcSourceStatus').textContent = '正在读取同一区块的数据，请稍候…';
+    byId('calcSourceStatus').textContent = 'Reading data from the same block. Please wait…';
     try {
       source = await api('/api/workspace/calculator-source', {method:'POST',body:JSON.stringify({
         token_id:token, account:health ? byId('calcAccount').value.trim() : null,
         capital:health ? 10000 : Number(byId('calcCapital').value), consent:true})});
       state.calculatorInput = source.task_input; state.calculatorSourceAt = source.observation.block_timestamp;
-      byId('calcSourceStatus').textContent = `本次任务改用区块 ${source.observation.block_number} 的数据，读取于 ${source.observation.observed_at}。${source.boundary}`;
+      byId('calcSourceStatus').textContent = `Using data from block ${source.observation.block_number}, observed at ${source.observation.observed_at}。${source.boundary}`;
       byId('calcSourcePreview').textContent = JSON.stringify(source.task_input,null,2);
       byId('calcDownloadSource').disabled = false;
     } catch(error) { byId('calcSourceStatus').textContent = error.message; toast(error.message,true); }
@@ -246,7 +246,7 @@ async function registerServerFollowup(jobId) {
       method:'POST', headers:{Authorization:`Bearer ${credential.token}`},
       body:JSON.stringify({kind:'order', job_id:jobId, notify_provider:true, consent:true})
     });
-  } catch (error) { toast(`订单已在链上；服务器跟进未保存：${error.message}。请保留订单号。`, true); }
+  } catch (error) { toast(`The order exists on chain, but server follow-up was not saved: ${error.message}. Keep your order number.`, true); }
 }
 
 function persistJob() {
@@ -376,7 +376,7 @@ async function loadRuntime() {
 async function loadQuote() {
   const params = new URLSearchParams(location.search);
   if (params.get("job_id")) {
-    byId("quoteState").textContent = "恢复已有订单：连接钱包后读取链上记录，无需新报价";
+    byId("quoteState").textContent = "Restore an existing order: connect your wallet to read chain records. No new quote required.";
     return;
   }
   const requested = params.get("skill_id") || "grid_plan";
@@ -399,7 +399,7 @@ async function loadQuote() {
   calculatorForm();
   if (state.agentTokenId === 269224) {
     const form = document.createElement('fieldset');
-    form.innerHTML = '<legend>网格计算参数（不会实际下单）</legend><label>参考价格<input id="gridPrice" type="number" min="0.00000001" step="any" value="750"></label><label>假设资金 / 美元<input id="gridBudget" type="number" min="0.01" step="any" value="1000"></label><label>每侧档数<input id="gridLevels" type="number" min="1" max="50" value="5"></label><label>半宽 / %<input id="gridSpan" type="number" min="0.01" max="99" step="any" value="2"></label><p>参考价格与资金由你提供，默认值是假设示例。服务交付价格表，不会管理订单或执行止损。</p>';
+    form.innerHTML = '<legend>Grid calculation inputs (no orders placed)</legend><label>Reference price<input id="gridPrice" type="number" min="0.00000001" step="any" value="750"></label><label>Hypothetical budget / USD<input id="gridBudget" type="number" min="0.01" step="any" value="1000"></label><label>Levels per side<input id="gridLevels" type="number" min="1" max="50" value="5"></label><label>Half-span / %<input id="gridSpan" type="number" min="0.01" max="99" step="any" value="2"></label><p>You supply the reference price and budget. Defaults are hypothetical examples. The service delivers a price table, not order management or stop-loss execution.</p>';
     byId('taskInput').before(form);
     byId('taskInput').hidden = true;
     byId('resetTask').hidden = true;
@@ -693,19 +693,19 @@ function renderDelivery(delivery) {
   if (!delivery.acceptance) {
     let box = byId('semanticAcceptance');
     if (!box) { box = document.createElement('p'); box.id = 'semanticAcceptance'; byId('deliveryContent').before(box); }
-    box.textContent = '交付文件与链上记录一致，但此类结果尚未通过内容验收。请逐项核对输入、计算和用途，再决定接受或争议。';
+    box.textContent = 'The file matches the chain record, but this result type has not passed content review. Check the inputs, calculations and usefulness before accepting or disputing.';
     byId('gridResultSummary')?.remove();
   }
   if (delivery.acceptance) {
     let box = byId('semanticAcceptance');
     if (!box) { box = document.createElement('p'); box.id = 'semanticAcceptance'; byId('deliveryContent').before(box); }
-    box.textContent = delivery.acceptance.passed ? '计算验收通过：参数、档数、价格、数量与总金额一致。不代表盈利或实际交易。' : `计算验收未通过：${delivery.acceptance.failures.join('; ')}`;
+    box.textContent = delivery.acceptance.passed ? 'Calculation checks passed: inputs, levels, prices, quantities and total allocation match. This does not prove profit or trade execution.' : `Calculation checks failed: ${delivery.acceptance.failures.join('; ')}`;
   }
   if (delivery.acceptance?.passed) {
     const grid = JSON.parse(verification.content);
     let summary = byId('gridResultSummary');
     if (!summary) { summary = document.createElement('div'); summary.id='gridResultSummary'; byId('deliveryContent').before(summary); }
-    summary.innerHTML = `<h3>你买到的网格计算结果</h3><p>参考价格 ${escapeHtml(grid.mark)}；假设总资金 ${escapeHtml(grid.budgetUsd)} 美元；每侧 ${escapeHtml(grid.levelsPerSide)} 档。</p><table><thead><tr><th>方向</th><th>价格</th><th>分配金额</th><th>计算数量</th></tr></thead><tbody>${[...grid.buys,...grid.sells].map(r=>`<tr><td>${r.side==='buy'?'买入':'卖出'}</td><td>${escapeHtml(r.price)}</td><td>${escapeHtml(r.sizeUsd)}</td><td>${escapeHtml(r.amount)}</td></tr>`).join('')}</tbody></table><p>这是按你提供的输入计算的价格表，未执行交易；费用、滑点、订单管理与止损不包含在这份服务中。</p>`;
+    summary.innerHTML = `<h3>Your delivered grid calculation</h3><p>Reference price ${escapeHtml(grid.mark)}; hypothetical total budget ${escapeHtml(grid.budgetUsd)} USD; levels per side: ${escapeHtml(grid.levelsPerSide)}.</p><table><thead><tr><th>Side</th><th>Price</th><th>Allocation</th><th>Quantity</th></tr></thead><tbody>${[...grid.buys,...grid.sells].map(r=>`<tr><td>${r.side==='buy'?'BUY':'SELL'}</td><td>${escapeHtml(r.price)}</td><td>${escapeHtml(r.sizeUsd)}</td><td>${escapeHtml(r.amount)}</td></tr>`).join('')}</tbody></table><p>This table was calculated from your inputs. No trades were executed. Fees, slippage, order management and stop losses are outside this service.</p>`;
   }
   const facts = [
     ["HASH", verification.hash_matches],
@@ -767,11 +767,11 @@ async function checkDelivery() {
       return toast("The full manifest was retrieved and its hash matches the on-chain commitment.");
     }
     if (status.status === "FUNDED") {
-      const deadline = new Date(status.expired_at * 1000).toLocaleString();
+      const deadline = new Date(status.expired_at * 1000).toLocaleString('en-US');
       byId("jobBadge").textContent = `JOB #${state.jobId} · FUNDED`;
       setStep("agent_delivery", "active", "Funds in escrow; no result submitted");
       byId("nextAction").textContent = `Waiting on the provider. No additional payment needed. If no result arrives, refund is available after ${deadline}. Internal provider progress is unavailable.`;
-      updateReceipt(`Job #${state.jobId} · checked ${new Date().toLocaleString()} · no delivery yet`);
+      updateReceipt(`Job #${state.jobId} · checked ${new Date().toLocaleString('en-US')} · no delivery yet`);
       return toast(`Funds are in escrow; the provider has not submitted a result. No need to pay again. Expiry refund: ${deadline}.`);
     }
     toast(`Current on-chain status: ${status.status}.`);

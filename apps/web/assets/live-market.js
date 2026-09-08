@@ -144,7 +144,7 @@
       status.querySelector("strong").textContent = payload.endpoint_reachable
         ? `${callableCount}/${agents.length} skills callable now`
         : "Registration snapshot loaded; A2A is offline";
-      meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString()} · ${payload.operator_count || 0} configured operator label(s); business independence unverified · read-only`;
+      meta.textContent = `Checked ${new Date(payload.observed_at).toLocaleString('en-US')} · ${payload.operator_count || 0} configured operator label(s); business independence unverified · read-only`;
       boundary.textContent = payload.trust_boundary;
       agentContainer.querySelectorAll("[data-live-quote]").forEach((button) => {
         button.addEventListener("click", () => prepareQuote(

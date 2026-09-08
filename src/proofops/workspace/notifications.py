@@ -68,12 +68,12 @@ class Notifications:
         with self.journal.db() as db:
             db.execute('BEGIN IMMEDIATE')
             old=db.execute('SELECT updated FROM push_channels WHERE space=?',(space,)).fetchone()
-            if old and now-old['updated']<60:raise ValueError('请等待一分钟再发送验证通知')
+            if old and now-old['updated']<60:raise ValueError('Wait one minute before sending another verification notification.')
             db.execute('INSERT OR REPLACE INTO push_channels VALUES(?,?,0,0,?,?,0,?,?)',
                        (space,sealed,hashlib.sha256(code.encode()).hexdigest(),now+900,now,generation))
             db.execute("UPDATE push_outbox SET state='cancelled' WHERE space=? AND state IN ('pending','sending')",(space,))
             db.execute('COMMIT')
-        accepted=await send_bark(key,'SafeHire：绑定验证',f'验证码：{code}。仅在你刚打开的 SafeHire 私有工作台填写，15 分钟有效。此为测试，不是风险告警。')
+        accepted=await send_bark(key,'SafeHire: verify your device',f'Verification code: {code}. Enter it only in the SafeHire workspace you just opened. Valid for 15 minutes. This is a test, not a risk alert.')
         return {'provider_accepted':accepted,'phone_receipt_verified':False,'expires_in_seconds':900}
 
     def verify(self, space: str, code: str) -> None:
@@ -81,12 +81,12 @@ class Notifications:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('SELECT * FROM push_channels WHERE space=?',(space,)).fetchone()
             if not row or row['deadline']<time.time() or row['attempts']>=5 or row['verified']:
-                raise ValueError('验证码已失效，请重新绑定')
+                raise ValueError('The verification code expired. Bind the device again.')
             db.execute('UPDATE push_channels SET attempts=attempts+1 WHERE space=?',(space,))
             valid=secrets.compare_digest(row['code_hash'],hashlib.sha256(code.encode()).hexdigest())
             if valid:db.execute("UPDATE push_channels SET enabled=1,verified=1,code_hash='',updated=? WHERE space=?",(time.time(),space))
             db.execute('COMMIT')
-        if not valid:raise ValueError('验证码不正确')
+        if not valid:raise ValueError('Incorrect verification code.')
 
     def unsubscribe(self, space: str) -> None:
         with self.journal.db() as db:
@@ -126,8 +126,8 @@ class Notifications:
         error=None
         try:
             key=self.unseal(row['space'],row['secret'])
-            labels={'health':'借贷风险','lp':'LP 仓位','yield':'收益比较','grid':'网格范围','order':'服务订单'}
-            accepted=await send_bark(key,'SafeHire：需要查看提醒',f"{labels.get(row['category'],'任务')}有新进展或需要查看的提醒。请打开工作台查看最新状态；本通知不代表已执行处置。提醒编号 {row['id']}。")
+            labels={'health':'Lending risk','lp':'LP positions','yield':'Yield comparison','grid':'Grid range','order':'Service order'}
+            accepted=await send_bark(key,'SafeHire: review a new alert',f"{labels.get(row['category'],'Task')} has a new update or alert. Open your workspace for the latest status. This notification does not mean any action was executed. Alert ID {row['id']}。")
             if not accepted:error='push_provider_rejected'
         except (ValueError,OSError):error='notification_key_unavailable'
         with self.journal.db() as db:
@@ -142,7 +142,7 @@ async def send_bark(key: str, title: str, body: str) -> bool:
     try:
         async with httpx.AsyncClient(timeout=15,follow_redirects=False) as client:
             r=await client.post('https://api.day.app/push',json={'device_key':key,'title':title,'body':body,
-                 'group':'SafeHire 风险提醒','url':'https://safehire.eyesonchain.xyz/workspace','isArchive':'0'})
+                 'group':'SafeHire alerts','url':'https://safehire.eyesonchain.xyz/workspace','isArchive':'0'})
             payload=r.json()
             return bool(r.status_code==200 and isinstance(payload,dict) and payload.get('code')==200)
     except (httpx.HTTPError,ValueError):return False

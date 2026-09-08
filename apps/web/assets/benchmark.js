@@ -1,6 +1,7 @@
 const byId = (id) => document.getElementById(id);
 const criteria = ["correctness", "completeness", "risk_awareness", "actionability", "evidence_quality"];
 let task = null;
+let englishBriefs = {};
 let startedAt = null;
 let startedClock = null;
 let timerHandle = null;
@@ -11,7 +12,7 @@ let toastTimer = null;
 let recoveredTiming = false;
 const draftKey = 'safehire-manual-draft-v1';
 const uiTest = new URLSearchParams(location.search).get('ui_test') === '1';
-if (uiTest) byId('manualAttestation').parentElement.lastChild.textContent = '这是自动化页面检查，不作为真人实验。';
+if (uiTest) byId('manualAttestation').parentElement.lastChild.textContent = 'This is an automated interface check, not a human study.';
 window.addEventListener('beforeunload', event => {
   if (startedAt && !byId('finishManual').disabled) { event.preventDefault(); event.returnValue = ''; }
 });
@@ -57,16 +58,22 @@ async function loadTask() {
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
   if (byId("taskSelect").value !== taskId) return;
+  if (!Object.keys(englishBriefs).length) {
+    const translation = await fetch("/assets/benchmark-briefs.en.json");
+    if (!translation.ok) throw new Error("English task instructions are unavailable. Retry before starting.");
+    englishBriefs = await translation.json();
+  }
+  if (byId("taskSelect").value !== taskId) return;
   task = payload;
-  byId("taskBrief").textContent = "题目已准备好。填写姓名后，点“开始计时”才会显示题目。";
+  byId("taskBrief").textContent = "Task ready. Enter your name and start the timer to reveal it.";
   byId("manualOutput").value = "";
   byId("manualOutput").disabled = true;
 }
 
 function readableInputs(input) {
-  const labels = {collateral_usd: '抵押品价值（美元）', debt_usd: '债务（美元）', liquidation_threshold: '加权清算阈值（小数）', alert_health_factor: '提醒线', target_health_factor: '目标健康系数', current_price: '当前价格', lower_price: '价格下界', upper_price: '价格上界', levels: '档数', capital_usd: '资金（美元）', max_drawdown_pct: '设置的最大回撤（%）', horizon_days: '天数', protocol: '市场', gross_apy: '年收益率 APY（%）', risk_score: '假设风险分', tvl_usd: '未读取的规模占位值', transaction_cost_usd: '假设成本（美元）'};
+  const labels = {collateral_usd: 'Collateral value / USD', debt_usd: 'Debt / USD', liquidation_threshold: 'Weighted liquidation threshold (decimal)', alert_health_factor: 'Alert threshold', target_health_factor: 'Target health factor', current_price: 'Observed price', lower_price: 'Lower price', upper_price: 'Upper price', levels: 'Levels', capital_usd: 'Budget / USD', max_drawdown_pct: 'Maximum drawdown setting / %', horizon_days: 'Days', protocol: 'Market', gross_apy: 'Annual percentage yield / %', risk_score: 'Assumed risk score', tvl_usd: 'Unobserved size placeholder', transaction_cost_usd: 'Assumed cost / USD'};
   return Object.entries(input).filter(([key]) => key !== 'source').map(([key, value]) =>
-    key === 'candidates' ? value.map(row => readableInputs(row)).join('\n\n') : `${labels[key] || key}：${value}`).join('\n');
+    key === 'candidates' ? value.map(row => readableInputs(row)).join('\n\n') : `${labels[key] || key}: ${value}`).join('\n');
 }
 
 function canonical(value) {
@@ -78,12 +85,13 @@ function canonical(value) {
 function startTimer() {
   if (!task) return toast("Task brief is not loaded.", true);
   const operator = byId("operatorName").value.trim();
-  if (!operator) return toast("请先填写实际操作人的姓名或公开昵称。", true);
+  if (!operator) return toast("Enter the actual participant name or public alias first.", true);
   startedAt = new Date();
   startedClock = performance.now();
   byId("taskSelect").disabled = true;
   byId("operatorName").disabled = true;
-  byId("taskBrief").textContent = task.manual_brief_zh ? `${task.title_zh}\n\n${task.manual_brief_zh}\n\n数据读取时间：${task.source_snapshot.observed_at}\n\n计算数据：\n${readableInputs(task.agent_request.input)}` : JSON.stringify(task, null, 2);
+  const brief = englishBriefs[task.task_id];
+  byId("taskBrief").textContent = brief ? `${brief.title}\n\n${brief.brief}\n\nData observed at: ${task.source_snapshot.observed_at}\n\nTask data:\n${readableInputs(task.agent_request.input)}` : JSON.stringify(task.agent_request?.input || {}, null, 2);
   byId("manualOutput").disabled = false;
   byId("manualOutput").focus();
   byId("startTimer").disabled = true;
@@ -97,8 +105,8 @@ function startTimer() {
 
 function finishManual(assisted = false) {
   const answer = byId("manualOutput").value.trim();
-  if (!answer) return toast("请先写下完整答案，再结束计时。", true);
-  if ((!assisted && !byId("manualAttestation").checked) || !byId("manualTools").value.trim()) return toast("请填写实际使用的工具，并勾选亲自完成的声明。", true);
+  if (!answer) return toast("Write your full answer before stopping the timer.", true);
+  if ((!assisted && !byId("manualAttestation").checked) || !byId("manualTools").value.trim()) return toast("List the tools used and confirm the personal completion statement.", true);
   const cost = Number(byId("manualCost").value);
   if (!Number.isFinite(cost) || cost < 0) return toast("Enter a valid non-negative cost.", true);
   const duration = elapsedSeconds();
@@ -111,6 +119,8 @@ function finishManual(assisted = false) {
     evidence_mode: uiTest ? "ui_verification_not_human" : assisted ? "assisted_practice_not_control" : recoveredTiming ? "recovered_manual_run_needs_review" : "human_timed_manual_run",
     task_id: task.task_id,
     task_snapshot: task,
+    displayed_instructions: englishBriefs[task.task_id] || null,
+    instruction_language: "en",
     operator: byId("operatorName").value.trim(),
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
@@ -131,7 +141,7 @@ function finishManual(assisted = false) {
   byId("manualOutput").disabled = true;
   byId("timerState").textContent = "RECORDED";
   downloadJson(`${task.task_id}-${assisted ? "assisted-practice" : "manual-output"}.json`, record);
-  toast("人工记录已下载。请保留原文件，然后告诉我已完成。");
+  toast("Manual record downloaded. Keep the original file.");
 }
 
 function renderScores() {
@@ -159,9 +169,9 @@ function answerContent(raw) {
 }
 
 function buildPacket() {
-  if (manualRaw?.evidence_mode !== "human_timed_manual_run") return toast("需要真实人工操作记录，页面测试不能参加比较。", true);
+  if (manualRaw?.evidence_mode !== "human_timed_manual_run") return toast("A real human activity record is required. Interface tests cannot enter the comparison.", true);
   if (!agentRaw?.task_id || agentRaw.task_id !== manualRaw?.task_id) return toast("Both outputs must have the same explicit task_id.", true);
-  if (!agentRaw.task_snapshot || !manualRaw.task_snapshot || JSON.stringify(canonical(agentRaw.task_snapshot)) !== JSON.stringify(canonical(manualRaw.task_snapshot))) return toast("两份文件的完整题目和输入不一致，不能配对比较。", true);
+  if (!agentRaw.task_snapshot || !manualRaw.task_snapshot || JSON.stringify(canonical(agentRaw.task_snapshot)) !== JSON.stringify(canonical(manualRaw.task_snapshot))) return toast("The task prompts and inputs do not match. These files cannot be paired.", true);
   let agentAnswer, manualAnswer;
   try { agentAnswer = answerContent(agentRaw); manualAnswer = answerContent(manualRaw); }
   catch (error) { return toast(error.message, true); }
@@ -249,7 +259,7 @@ loadTask().then(restoreManualDraft).catch((error) => toast(error.message, true))
 function saveManualDraft() {
   if (!startedAt || byId('finishManual').disabled) return;
   try { localStorage.setItem(draftKey,JSON.stringify({task,started_at:startedAt.toISOString(),operator:byId('operatorName').value,output:byId('manualOutput').value,tools:byId('manualTools').value,cost:byId('manualCost').value,currency:byId('manualCurrency').value})); }
-  catch (_) { toast('浏览器无法保存草稿，请及时下载记录。',true); }
+  catch (_) { toast('This browser cannot save drafts. Download your record promptly.',true); }
 }
 function restoreManualDraft() {
   try {
@@ -259,9 +269,9 @@ function restoreManualDraft() {
     task=saved.task;byId('operatorName').value=saved.operator;startTimer();
     startedAt=new Date(start);startedClock=performance.now()-(Date.now()-start);recoveredTiming=true;
     for(const [id,name] of [['manualOutput','output'],['manualTools','tools'],['manualCost','cost'],['manualCurrency','currency']])byId(id).value=saved[name]||'';
-    byId('manualAttestation').checked=false;byId('timerState').textContent='已恢复，计时待复核';renderTimer();saveManualDraft();
-    toast('已恢复草稿，关闭页面的时间也计入；这轮记录会标为待复核，不自动计入正式对照。');
-  } catch (_) { toast('草稿无法恢复，原始下载文件不受影响。',true); }
+    byId('manualAttestation').checked=false;byId('timerState').textContent='Restored; timing requires review';renderTimer();saveManualDraft();
+    toast('Draft restored. Closed-page time is included. This run requires review and does not automatically count as a formal control.');
+  } catch (_) { toast('The draft could not be restored. Previously downloaded files are unaffected.',true); }
 }
 for(const id of ['manualOutput','manualTools','manualCost','manualCurrency'])byId(id).addEventListener('input',saveManualDraft);
 setInterval(saveManualDraft,5000);

@@ -228,7 +228,7 @@ function renderWorkflow() {
   byId("taskState").textContent = taskState.replaceAll("_", " ").toUpperCase();
   byId("decisionValue").textContent = result.action || receipt?.result?.status || "—";
   byId("confidenceValue").textContent = result.confidence == null ? "—" : `${Math.round(Number(result.confidence) * 100)}%`;
-  byId("expiryValue").textContent = new Date(state.policy.expires_at).toLocaleString();
+  byId("expiryValue").textContent = new Date(state.policy.expires_at).toLocaleString('en-US');
   byId("sourceValue").textContent = receipt?.source || (result.source_labels || []).join(", ") || "caller_supplied";
   byId("taskResult").textContent = JSON.stringify({ task: state.task, policy: state.policy, agent_result: result }, null, 2);
   byId("approveButton").disabled = taskState !== "approval_required";
