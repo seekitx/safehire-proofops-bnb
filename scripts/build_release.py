@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -39,10 +40,14 @@ def sha256(path: Path) -> str:
 
 
 def releasable_files() -> list[Path]:
+    # Use the repository index so local-only notes cannot enter release archives.
+    tracked = subprocess.check_output(
+        ["git", "ls-files", "--cached", "-z"], cwd=ROOT
+    ).decode("utf-8").split("\0")
     return sorted(
         (
             path
-            for path in ROOT.rglob("*")
+            for path in (ROOT / name for name in tracked if name)
             if path.is_file()
             and path.name not in EXCLUDED_NAMES
             and path.suffix not in {".pyc", ".pyo"}

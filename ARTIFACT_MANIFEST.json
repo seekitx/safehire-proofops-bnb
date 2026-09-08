@@ -1,12 +1,12 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T13:36:07.376097+00:00",
-  "file_count_excluding_manifest": 419,
+  "generated_at_utc": "2026-09-08T13:52:04.862674+00:00",
+  "file_count_excluding_manifest": 358,
   "files": [
     {
       "path": ".dockerignore",
-      "bytes": 267,
-      "sha256": "deb5fb7e0fe31006bb0da999906ecb504ea8b8446946d7c6f85693dd94a75511"
+      "bytes": 2800,
+      "sha256": "acc90c0a024f4be36421cbcf03c3b03eb37cb666efdb8f2411f8898e9e45bf43"
     },
     {
       "path": ".env.example",
@@ -25,18 +25,8 @@
     },
     {
       "path": ".gitignore",
-      "bytes": 477,
-      "sha256": "42a6208c4d8ac34465bdbd8437b274c54e6ff4d438b546996a0d10208490409f"
-    },
-    {
-      "path": "AGENTS.md",
-      "bytes": 11995,
-      "sha256": "6b0f39d2f6c3a1ee1cbd2fd54881d50f884ec4b005a399c8e4d4f1f18f74fc07"
-    },
-    {
-      "path": "CHAMPION_V2_START_HERE.md",
-      "bytes": 555,
-      "sha256": "04ace0d11cb7ef9053e8fcfbe31bb50269e848fc6d18c74bfb9dddb9e4abebe6"
+      "bytes": 2953,
+      "sha256": "94387f52c0237784fc602009d8b84fa643459cb3556b8e129951ef39803c48f0"
     },
     {
       "path": "Dockerfile",
@@ -55,28 +45,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 11014,
-      "sha256": "c68be396f906a69b91e767b6b491423e8e86b38e84babb2be50b8e9860104b46"
-    },
-    {
-      "path": "TEST_REPORT.md",
-      "bytes": 3535,
-      "sha256": "5685eea810dc5708455016fabce538bf4a3371b7a60cfa8779bc01d3b9521976"
-    },
-    {
-      "path": "agent-studio/safehireagents/.cursor/rules/funding-pieverse-llm.mdc",
-      "bytes": 8919,
-      "sha256": "e9b2128df4fae48892a615ec21b5c7aa752da8f7286d93abd1cd38de6fc8ac6e"
+      "bytes": 10401,
+      "sha256": "c11602d03307ef7846c153a4f998a6d9fe699a3d527b9ab2e79baade31d5707f"
     },
     {
       "path": "agent-studio/safehireagents/.gitignore",
       "bytes": 854,
       "sha256": "5e26b3b8a65c8f02aff815e1145d16ffcdd41ec3895cabb3150dec0a1cee37d7"
-    },
-    {
-      "path": "agent-studio/safehireagents/AGENTS.md",
-      "bytes": 2096,
-      "sha256": "e880e9fd18af9c361c3dc24903346764a074090d2c0d545ae6bcaacc44b04de1"
     },
     {
       "path": "agent-studio/safehireagents/README.md",
@@ -222,11 +197,6 @@
       "path": "agent-studio/safehireagents/scripts/store-invoke-client.mjs",
       "bytes": 1951,
       "sha256": "61bd77d102d9e01d3b9d98fa3736eaddb7aaa36a60620bfd2d476dfa1359a92f"
-    },
-    {
-      "path": "agent.md",
-      "bytes": 8291,
-      "sha256": "92212f1bc14a8d0d88ae04a3d2770ff0e94ed215169c850d9acae3c8dcf22fcc"
     },
     {
       "path": "apps/__init__.py",
@@ -569,54 +539,9 @@
       "sha256": "d3cd91c636fd2379a664004d7248bfff776f5d683c2f292a63e882d26a890c69"
     },
     {
-      "path": "designs/safehire-marketplace-refresh/README.md",
-      "bytes": 1187,
-      "sha256": "3501ca62cddf7b45466b120732e024cb845ef2cabc85c32550f42139c9cfd0ee"
-    },
-    {
-      "path": "designs/safehire-marketplace-refresh/Service workspace.html",
-      "bytes": 25125,
-      "sha256": "30a18ae0f5f8c6161a114a85e82241012deeaa4d9b152f1f1b4c83219b7d9523"
-    },
-    {
-      "path": "designs/safehire-marketplace-refresh/_d_meta.json",
-      "bytes": 393,
-      "sha256": "9a5d2cb0c370cf17262a9aaf53cf7c0c06d541ac8328b0dd41b1e22c0cca0bf8"
-    },
-    {
-      "path": "designs/safehire-marketplace-refresh/product-design.css",
-      "bytes": 11003,
-      "sha256": "29ade8d73139e1d0a699d83a07ff3ba32022195e8144aa41e76c278765d65600"
-    },
-    {
-      "path": "designs/safehire-marketplace-refresh/workspace-desktop.png",
-      "bytes": 137666,
-      "sha256": "a1c7c3b6b55059524323efffee46f9034ed0041c4b5cb1d800122c847e9cd7b3"
-    },
-    {
-      "path": "designs/safehire-marketplace-refresh/workspace.css",
-      "bytes": 7957,
-      "sha256": "65777bb9b1f297df9d93267e9f08f14a9df5138a3264892dcdece818ffc6a804"
-    },
-    {
       "path": "docker-compose.yml",
       "bytes": 284,
       "sha256": "8a03b7593713d0b8b23069891781248b27639bfb645f051388937cf0e67c8bdc"
-    },
-    {
-      "path": "docs/00_OFFICIAL_IMPLEMENTATION_REFERENCES.md",
-      "bytes": 39954,
-      "sha256": "8d49b12dccf23c7137ecf0d18d3ad1969e33e068bb1f851509442c4e55d686d5"
-    },
-    {
-      "path": "docs/01_COMPETITION_REQUIREMENTS.md",
-      "bytes": 2039,
-      "sha256": "3c484a955710623557e37217c2fdbaaab44dcd8284f6dae29b61b4e2bf6c0da3"
-    },
-    {
-      "path": "docs/01_U_TOKEN_REQUIREMENT_CHECK.md",
-      "bytes": 3959,
-      "sha256": "845bbf078eb2b99bf5766d1899fbca15b6abf18603adf759e3365fba5cc6010e"
     },
     {
       "path": "docs/02_ARCHITECTURE.md",
@@ -634,24 +559,9 @@
       "sha256": "536936740ee3af217a7b62f354f2169af7d1bdb07c070ed9b3ceaac897d42fe6"
     },
     {
-      "path": "docs/05_MULTI_AGENT_ADVERSARIAL_REVIEW.md",
-      "bytes": 4699,
-      "sha256": "b560f3c2ef9ecd6d47b31834ff0a7c87b33015b03c56d4b3401cc020bdc21b0e"
-    },
-    {
       "path": "docs/06_SECURITY_AND_THREAT_MODEL.md",
       "bytes": 3612,
       "sha256": "92b4517565845170c2eb98e422b025e2785f43bc6d9b7509d377cf60f8157540"
-    },
-    {
-      "path": "docs/07_CONSTRUCTION_BLUEPRINT.md",
-      "bytes": 2274,
-      "sha256": "beb403586bce98a0015699dac033d576f5b6a1b6bac1d101d0a3fc890f4615aa"
-    },
-    {
-      "path": "docs/08_DEMO_AND_SUBMISSION.md",
-      "bytes": 1945,
-      "sha256": "810aa4924d587aab13616cf224a6e2fc96ae5cc17ac3fcf413094fc6c6c92a94"
     },
     {
       "path": "docs/09_OPERATIONS.md",
@@ -659,39 +569,9 @@
       "sha256": "934eb6005e03d3dd55717ce01a81cf5613ab1f9b1c124c09880e5feeca79a8c3"
     },
     {
-      "path": "docs/10_EXTERNAL_COMPLETION_CHECKLIST.md",
-      "bytes": 3025,
-      "sha256": "001e6e14a437c3b7c62d33f6b64420bfdaa3a4394d033cc1be991325a7346fdd"
-    },
-    {
-      "path": "docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md",
-      "bytes": 11310,
-      "sha256": "69e8fbe4c3e03169eb83879330596c48f8ccb0ee7a61ff226ad1d7e4940768d9"
-    },
-    {
-      "path": "docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md",
-      "bytes": 7979,
-      "sha256": "bb30dcb292a42338527756ff9e2e89625c744248e92d7217607b88a2e786fd14"
-    },
-    {
-      "path": "docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md",
-      "bytes": 5909,
-      "sha256": "459332dcc9f419a2e152fec819f2df3e02643ded73a94d96afab8153b12865d8"
-    },
-    {
-      "path": "docs/BUSINESS_HARDENING_2026-09-07.md",
-      "bytes": 3342,
-      "sha256": "7c33a06209cb0888a354e2020bd944a948f37e80575ab7e88f71a4b38a393170"
-    },
-    {
       "path": "docs/CHAINHELIX_DELIVERY_56741_2026-09-08.zh-CN.md",
       "bytes": 1941,
       "sha256": "ca02a82709422dff8cf0383523e2505303b0f589443536a85413aeef51a75dff"
-    },
-    {
-      "path": "docs/CONTEST_RULES_AUDIT_2026-09-08.zh-CN.md",
-      "bytes": 3966,
-      "sha256": "cbdd68ee98b97acdb95d721c60d85c5cf6d52b4181f1417cfd49136133d61cdd"
     },
     {
       "path": "docs/DELIVERY_FAILURE_56733_2026-09-08.zh-CN.md",
@@ -699,189 +579,9 @@
       "sha256": "d157edbd89cd8c9811bdfdc5af8614bb3f5e3b68155124063ff80108f3c7fecf"
     },
     {
-      "path": "docs/DEMO_VOICE_AND_CAPTIONS_2026-09-08.zh-CN.md",
-      "bytes": 1335,
-      "sha256": "d3c7f3761fcc69d72f6c730b0d2ef74c934480aa773d982dced0e722289b411e"
-    },
-    {
-      "path": "docs/ENGLISH_REDESIGN_2026-09-08.zh-CN.md",
-      "bytes": 4383,
-      "sha256": "236c3814c5de1224995274346354d89f22a8d9147f2aadca4bf4b29cd8f337f8"
-    },
-    {
-      "path": "docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md",
-      "bytes": 7280,
-      "sha256": "484584686e4bfb45d88230ad6493179245ad3aa6ae997e4e0152b36881271c30"
-    },
-    {
-      "path": "docs/FINANCIAL_SOURCES_AND_PROVIDER_INTEGRATION.zh-CN.md",
-      "bytes": 6092,
-      "sha256": "fa395dcf5269c09dfd0ec659874dd8266d5317f744e3211f864205d8e92b7dc8"
-    },
-    {
-      "path": "docs/HACKATHON_FINAL_SUBMISSION_CHECKLIST_2026-08-31.md",
-      "bytes": 18405,
-      "sha256": "65ed0214f52f80fb5e292099f1bc94895f16f901dc6a2be3cf504682aa1f3e04"
-    },
-    {
-      "path": "docs/HACKATHON_SUBMISSION_READINESS_2026-08-31.md",
-      "bytes": 4483,
-      "sha256": "286f865679a548f88d38e3933486049f990dd58dbebf46551cbd0ffffb65e310"
-    },
-    {
       "path": "docs/IN_PRODUCT_DELIVERY_AND_SUBMISSION_2026-09-08.zh-CN.md",
       "bytes": 4827,
       "sha256": "d5314f7bf01894a56d74d5a856d52ba0210be56e255ab25d9c30b8bbe0d58c2f"
-    },
-    {
-      "path": "docs/MANUAL_COMPLETION_GATES_2026-08-31.md",
-      "bytes": 2239,
-      "sha256": "809383262438d0c206888faabb69bb7de4ead486925d54c3129cf15cf11b6ca5"
-    },
-    {
-      "path": "docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md",
-      "bytes": 9057,
-      "sha256": "d690663718f9c3519027cc5f8f5325319c5b20a43ccb394f36d0301b89872eb5"
-    },
-    {
-      "path": "docs/PROVIDER_CANDIDATES_2026-09-08.md",
-      "bytes": 10446,
-      "sha256": "46008e7e255514e8a8cc11dd4d184dc42dd189c800dcdc3667176f1ddf8a3d4d"
-    },
-    {
-      "path": "docs/PROVIDER_INTEGRATION_HANDOFF_2026-09-08.md",
-      "bytes": 1911,
-      "sha256": "75766fc988af47b7b418e84a0e5094f8a0fbde49d9043ba239240914e65a6874"
-    },
-    {
-      "path": "docs/SDK_LP_SECURITY_REVIEW_2026-09-08.md",
-      "bytes": 4336,
-      "sha256": "0f85d758008574f4a64533ded5d2c7e4074058e64827c7e964fa59da98423b2d"
-    },
-    {
-      "path": "docs/SERVICE_WORKSPACE_RELEASE_2026-09-08.zh-CN.md",
-      "bytes": 6097,
-      "sha256": "e37a4a66b5e82b61d852948e35d423c203a5f904e3bca9622a133c717aa66490"
-    },
-    {
-      "path": "docs/SPRINT_ACCEPTANCE_2026-09-08.zh-CN.md",
-      "bytes": 3756,
-      "sha256": "21bfd3d87561be71de5b0c41be026a232e6b49f1fbe1616578cf5b60e8f6d66a"
-    },
-    {
-      "path": "docs/SPRINT_DELIVERY_2026-09-08.zh-CN.md",
-      "bytes": 3051,
-      "sha256": "b9a1239ec22c51b90da11d5b48bb9d8a5fd2c34b6fa472c57d6d70a842149a95"
-    },
-    {
-      "path": "docs/SUPPLY_AND_OFFSITE_DELIVERY_2026-09-08.zh-CN.md",
-      "bytes": 8400,
-      "sha256": "8adbe3f4a2940d74e74c0a0b3c2eff800d1560f732c8345163105810b746225d"
-    },
-    {
-      "path": "docs/TERMIX_EXECUTION_RUNBOOK.md",
-      "bytes": 4927,
-      "sha256": "e7630432c6f399219e3f1402a701c465d597b88882102fd766077c9ac729f773"
-    },
-    {
-      "path": "docs/TERMIX_HUMAN_SESSION_2026-09-08.zh-CN.md",
-      "bytes": 3916,
-      "sha256": "17530962ea2ee4dd0bed0705d77d60b2721272efcc7a5bbf4050fe52b606b3ee"
-    },
-    {
-      "path": "docs/WALLET_HOLDINGS.zh-CN.md",
-      "bytes": 3150,
-      "sha256": "cb42eb79a13f3b2d103788b63fdb64c74adbb3c3632c43f31d7343627d160c74"
-    },
-    {
-      "path": "docs/champion-2026-09-05/BLUEPRINT.zh-CN.md",
-      "bytes": 15017,
-      "sha256": "883d0a9ba964e27d95ccce16cc2a586dff8e3cecbe137b20f2a7bf72155804fc"
-    },
-    {
-      "path": "docs/champion-2026-09-05/COMPETITOR_RESEARCH.zh-CN.md",
-      "bytes": 7699,
-      "sha256": "3bacacdeb37db423b5d401a093614b128aeb9c2019f37a8c3e552d103739ca4f"
-    },
-    {
-      "path": "docs/champion-2026-09-05/RUNBOOK.zh-CN.md",
-      "bytes": 9618,
-      "sha256": "ceeb73600a3f7052f581ab953ac617dcaf562415cb8ff70a78e2eff3306a1026"
-    },
-    {
-      "path": "docs/champion-2026-09-05/sources.json",
-      "bytes": 2837,
-      "sha256": "9a3d9a65df6e8cce0563bdb45498a84bea918f202304b32c48fb01933743cb46"
-    },
-    {
-      "path": "docs/champion-v2/API_EXAMPLES.zh-CN.md",
-      "bytes": 3528,
-      "sha256": "1b5bf0f93b16bceefedc07cfb8480e00683822926cd893b2555e6652c8cddbd6"
-    },
-    {
-      "path": "docs/champion-v2/CONSTRUCTION_BLUEPRINT.zh-CN.md",
-      "bytes": 9994,
-      "sha256": "14206bc892e7a1ce83868ed615feee4f4525d16ed549b333c18c705b03da40c0"
-    },
-    {
-      "path": "docs/champion-v2/GAP_AND_COMPETITORS.zh-CN.md",
-      "bytes": 8366,
-      "sha256": "6149f791471ac84498f1ad3d8b46f79eba572aeb50536f9ad21550abd01fcf3a"
-    },
-    {
-      "path": "docs/champion-v2/PROVIDER_AND_REAL_EVIDENCE.zh-CN.md",
-      "bytes": 5774,
-      "sha256": "05098d7dd7feeb2dbb0a4923052f6b982517b74ce9b42ca4fe113acb49324c8a"
-    },
-    {
-      "path": "docs/champion-v2/RELEASE_AND_DEMO.zh-CN.md",
-      "bytes": 5184,
-      "sha256": "bc094ec8d55b037a071f6fca59444830943ea07294b12a882a106da9fe16d023"
-    },
-    {
-      "path": "docs/champion-v2/START_HERE.zh-CN.md",
-      "bytes": 5020,
-      "sha256": "9be58933c69cc47ec09c46bb7bfc82d00bbe07111850b793a3c1e11ae2c4f669"
-    },
-    {
-      "path": "docs/champion-v2/TEST_REPORT.md",
-      "bytes": 4031,
-      "sha256": "abf951f19995d9dfb3a9446c0c333d728cfec0b15eba41b36ec964aa9d387616"
-    },
-    {
-      "path": "docs/champion-v2/backlog.json",
-      "bytes": 2832,
-      "sha256": "8944b83b5dad94544ecb4e0d94a38b984be6f2085435e7c08c9bd86f6210e9e6"
-    },
-    {
-      "path": "docs/champion-v2/sources.json",
-      "bytes": 2203,
-      "sha256": "9f78e2367e9d5f6afe6e0433361e9724a4c0d8b8bb45f4278cd5fef0a0c7a924"
-    },
-    {
-      "path": "docs/hackathon_official_requirements_2026-08-31.md",
-      "bytes": 22552,
-      "sha256": "5dba83b35e60f18a344e8bcb976ed65f20d1ff6e353238d6e1cff95a9b8027af"
-    },
-    {
-      "path": "docs/research/2026-09-08/\u5bf9\u7167\u7ed3\u679c\u4e0e\u9650\u5236.zh-CN.md",
-      "bytes": 3919,
-      "sha256": "b43200d3dd0f14469e694f01c765793f58e470fe76afb8bf48c0818f02687ffa"
-    },
-    {
-      "path": "docs/research/2026-09-08/\u6f14\u793a\u5f55\u5236\u987a\u5e8f.zh-CN.md",
-      "bytes": 1910,
-      "sha256": "c50d0d4c4934f7370ca76dd6a5e4093669e892a7427eb3fc998b394e5f2d0f81"
-    },
-    {
-      "path": "docs/research/README.md",
-      "bytes": 965,
-      "sha256": "df646d9547c8cc900bd91437b9b4df10fe650f97ece62bf117c695f7340b8743"
-    },
-    {
-      "path": "docs/\u7f16\u8bd1\u8e29\u5751\u8bb0\u5f55.md",
-      "bytes": 2833,
-      "sha256": "5f6aae6e9e059d7f767602c1e3adb8c17e305f04193dba6df92e2ba56c108f07"
     },
     {
       "path": "evidence/README.md",
@@ -1360,8 +1060,8 @@
     },
     {
       "path": "scripts/build_release.py",
-      "bytes": 3173,
-      "sha256": "33e63332e58fd42c2570b324db948c5979d0206089a492838b050e46d6ac55ee"
+      "bytes": 3428,
+      "sha256": "b7cf5ecef0fbe2a890849001da8bfcf3cf641c18bb6375ee33881907d0631c17"
     },
     {
       "path": "scripts/build_termix_report.py",
@@ -1810,8 +1510,8 @@
     },
     {
       "path": "src/proofops/services/submission.py",
-      "bytes": 24730,
-      "sha256": "367d72c76de75bc88db40498647d20924c9fabfd2e3feda9272e8e503abc5ee0"
+      "bytes": 24439,
+      "sha256": "397ad49f8d5889f57259529b9160653fa6c81648425e821b9a7e93b0074cad94"
     },
     {
       "path": "src/proofops/services/wallet_auth.py",
@@ -1877,11 +1577,6 @@
       "path": "submission/README.md",
       "bytes": 418,
       "sha256": "bfc1f6b8f0707d6eb9602ae8c24dae8838ef2aa9c61dbe0bd6e1883b715f4f7c"
-    },
-    {
-      "path": "submission/form-draft.md",
-      "bytes": 3176,
-      "sha256": "a60da8ab3f3470c3f124528a77965a2d6f4855a7fbc0f8dcd8ba9fd16f9d0852"
     },
     {
       "path": "submission/official-confirmation-2026-09-08.json",

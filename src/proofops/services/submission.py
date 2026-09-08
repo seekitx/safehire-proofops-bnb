@@ -263,17 +263,11 @@ class SubmissionValidator:
     def _check_required_files(self) -> GateCheck:
         required = [
             "README.md",
-            "docs/00_OFFICIAL_IMPLEMENTATION_REFERENCES.md",
-            "docs/01_COMPETITION_REQUIREMENTS.md",
             "docs/02_ARCHITECTURE.md",
             "docs/03_DOMAIN_AND_MODULE_DESIGN.md",
             "docs/04_PLUGIN_DECOUPLING.md",
-            "docs/05_MULTI_AGENT_ADVERSARIAL_REVIEW.md",
             "docs/06_SECURITY_AND_THREAT_MODEL.md",
-            "docs/07_CONSTRUCTION_BLUEPRINT.md",
-            "docs/08_DEMO_AND_SUBMISSION.md",
             "docs/09_OPERATIONS.md",
-            "docs/10_EXTERNAL_COMPLETION_CHECKLIST.md",
             "contracts/src/AgentRegistry.sol",
             "contracts/src/ScopedExecutionPolicy.sol",
             "contracts/src/EvidenceAnchor.sol",
@@ -287,8 +281,8 @@ class SubmissionValidator:
             "required_artifacts",
             not missing,
             "P0",
-            "All design and submission artifacts exist" if not missing else f"Missing: {missing}",
-            "Restore every listed design, security, operations and submission artifact.",
+            "All public product and implementation artifacts exist" if not missing else f"Missing: {missing}",
+            "Restore every listed public architecture, security, operations and implementation artifact.",
         )
 
     def _check_termix(self) -> GateCheck:

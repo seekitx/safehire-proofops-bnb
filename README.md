@@ -79,7 +79,7 @@ a fabricated green status.
 
 ## Current live and on-chain evidence
 
-- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. Includes fresh supplier quote probes and four-category action preparation with bounded unsigned drafts and read-only simulation. No automatic trading. Opt-in Bark phone notifications require a device verification code; provider acceptance is not proof of human receipt. See [scope and security review](docs/BUSINESS_ACTION_PREPARATION_2026-09-08.zh-CN.md).
+- [Service workspace](https://safehire.eyesonchain.xyz/workspace): private durable orders, four read-only monitoring categories, in-app alerts, recovery and explicit user feedback. Includes fresh supplier quote probes and four-category action preparation with bounded unsigned drafts and read-only simulation. No automatic trading. Opt-in Bark phone notifications require a device verification code; provider acceptance is not proof of human receipt. See the [security model](docs/06_SECURITY_AND_THREAT_MODEL.md).
 - ChainHelix #269224 delivered paid mainnet Job #56741 (0.5 U). Signed task, raw manifest and grid arithmetic were recomputed by SafeHire on GreenCloud. This was purchased on the supplier site; it is submitted delivery, not final settlement or a newly measured SafeHire purchase.
 
 - Four categories are listed, but live service depth is uneven. ChainHelix grid, lending-health and yield-allocation calculators have verified sample quotes at 0.50 U each. They share one operator and do not execute trades. The two new calculators still need first paid deliveries. LP paid supply remains unresolved.
@@ -115,7 +115,7 @@ Primary evidence:
 5. The owner must verify identity, prize wallet, contact fields and terms before
    submitting.
 
-See the current [delivery, supply and owner handoff](docs/SUPPLY_AND_OFFSITE_DELIVERY_2026-09-08.zh-CN.md). Older manual-gate documents are dated snapshots.
+See the [in-product delivery record](docs/IN_PRODUCT_DELIVERY_AND_SUBMISSION_2026-09-08.zh-CN.md) for the verified purchase, delivery and notification boundaries.
 
 ## Architecture
 
@@ -187,18 +187,11 @@ keystores, virtual environments, caches, build output and dependencies.
 
 ## Repository reading order
 
-1. [`AGENTS.md`](AGENTS.md) — hard safety, evidence and scope invariants.
-2. [`agent.md`](agent.md) — task-oriented file index.
-3. [`docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md`](docs/11_JUDGE_WINNING_STRATEGY_2026-08-31.md)
-   — current official-rubric strategy and demo.
-4. [`docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md`](docs/13_PROTOCOL_HARDENING_MULTI_AGENT_REVIEW_2026-08-31.md)
-   — latest signed-quote, delivery verification, dispute and resumability review.
-5. [`docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md`](docs/12_ADVERSARIAL_CONSENSUS_2026-08-31.md)
-   — ten-role debate and consensus.
-6. [`docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md`](docs/PAST_WINNERS_AND_JUDGE_PATTERNS_2026-08-31.md)
-   — official winner patterns and current gap analysis.
-7. `docs/02_ARCHITECTURE.md` through `docs/10_EXTERNAL_COMPLETION_CHECKLIST.md`
-   — implementation, security, operation and submission details.
+1. [Architecture](docs/02_ARCHITECTURE.md) and [domain model](docs/03_DOMAIN_AND_MODULE_DESIGN.md).
+2. [Plugin interfaces](docs/04_PLUGIN_DECOUPLING.md).
+3. [Security and threat model](docs/06_SECURITY_AND_THREAT_MODEL.md).
+4. [Operations](docs/09_OPERATIONS.md).
+5. [Evidence](evidence/README.md) and [submission record](submission/README.md).
 
 ## Security boundary
 
