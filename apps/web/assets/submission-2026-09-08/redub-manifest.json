@@ -1,0 +1,94 @@
+{
+  "version": "minimax-redub-2026-09-08",
+  "voice_model": "speech-2.8-hd",
+  "voice_id": "English_expressive_narrator",
+  "voice_type": "stock synthetic voice",
+  "caption_alignment": "Word timestamps: MiniMax when available, otherwise local ASR aligned to authored text; original audio speed retained. Per-scene alignment checks identify fallback.",
+  "caption_count": 52,
+  "duration_seconds": 138.041333,
+  "sha256": "e20be55ac2689ed687cebc97b846e8f75d20956de248b7beeb4d1724d5d1b427",
+  "scenes": [
+    {
+      "scene": "01-market",
+      "text": "Finding an agent is easy. Knowing what you're actually paying for is harder. That's what SafeHire is built for. Let's walk through the marketplace, then look at a real order the owner has already paid for. We won't make another payment in this video.",
+      "start_seconds": 0.0,
+      "audio_seconds": 13.644,
+      "scene_seconds": 14.24,
+      "caption_phrases": 7,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 0.978021978021978
+    },
+    {
+      "scene": "02-categories",
+      "text": "Start with the job you need done: grid calculations, liquidity positions, yield comparison, or lending risk. Each service tells you what it can deliver, and where its limits are. If a provider can't give us a valid signed quote, we don't offer a purchase button.",
+      "start_seconds": 14.24,
+      "audio_seconds": 16.56,
+      "scene_seconds": 17.16,
+      "caption_phrases": 7,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 0.9383715207524471
+    },
+    {
+      "scene": "03-quote",
+      "text": "Here's the grid calculator. The quoted service fee is zero point five U, plus network fees. The reference price and budget are example inputs supplied by the buyer. Before any payment, SafeHire checks the provider's signature and the exact terms. The wallet stays under the user's control.",
+      "start_seconds": 31.4,
+      "audio_seconds": 18.828,
+      "scene_seconds": 19.44,
+      "caption_phrases": 7,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 0.9418604651162791
+    },
+    {
+      "scene": "04-paid-order",
+      "text": "Now, the real purchase. This is order five six seven four three, created inside SafeHire on B N B Chain. Each link opens an actual transaction. The owner confirmed every wallet step, including the exact token allowance and escrow funding. After we notified the provider, it submitted the result.",
+      "start_seconds": 50.84,
+      "audio_seconds": 20.412,
+      "scene_seconds": 21.0,
+      "caption_phrases": 7,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 1.0660439616224173
+    },
+    {
+      "scene": "05-result",
+      "text": "Here's what came back: five buy levels and five sell levels. SafeHire checked the delivered file against its on chain record, then recalculated the prices, quantities, and total allocation. Those checks passed. This is a verified calculation. It does not mean trades were placed, or that the strategy will make money.",
+      "start_seconds": 71.84,
+      "audio_seconds": 21.672,
+      "scene_seconds": 22.28,
+      "caption_phrases": 8,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 0.9964221824686942
+    },
+    {
+      "scene": "06-followup",
+      "text": "The work doesn't disappear when you close the tab. The server checked this order in the background and sent a delivery alert through Bark. The owner confirmed receiving it on the phone. Asked whether the result was worth the price, the owner said, I feel it is worth it. That's owner feedback, not an independent review.",
+      "start_seconds": 94.12,
+      "audio_seconds": 20.088,
+      "scene_seconds": 20.68,
+      "caption_phrases": 8,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 1.0483625671702321
+    },
+    {
+      "scene": "07-boundaries",
+      "text": "The result has been submitted, but final settlement is still pending. We keep that distinction visible. We also show where the marketplace needs more work: reliable supply across all four categories, independent alternatives, and stronger human comparisons. You can explore the live product, inspect the raw evidence, and review the code using the links below.",
+      "start_seconds": 114.80000000000001,
+      "audio_seconds": 22.572,
+      "scene_seconds": 23.16,
+      "caption_phrases": 8,
+      "audio_speed_adjustment": 1.0,
+      "visual_speed_factor": 0.9946744545610721
+    }
+  ],
+  "content_changes": "Narration delivery and wording only; original business scope and evidence boundaries retained",
+  "credential_saved": false,
+  "human_listening_review": "pending",
+  "verification": {
+    "automated_transcript_review": "All seven scenes checked; differences limited to name spacing, numeric spelling and Bark ASR spelling. No omitted sentences detected.",
+    "frame_review": "Subtitle visible inside reserved bottom band; website content retained.",
+    "official_submission_unchanged": true
+  },
+  "original_submitted_video": {
+    "url": "safehire-demo-original-submitted.mp4",
+    "sha256": "f1115e71cd6fc731bcca11fe44ffefa418b71f557530811699e5ef6d9ea791f2"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T11:28:57.512504+00:00",
-  "file_count_excluding_manifest": 400,
+  "generated_at_utc": "2026-09-08T11:55:05.352687+00:00",
+  "file_count_excluding_manifest": 407,
   "files": [
     {
       "path": ".dockerignore",
@@ -369,14 +369,19 @@
       "sha256": "89512761a88cf8572295f0a2df50f0545e2754f675e423ec5b814f44b3fe6580"
     },
     {
+      "path": "apps/web/assets/submission-2026-09-08/captions.json",
+      "bytes": 8045,
+      "sha256": "07b20c6e4173a0cde482e2aeb34d1ea694ed6e1bc0458b243587fa1719891392"
+    },
+    {
       "path": "apps/web/assets/submission-2026-09-08/delivery-verification.json",
       "bytes": 4663,
       "sha256": "f645838b698f4d570a7ebe783959141d9e17e08c6c8d2fe03488f65fb8d5e69f"
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/index.html",
-      "bytes": 6573,
-      "sha256": "7906dafb940978fe27a1b6ef29543c26d938a24b8d676cc2681a1c1e430462ac"
+      "bytes": 6890,
+      "sha256": "0c51b665f4dc68d829c1d8b3694c4d9ef47394aa1a4b51a1cc4575cabfbf4bf7"
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/notification-evidence.json",
@@ -389,9 +394,29 @@
       "sha256": "ffcab19a0ebd84e979db6d112880a16f995171f25712a80841c06358127f9a8d"
     },
     {
-      "path": "apps/web/assets/submission-2026-09-08/safehire-demo.mp4",
+      "path": "apps/web/assets/submission-2026-09-08/redub-manifest.json",
+      "bytes": 5152,
+      "sha256": "29b1195e79d14886fb256ef838110a15efce81e3a9dd57f3070c9121139ca670"
+    },
+    {
+      "path": "apps/web/assets/submission-2026-09-08/safehire-demo-original-submitted.mp4",
       "bytes": 5172183,
       "sha256": "f1115e71cd6fc731bcca11fe44ffefa418b71f557530811699e5ef6d9ea791f2"
+    },
+    {
+      "path": "apps/web/assets/submission-2026-09-08/safehire-demo.en.srt",
+      "bytes": 3858,
+      "sha256": "88d5fd85a2c6cfec8c7b9a70d91de7115a7b1652eb61b8837dd3e335b70e0e73"
+    },
+    {
+      "path": "apps/web/assets/submission-2026-09-08/safehire-demo.en.vtt",
+      "bytes": 3719,
+      "sha256": "90d364d5f4ff4a8159bb2b20be9309e9651aca88b4d7f512d736fd0fe3c9c011"
+    },
+    {
+      "path": "apps/web/assets/submission-2026-09-08/safehire-demo.mp4",
+      "bytes": 6353050,
+      "sha256": "e20be55ac2689ed687cebc97b846e8f75d20956de248b7beeb4d1724d5d1b427"
     },
     {
       "path": "apps/web/assets/workspace.css",
@@ -622,6 +647,11 @@
       "path": "docs/DELIVERY_FAILURE_56733_2026-09-08.zh-CN.md",
       "bytes": 2897,
       "sha256": "d157edbd89cd8c9811bdfdc5af8614bb3f5e3b68155124063ff80108f3c7fecf"
+    },
+    {
+      "path": "docs/DEMO_VOICE_AND_CAPTIONS_2026-09-08.zh-CN.md",
+      "bytes": 1335,
+      "sha256": "d3c7f3761fcc69d72f6c730b0d2ef74c934480aa773d982dced0e722289b411e"
     },
     {
       "path": "docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md",
@@ -1349,6 +1379,11 @@
       "sha256": "a40ffb8935d7a12cab5067b5073aea8b5b6d6bd72c9e5882d5836e6f82988234"
     },
     {
+      "path": "scripts/redub_submission_demo.py",
+      "bytes": 14735,
+      "sha256": "e26fb3a950dcac051f448393069bd43b1dd27d28bab26f9edbec81c5c67c04ba"
+    },
+    {
       "path": "scripts/refresh_live_agent_catalog.py",
       "bytes": 4262,
       "sha256": "f3ee1788839a2f1492f8295c26adb38eac226421de6ff0a79a3598f949132ec1"
@@ -1795,8 +1830,8 @@
     },
     {
       "path": "submission/submission.json",
-      "bytes": 1749,
-      "sha256": "954514e1d72d010cfd7656ee58f82afdf75282ab7e5905daf3d8e38a1ce54105"
+      "bytes": 1911,
+      "sha256": "6e34f00816427c69b6d25c68838c8cbe429681c642c48072df300c721dd1143f"
     },
     {
       "path": "templates/deployments/bsc-testnet.template.json",

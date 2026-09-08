@@ -1,0 +1,366 @@
+[
+  {
+    "text": "Finding an agent is easy. Knowing what",
+    "startMs": 0,
+    "endMs": 2300,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "you're actually paying for is harder. That's",
+    "startMs": 2300,
+    "endMs": 4720,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "what SafeHire is built for. Let's walk",
+    "startMs": 4720,
+    "endMs": 6880,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "through the marketplace, then look at a",
+    "startMs": 6880,
+    "endMs": 8900,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "real order the owner has already paid",
+    "startMs": 8900,
+    "endMs": 10620,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "for. We won't make another payment in",
+    "startMs": 10620,
+    "endMs": 12720,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "this video.",
+    "startMs": 12720,
+    "endMs": 13220,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "Start with the job you need done:",
+    "startMs": 14240,
+    "endMs": 15800,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "grid calculations, liquidity positions, yield comparison, or",
+    "startMs": 16340,
+    "endMs": 20560,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "lending risk. Each service tells you what",
+    "startMs": 20560,
+    "endMs": 22980,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "it can deliver, and where its limits",
+    "startMs": 22980,
+    "endMs": 24820,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "are. If a provider can't give us",
+    "startMs": 24820,
+    "endMs": 27060,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "a valid signed quote, we don't offer",
+    "startMs": 27060,
+    "endMs": 29620,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "a purchase button.",
+    "startMs": 29620,
+    "endMs": 30500,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "Here's the grid calculator. The quoted service",
+    "startMs": 31400,
+    "endMs": 34380,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "fee is zero point five U, plus",
+    "startMs": 34380,
+    "endMs": 36940,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "network fees. The reference price and budget",
+    "startMs": 36940,
+    "endMs": 39820,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "are example inputs supplied by the buyer.",
+    "startMs": 39820,
+    "endMs": 42260,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "Before any payment, SafeHire checks the provider's",
+    "startMs": 42680,
+    "endMs": 45500,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "signature and the exact terms. The wallet",
+    "startMs": 45500,
+    "endMs": 48000,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "stays under the user's control.",
+    "startMs": 48000,
+    "endMs": 49760,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "Now, the real purchase. This is order",
+    "startMs": 50840,
+    "endMs": 53980,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "five six seven four three, created inside",
+    "startMs": 53980,
+    "endMs": 57200,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "SafeHire on B N B Chain. Each",
+    "startMs": 57200,
+    "endMs": 60040,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "link opens an actual transaction. The owner",
+    "startMs": 60040,
+    "endMs": 62680,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "confirmed every wallet step, including the exact",
+    "startMs": 62680,
+    "endMs": 65600,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "token allowance and escrow funding. After we",
+    "startMs": 65600,
+    "endMs": 68400,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "notified the provider, it submitted the result.",
+    "startMs": 68400,
+    "endMs": 70880,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "Here's what came back: five buy levels",
+    "startMs": 71840,
+    "endMs": 74560,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "and five sell levels. SafeHire checked the",
+    "startMs": 74560,
+    "endMs": 77920,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "delivered file against its on chain record,",
+    "startMs": 77920,
+    "endMs": 80140,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "then recalculated the prices, quantities, and total",
+    "startMs": 80540,
+    "endMs": 83740,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "allocation. Those checks passed. This is a",
+    "startMs": 83740,
+    "endMs": 87780,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "verified calculation. It does not mean trades",
+    "startMs": 87780,
+    "endMs": 90740,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "were placed, or that the strategy will",
+    "startMs": 90740,
+    "endMs": 92660,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "make money.",
+    "startMs": 92660,
+    "endMs": 93160,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "The work doesn't disappear when you close",
+    "startMs": 94120,
+    "endMs": 96160,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "the tab. The server checked this order",
+    "startMs": 96160,
+    "endMs": 98620,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "in the background and sent a delivery",
+    "startMs": 98620,
+    "endMs": 100620,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "alert through Bark. The owner confirmed receiving",
+    "startMs": 100620,
+    "endMs": 103820,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "it on the phone. Asked whether the",
+    "startMs": 103820,
+    "endMs": 105680,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "result was worth the price, the owner",
+    "startMs": 105680,
+    "endMs": 107800,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "said, I feel it is worth it.",
+    "startMs": 107800,
+    "endMs": 110160,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "That's owner feedback, not an independent review.",
+    "startMs": 110640,
+    "endMs": 113740,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "The result has been submitted, but final",
+    "startMs": 114800,
+    "endMs": 117240,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "settlement is still pending. We keep that",
+    "startMs": 117240,
+    "endMs": 119620,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "distinction visible. We also show where the",
+    "startMs": 119620,
+    "endMs": 122180,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "marketplace needs more work: reliable supply across",
+    "startMs": 122180,
+    "endMs": 125600,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "all four categories, independent alternatives, and stronger",
+    "startMs": 125600,
+    "endMs": 129720,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "human comparisons. You can explore the live",
+    "startMs": 129720,
+    "endMs": 132480,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "product, inspect the raw evidence, and review",
+    "startMs": 132480,
+    "endMs": 135340,
+    "timestampMs": null,
+    "confidence": null
+  },
+  {
+    "text": "the code using the links below.",
+    "startMs": 135340,
+    "endMs": 136920,
+    "timestampMs": null,
+    "confidence": null
+  }
+]
