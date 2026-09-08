@@ -6,7 +6,7 @@
   "caption_alignment": "Word timestamps: MiniMax when available, otherwise local ASR aligned to authored text; original audio speed retained. Per-scene alignment checks identify fallback.",
   "caption_count": 52,
   "duration_seconds": 138.041333,
-  "sha256": "e20be55ac2689ed687cebc97b846e8f75d20956de248b7beeb4d1724d5d1b427",
+  "sha256": "c3dfe850dbdd839f5197e6bd237c638bbfb51a139f4d15895a77080840c289d0",
   "scenes": [
     {
       "scene": "01-market",
@@ -79,7 +79,7 @@
       "visual_speed_factor": 0.9946744545610721
     }
   ],
-  "content_changes": "Narration delivery and wording only; original business scope and evidence boundaries retained",
+  "content_changes": "Conversational English narration and synchronized captions; real public pages re-recorded with the English redesign. Business scope and original evidence boundaries retained.",
   "credential_saved": false,
   "human_listening_review": "pending",
   "verification": {
@@ -90,5 +90,8 @@
   "original_submitted_video": {
     "url": "safehire-demo-original-submitted.mp4",
     "sha256": "f1115e71cd6fc731bcca11fe44ffefa418b71f557530811699e5ef6d9ea791f2"
-  }
+  },
+  "original_narration_video_sha256": "e20be55ac2689ed687cebc97b846e8f75d20956de248b7beeb4d1724d5d1b427",
+  "visual_refresh_manifest": "visual-refresh-manifest.json",
+  "visual_version": "english-design-2026-09-08"
 }

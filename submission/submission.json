@@ -27,6 +27,7 @@
   "phone_alert": "Bark accepted; owner confirmed actual receipt",
   "submitted_at_utc": "2026-09-08T11:27:42Z",
   "official_confirmation": "submission/official-confirmation-2026-09-08.json",
-  "demo_media_version": "minimax-redub-2026-09-08",
-  "demo_subtitles_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/safehire-demo.en.srt"
+  "demo_media_version": "english-design-2026-09-08",
+  "demo_subtitles_url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/safehire-demo.en.srt",
+  "demo_visual_refresh_manifest": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/visual-refresh-manifest.json"
 }

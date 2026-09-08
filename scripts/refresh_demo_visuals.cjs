@@ -11,7 +11,7 @@ const probe=p=>Number(execFileSync('ffprobe',['-v','error','-show_entries','form
 (async()=>{const browser=await chromium.launch({headless:true});const parts=[],observations=[];
 for(let i=0;i<timings.length;i++){const scene=timings[i],duration=scene.scene_seconds;const context=await browser.newContext({viewport:{width:1440,height:960},recordVideo:{dir:out,size:{width:1440,height:960}},locale:'en-US',reducedMotion:'reduce'});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+urls[i],{waitUntil:'domcontentloaded',timeout:45000});
 if(i<2)await page.locator('.service-card').first().waitFor({timeout:45000});
-if(i===2){await page.getByRole('heading',{name:'ChainHelix — Grid calculation',exact:true}).waitFor({timeout:45000});await page.locator('.brief-card').scrollIntoViewIfNeeded();}
+if(i===2){await page.getByRole('heading',{name:'ChainHelix — Grid calculation',exact:true}).waitFor({timeout:45000});if(!(await page.locator('#quoteState').innerText()).startsWith('SIGNED'))throw new Error('A valid signed quote is required for the quote scene');await page.locator('.brief-card').scrollIntoViewIfNeeded();}
 if(i===1)await page.locator('#services-section').scrollIntoViewIfNeeded();
 await page.waitForTimeout(500);const initialText=await page.locator('body').innerText();if(/\p{Script=Han}/u.test(initialText))throw new Error('Non-English content in scene '+scene.scene);if(errors.length)throw new Error(errors.join('; '));
 const started=Date.now();const observed={scene:scene.scene,url:page.url(),recorded_at:new Date().toISOString(),duration_seconds:duration,visible_text:initialText,category_states:[]};

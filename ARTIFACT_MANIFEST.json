@@ -1,7 +1,7 @@
 {
   "project": "SafeHire ProofOps for BNB Chain",
-  "generated_at_utc": "2026-09-08T13:19:52.741010+00:00",
-  "file_count_excluding_manifest": 418,
+  "generated_at_utc": "2026-09-08T13:28:36.600269+00:00",
+  "file_count_excluding_manifest": 419,
   "files": [
     {
       "path": ".dockerignore",
@@ -245,8 +245,8 @@
     },
     {
       "path": "apps/web/arena.html",
-      "bytes": 11816,
-      "sha256": "ec4dbbf5a2237a918f47c62779c8e616c340287bfa74b33eadff2908e480ad75"
+      "bytes": 11911,
+      "sha256": "2faf2b95f88997931f7d35ff9456e7f1eb6efe5aadaeb277b859a8177fcf440d"
     },
     {
       "path": "apps/web/assets/app.js",
@@ -315,8 +315,8 @@
     },
     {
       "path": "apps/web/assets/judge-scorecard.html",
-      "bytes": 4311,
-      "sha256": "c4df4644b1e1af4ea62e1ab59301c7306c4993dcb41fb53445c81d5d8d52f5ea"
+      "bytes": 4368,
+      "sha256": "9d17b62af7f1af2c00b857f9f2fd82a887eec542db80c6b06d28660e4df8e77d"
     },
     {
       "path": "apps/web/assets/judge-scorecard.js",
@@ -395,8 +395,8 @@
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/index.html",
-      "bytes": 6388,
-      "sha256": "b782bdca58b28025fd7f175b214fb0b47381648df59764b965997da66f2dc471"
+      "bytes": 6471,
+      "sha256": "4dfedcd145088f50aa2332d9d7e650d7ead7795d948c573758af865c80959305"
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/notification-evidence.json",
@@ -410,8 +410,8 @@
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/redub-manifest.json",
-      "bytes": 5152,
-      "sha256": "29b1195e79d14886fb256ef838110a15efce81e3a9dd57f3070c9121139ca670"
+      "bytes": 5448,
+      "sha256": "c306f8d3d5ec61bcdb3b7dcf7ba1feffdfa2d2eac90e09f91c689ca07a49aae7"
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/safehire-demo-original-submitted.mp4",
@@ -430,8 +430,13 @@
     },
     {
       "path": "apps/web/assets/submission-2026-09-08/safehire-demo.mp4",
-      "bytes": 6353050,
-      "sha256": "e20be55ac2689ed687cebc97b846e8f75d20956de248b7beeb4d1724d5d1b427"
+      "bytes": 5974648,
+      "sha256": "c3dfe850dbdd839f5197e6bd237c638bbfb51a139f4d15895a77080840c289d0"
+    },
+    {
+      "path": "apps/web/assets/submission-2026-09-08/visual-refresh-manifest.json",
+      "bytes": 2330,
+      "sha256": "194964023515159080628c6b0b3b0c13f3533f320e9e31193c18e435da58fd48"
     },
     {
       "path": "apps/web/assets/workspace.css",
@@ -445,43 +450,43 @@
     },
     {
       "path": "apps/web/benchmark.html",
-      "bytes": 6740,
-      "sha256": "2d8ceaa84b1416e1ee8fb1b0e1d2883581dd2f3af53ec9b610442535085ba6e9"
+      "bytes": 6816,
+      "sha256": "58b3bf5af63700b16a1710cc2b7db5e68fc5bf4d2c2ba22db26de43be8f1ca38"
     },
     {
       "path": "apps/web/decision.html",
-      "bytes": 5093,
-      "sha256": "4fcb2b0ce720b9f0ec90d13b50c61a2cb57c90b5a35fd3f627430a94c91eacb8"
+      "bytes": 5150,
+      "sha256": "83dc59122aa1edc83fb8e83a5f09abed07558cfb6a63b1d5343aa65eda5ec167"
     },
     {
       "path": "apps/web/deploy-testnet.html",
-      "bytes": 3298,
-      "sha256": "9c757796bed2beb96a417aecadb36c8f0cfd376bd087ba86fc89cd594ad123d4"
+      "bytes": 3374,
+      "sha256": "5ae2b01e01e5154b93f8dd175244612f592af8dfba478b2faa7ebc72e943f072"
     },
     {
       "path": "apps/web/hire-agent.html",
-      "bytes": 3941,
-      "sha256": "01c27b34d5aa9f0d1ee6f72a6414c4d00762dbbc72978debb2970d56165fc146"
+      "bytes": 4017,
+      "sha256": "622d4f768ae6efa91a4a3f97d46158c05a49e5c21640a2afa4d729a63a6a29b9"
     },
     {
       "path": "apps/web/index.html",
-      "bytes": 13200,
-      "sha256": "6845a00c95420ef39c55036860544d66872cc558385052bbcd33be37373bbc18"
+      "bytes": 13311,
+      "sha256": "bbc7e72bae66133a0028d57a9bdc8341eabdb6207fb8a876860c2ac5787290b7"
     },
     {
       "path": "apps/web/live-hire.html",
-      "bytes": 7908,
-      "sha256": "402c6e9f7900f0264137a41db20a817c367046a563511cf1a3a6ce465f6855d4"
+      "bytes": 7984,
+      "sha256": "629a237bb798193e4f4e223844420f835e56ba8994cfb07f0f73503ed6e74233"
     },
     {
       "path": "apps/web/proof.html",
-      "bytes": 7534,
-      "sha256": "3cd337a9301ebdce61f9d1a34bd3f40a7fda859e74bd3aef386dd6e4593171a6"
+      "bytes": 7610,
+      "sha256": "8a719fbcbd7a2d35052a250b804548dc468a7d4f8cb77aba76aa8350cd1fa2ad"
     },
     {
       "path": "apps/web/workspace.html",
-      "bytes": 9286,
-      "sha256": "f8025e81f323fbca59e76b7c0f14e4cb2342f91e4ca6f96a55b52cffbbcc4ff4"
+      "bytes": 9343,
+      "sha256": "3fcbc939380c2611c377e5fff91d4b5eadf3f2f9c46f1dff46de0a8a7af40a3f"
     },
     {
       "path": "config/agents.json",
@@ -700,8 +705,8 @@
     },
     {
       "path": "docs/ENGLISH_REDESIGN_2026-09-08.zh-CN.md",
-      "bytes": 1994,
-      "sha256": "164f5388239f4cf2333f539729fec8583c52b13e25508b367625ed17bd634ba4"
+      "bytes": 3609,
+      "sha256": "881ad3358fedc06cab77b8239c9da3fb9a13e0ad8a6bd1f8cbf8550e5d51ef82"
     },
     {
       "path": "docs/FINAL_EXECUTION_BOARD_2026-09-06.zh-CN.md",
@@ -875,8 +880,8 @@
     },
     {
       "path": "docs/\u7f16\u8bd1\u8e29\u5751\u8bb0\u5f55.md",
-      "bytes": 1847,
-      "sha256": "df960cc392c1a24ec27a5d92fb030bbbcf1a76133a938ba7192bb38b396cc06b"
+      "bytes": 2833,
+      "sha256": "5f6aae6e9e059d7f767602c1e3adb8c17e305f04193dba6df92e2ba56c108f07"
     },
     {
       "path": "evidence/README.md",
@@ -1435,8 +1440,8 @@
     },
     {
       "path": "scripts/refresh_demo_visuals.cjs",
-      "bytes": 4663,
-      "sha256": "84407304456c85c26d40125eff5843b60042cadd1cb1a56ace9ceecd0b2e0ffd"
+      "bytes": 4808,
+      "sha256": "ad4aae4120493812d5085c4c69f80ac5e14469edb6e676903b0e2d2a4db23717"
     },
     {
       "path": "scripts/refresh_live_agent_catalog.py",
@@ -1885,8 +1890,8 @@
     },
     {
       "path": "submission/submission.json",
-      "bytes": 1911,
-      "sha256": "6e34f00816427c69b6d25c68838c8cbe429681c642c48072df300c721dd1143f"
+      "bytes": 2040,
+      "sha256": "7aac9f89e6d8c70a27f21f2ba651aec8a11814cb09408db6871f1b4dd3d2b696"
     },
     {
       "path": "templates/deployments/bsc-testnet.template.json",

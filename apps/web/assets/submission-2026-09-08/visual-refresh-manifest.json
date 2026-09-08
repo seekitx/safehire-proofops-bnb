@@ -1,0 +1,59 @@
+{
+  "version": "english-design-2026-09-08",
+  "recorded_source_revision": "bbe53379a9914a02f2e33435e8aec74b9c6bee7f",
+  "video_sha256": "c3dfe850dbdd839f5197e6bd237c638bbfb51a139f4d15895a77080840c289d0",
+  "duration_seconds": 138.041333,
+  "audio_unchanged": true,
+  "audio_adts_sha256": "51b564d13056caae04ff8f96ad82d4c2436ed9022073362ab8ace4afe3e38e00",
+  "caption_count": 52,
+  "captions_unchanged": true,
+  "caption_srt_sha256": "88d5fd85a2c6cfec8c7b9a70d91de7115a7b1652eb61b8837dd3e335b70e0e73",
+  "recorded_scenes": [
+    {
+      "scene": "01-market",
+      "url": "https://safehire.eyesonchain.xyz/workspace",
+      "recorded_at": "2026-09-08T13:23:40.222Z",
+      "duration_seconds": 14.24
+    },
+    {
+      "scene": "02-categories",
+      "url": "https://safehire.eyesonchain.xyz/workspace",
+      "recorded_at": "2026-09-08T13:24:01.566Z",
+      "duration_seconds": 17.16
+    },
+    {
+      "scene": "03-quote",
+      "url": "https://safehire.eyesonchain.xyz/hire-live?skill_id=grid_plan&agent_token_id=269224",
+      "recorded_at": "2026-09-08T13:24:25.533Z",
+      "duration_seconds": 19.44
+    },
+    {
+      "scene": "04-paid-order",
+      "url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html#journey",
+      "recorded_at": "2026-09-08T13:24:52.998Z",
+      "duration_seconds": 21
+    },
+    {
+      "scene": "05-result",
+      "url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html#result",
+      "recorded_at": "2026-09-08T13:25:19.807Z",
+      "duration_seconds": 22.28
+    },
+    {
+      "scene": "06-followup",
+      "url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html#followup",
+      "recorded_at": "2026-09-08T13:25:48.203Z",
+      "duration_seconds": 20.68
+    },
+    {
+      "scene": "07-boundaries",
+      "url": "https://safehire.eyesonchain.xyz/assets/submission-2026-09-08/index.html#scope",
+      "recorded_at": "2026-09-08T13:26:14.744Z",
+      "duration_seconds": 23.16
+    }
+  ],
+  "english_visible_text_check": "No Han characters detected in recorded page text and all recorded category states",
+  "wallet_actions": 0,
+  "original_submission_receipt_unchanged": true,
+  "historical_source_evidence": "Original source records and original submitted video are retained without rewriting their original language."
+}
